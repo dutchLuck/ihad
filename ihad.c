@@ -29,14 +29,16 @@
  *  index  hex digit 1 .. hex digit N  ascii char 1 .. ascii char N
  *
  * if there is no ascii printable character corresponding to a byte of input
- * then a full stop is printed.
+ * then a full stop is printed. By default space is not considered printable.
  *
  * e.g.
+ * $ ./ihad tmp.bin
  * 00000000 54686973206973206120737472696e67 This.is.a.string
- * 00000010 206f6620636861726163746572730a74 .of.characters.t
+ * 00000010 206f6620636861726163746572730a   .of.characters.
+ * $
  *
- * Output of the index may be switched off with the -I switch.
- * Output of the ascii may be switched off with the -A switch.
+ * Output of the index (first column) may be switched off with the -I switch.
+ * Output of the ascii (third column) may be switched off with the -A switch.
  *
  * For useage help type the switch -h;
  * e.g.
@@ -46,6 +48,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.3  2016/11/26 13:12:37  owen
+ * Added -f switch to specify number of spaces between byte hex values.
+ *
  * Revision 0.2  2016/11/26 10:44:14  owen
  * Added -s switch to allow spaces as printable chars.
  * changed default format to 3 columns with a single space between columns.
@@ -67,24 +72,26 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.2 2016/11/26 10:44:14 owen Exp $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.3 2016/11/26 13:12:37 owen Exp $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
 #define  DEFAULT_WIDTH 16
 #define  DEFAULT_DECIMAL_WIDTH 10
 #define  MAX_WIDTH 32
-#define  HEX_BYTE_FIELD_WIDTH 2		/* Must be less than 5 but greater than 1 */
+#define  HEX_BYTE_FIELD_WIDTH 2		/* Default is 2 which is no spaces */
 
 int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char *  cmdLnStrngs[] );
 int  processA_SingleCommandLineParameter( char *  nameStrng );
 
 /* Optional Switches: */
 /*  Ascii, decimal, Debug, help, Index, outFile, space, verbosity, width */
-char  optionStr[] = "AdDhIo:sv::w::";
+char  optionStr[] = "AdDhf::Io:sv::w::";
 int  A_Flg;			/* Control Ascii column output */
 int  dFlg;			/* use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg;			/* Control Debug info output */
+int  fFlg, fieldSeparatorWidth;	/* Control hex field separation width */
+char *  fStrng;
 int  hFlg;			/* Control help info output */
 int  I_Flg;			/* Control Index column output */
 int  oFlg;			/* Control output file output */
@@ -101,10 +108,11 @@ char *  wStrng;
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
-  printf( "  where options are '-A -d -D -h -I -o outfileName -s -vX -wX'; -\n" );
+  printf( "  where options are '-A -d -D -fX -h -I -o outfileName -s -vX -wX'; -\n" );
   printf( "   -A .. Ascii output disable\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
+  printf( "   -fX .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
   printf( "   -h .. Print out this help message and exit\n" );
   printf( "   -I .. Index output disable\n" );
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
@@ -130,6 +138,8 @@ int  main( int  argc, char *  argv[] )  {
   A_Flg = 0;			/* Default is Ascii column output */
   dFlg = 0;			/* Default to output hex index rather than decimal index */
   D_Flg = 0;			/* Default to Debug off */
+  fFlg = fieldSeparatorWidth = 0;	/* Default to no spaces between hex bytes */
+  fStrng = ( char * ) NULL;
   hFlg = 0;			/* Default to no help text output */
   I_Flg = 0;			/* Default is Index column output */
   oFlg = 0;			/* Default to output to stdout */
@@ -149,6 +159,7 @@ int  main( int  argc, char *  argv[] )  {
       case 'A' :  A_Flg = 1; break;
       case 'd' :  dFlg = 1; break;
       case 'D' :  D_Flg = 1; break;
+      case 'f' :  fFlg = 1; fStrng = optarg; break;
       case 'h' :  hFlg = 1; break;
       case 'I' :  I_Flg = 1; break;
       case 'o' :  oFlg = 1; oStrng = optarg; break;
@@ -165,8 +176,6 @@ int  main( int  argc, char *  argv[] )  {
 /* Postprocess -D (debug) switch option */
   if( D_Flg )  {
     printf( "Flag for option '-D' is %d\n", D_Flg );
-    printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
-    printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
   }
 
 /* Postprocess -v (verbosityLevel) switch option */
@@ -187,6 +196,31 @@ int  main( int  argc, char *  argv[] )  {
   else  {
     if( D_Flg )  printf( "switch '-v' was not found in the command line options\n" );
   }
+
+  if( D_Flg || ( verbosityLevel > 1 ))  {
+    printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
+    printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
+  }
+
+  
+/* Postprocess -f (fieldSeparatorWidth) switch option */
+  if( D_Flg )  printf( "Flag for option '-f' is %d\n", fFlg );
+  if( fFlg )  {
+    if( fStrng == ( char * ) NULL )  {
+      if( D_Flg )  printf( "String for option '-f' is uninitialised, using default value of 1\n" );
+      fieldSeparatorWidth = 1;
+    }
+    else  {
+      if( D_Flg )  printf( "String for option '-f' is %s\n", fStrng );
+      fieldSeparatorWidth = atoi( fStrng );
+      if( fieldSeparatorWidth > 2 )  fieldSeparatorWidth = 2;
+      else if( fieldSeparatorWidth < 1 )  fieldSeparatorWidth = 1; 
+    }
+    if( D_Flg )  printf( "field separator width is %d\n", fieldSeparatorWidth );
+  }
+  else  {
+    if( D_Flg )  printf( "switch '-f' was not found in the command line options\n" );
+  }
   
 /* Postprocess -w (width) switch option */
   if( D_Flg )  printf( "Flag for option '-w' is %d\n", wFlg );
@@ -199,7 +233,7 @@ int  main( int  argc, char *  argv[] )  {
       if( D_Flg )  printf( "String for option '-w' is %s\n", wStrng );
       byteDisplayWidth = atoi( wStrng );
       if( byteDisplayWidth > MAX_WIDTH )  byteDisplayWidth = MAX_WIDTH;
-      else if( byteDisplayWidth < 1 )  byteDisplayWidth = 1; 
+      else if( byteDisplayWidth < 1 )  byteDisplayWidth = DEFAULT_WIDTH; 
     }
   }
   else  {
@@ -258,50 +292,73 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
   int  byte;
   int  byteCnt = 0;
   unsigned int  byteAddr = 0;
-  char  outputString[ 14+(HEX_BYTE_FIELD_WIDTH + 1)*MAX_WIDTH ];	/* must be big enough for MAX_WIDTH bytes per line */
-  char *  bPtr;	/* byte pointer */					/* output line space > 8+2+3*MAX_WIDTH+1+MAX_WIDTH+1 */
+  char *  outputString;			/* pointer to string to print */
+  int  outputStringSize;		/* must be big enough for MAX_WIDTH bytes per line */
+  char *  bPtr;	/* byte pointer */	/* output line space > 8+2+3*MAX_WIDTH+1+MAX_WIDTH+1 */
   char *  aPtr; /* ascii pointer */
   int  hexFldWdth;
   char  hexFldFrmt[ 11 ];
 
 /* Setup the format for printing the hex bytes */
-  hexFldWdth = HEX_BYTE_FIELD_WIDTH;
+  hexFldWdth = HEX_BYTE_FIELD_WIDTH + fieldSeparatorWidth;
   if( hexFldWdth > ( sizeof( hexFldFrmt ) - 7))  hexFldWdth = ( sizeof( hexFldFrmt ) - 7);
   else if( hexFldWdth < 2 )  hexFldWdth = 2;
   sprintf( hexFldFrmt, "%c02x     ", '%' );
-  bPtr = hexFldFrmt + (2 + hexFldWdth);
+  bPtr = hexFldFrmt + ( 2 + hexFldWdth );
   *bPtr = '\0';
-  if( D_Flg )  {
-    printf( "hexFldWdth is %d and hexFldFrmt is '%s'\n", hexFldWdth, hexFldFrmt ); 
-    printf( "Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
-    printf( "Capacity of output string is %lu characters\n", sizeof( outputString ));
+/* Get a suitably sized buffer to hold the output string */
+  outputStringSize = (( I_Flg ) ? 4 : 14 ) + ( hexFldWdth + (( A_Flg ) ? 0 : 1 )) * byteDisplayWidth;
+  outputString = malloc( outputStringSize );
+  if( outputString == NULL )  {
+    fprintf( stderr, "?? malloc failed\n" );
+    perror( "readByteStreamAndPrintIndexHexAscii()" ); 
   }
-  *outputString = '\0';		/* in-case the stdin or file has 0 length */
-/* Read bytes from stdin or file */
-  while(( byte = fgetc( fp )) != EOF )  {
-    byte &= BYTE_MASK;
-    byteCnt += 1;
- /* Initialize new line if required */
-    if(( byteAddr % byteDisplayWidth ) == 0 )  {
-      bPtr = ( char * ) memset( outputString, 0x20, sizeof( outputString ));
-      if( ! I_Flg )  {
-        sprintf( bPtr, ( dFlg ) ? "%08u " : "%08x ", byteAddr );
-        bPtr += strlen( outputString );
+  else  {
+    if( D_Flg )  {
+      printf( "hexFldWdth is %d and hexFldFrmt is '%s'\n", hexFldWdth, hexFldFrmt ); 
+      printf( "Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
+      printf( "Capacity of output string is %d characters\n", outputStringSize );
+    }
+    *outputString = '\0';		/* in-case the stdin or file has 0 length */
+ /* Read bytes from stdin or file */
+    while(( byte = fgetc( fp )) != EOF )  {
+      byte &= BYTE_MASK;
+      byteCnt += 1;
+   /* Initialize new line if required */
+      if(( byteAddr % byteDisplayWidth ) == 0 )  {
+        bPtr = ( char * ) memset( outputString, 0x20, outputStringSize );
+        if( ! I_Flg )  {
+          sprintf( bPtr, ( dFlg ) ? "%08u " : "%08x ", byteAddr );
+	  if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), " " );
+          bPtr += strlen( outputString );
+        }
+        aPtr = bPtr + hexFldWdth * byteDisplayWidth + 1;
       }
-      aPtr = bPtr + hexFldWdth * byteDisplayWidth + 1;
+   /* Put byte into outputString in hex form */
+      sprintf( bPtr, hexFldFrmt, byte );		/* Print byte as hex number */
+      bPtr += hexFldWdth;
+   /* If Ascii output is required put byte into outputString in char form */
+      if( ! A_Flg )  {
+        if(( byte >= lowestPrintableAsciiChar ) && ( byte <= 0x7e ))	/* Test for printable Ascii */
+          sprintf( aPtr, "%c", byte );		/* Print byte as ascii character */
+        else  sprintf( aPtr, "." );		/* Print a full stop instead of non-printable ascii */
+        aPtr += 1;
+      }
+   /* Output current line if required */
+      if(( ++byteAddr % byteDisplayWidth ) == 0 )  {
+        if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
+        else  {
+          *bPtr = ' ';
+          sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
+        }
+        fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
+        if( D_Flg )
+          printf( "Output string is %lu characters\n", strlen( outputString ));
+        *outputString = '\0';		/* set string back to zero length */
+      }
     }
- /* Put byte into outputString in hex form */
-    sprintf( bPtr, hexFldFrmt, byte );		/* Print byte as hex number */
-    bPtr += hexFldWdth;
- /* If Ascii output is required put byte into outputString in char form */
-    if( ! A_Flg )  {
-      if(( byte >= lowestPrintableAsciiChar ) && ( byte <= 0x7e ))	/* Test for printable Ascii */
-        sprintf( aPtr, "%c", byte );		/* Print byte as ascii character */
-      else  sprintf( aPtr, "." );		/* Print a full stop instead of non-printable ascii */
-      aPtr += 1;
-    }
- /* Output current line if required */
-    if(( ++byteAddr % byteDisplayWidth ) == 0 )  {
+ /* Finish off last line if it is a short line */
+    if( strlen( outputString ) > 0 )  {
       if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
       else  {
         *bPtr = ' ';
@@ -310,19 +367,10 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
       fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
       if( D_Flg )
         printf( "Output string is %lu characters\n", strlen( outputString ));
-      *outputString = '\0';		/* set string back to zero length */
     }
-  }
- /* Finish off last line if it is a short line */
-  if( strlen( outputString ) > 0 )  {
-    if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
-    else  {
-      *bPtr = ' ';
-      sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
+    if( outputString != NULL )  {
+      free( outputString );
     }
-    fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
-    if( D_Flg )
-      printf( "Output string is %lu characters\n", strlen( outputString ));
   }
   return( byteCnt );
 }
