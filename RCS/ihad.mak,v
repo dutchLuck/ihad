@@ -1,0 +1,29 @@
+head	0.0;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+0.0
+date	2016.11.12.12.09.39;	author owen;	state Exp;
+branches;
+next	;
+
+
+desc
+@Make file for ihad.c
+@
+
+
+0.0
+log
+@Initial version.
+@
+text
+@ihad: ihad.o
+	gcc -o $@@ $<
+
+ihad.o: ihad.c
+	gcc -Wall -c $<
+@

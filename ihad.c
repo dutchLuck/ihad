@@ -1,26 +1,44 @@
 /*
- * H A D
+ * I H A D
  *
- * had.c, 0v0, last edited on Wed Nov  9 00:00:27 2016 by OFH.
+ * Index Hex Ascii Dump of a (binary) file or stdin.
+ *
+ * ihad.c, 0v1, last edited on Fri Nov 25 13:54:17 2016 by OFH.
  *
  */
 
 /*
- * Read stdin or a file or files and print lines with the format
- *  index  hex  ascii
- * as a representation of the input or contents of the file(s).
+ * Output a human readable dump of input (bytes) from either stdin or file(s).
  *
+ * i.e. read input stream and output lines with the format
+ *  index  hex digit 1 .. hex digit N  ascii char 1 .. ascii char N
+ *
+ * if there is no ascii printable character corresponding to a byte of input
+ * then a full stop is printed.
+ *
+ * e.g.
+ * 00000000  54 68 69 73 20 69 73 20 61 20 73 74 72 69 6e 67  This is a string
+ * 00000010  20 6f 66 20 63 68 61 72 61 63 74 65 72 73 0a 74   of characters.t
+ *
+ * Output of the index may be switched off with the -I switch.
+ * Output of the ascii may be switched off with the -A switch.
+ *
+ * For useage help type the switch -h;
+ * e.g.
+ *  ./ihad -h
+ * 
  */
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.1  2016/11/25 02:54:28  owen
+ * Added functionality to write output to a file with the -o switch
+ *
  * Revision 0.0  2016/11/12 12:05:18  owen
  * Outputs dump to stdout with adjustable width & index & ascii
  * can be suppressed. Doesn't implement all defined switches yet.
  *
- *
- * Revision 0.0  2015/10/20 01:04:17  owen
- * Original Code from scratch.
+ * ihad.c code developed from writeSimpleTemplateCode.c version 0.0.
  *
  *
  */
@@ -30,7 +48,7 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.0 2016/11/12 12:05:18 owen Exp $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.1 2016/11/25 02:54:28 owen Exp $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -41,14 +59,15 @@
 int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char *  cmdLnStrngs[] );
 int  processA_SingleCommandLineParameter( char *  nameStrng );
 
-char  optionStr[] = "AdDf:hIv::w::";	/* Ascii, decimal, Debug, file, help, Index, verbosity options, width */
+char  optionStr[] = "AdDhIo:v::w::";	/* Ascii, decimal, Debug, help, Index, outFile, verbosity, width */
 int  A_Flg;			/* Control Ascii column output */
 int  dFlg;			/* use decimal index and a default hex width of 10 */
 int  D_Flg;			/* Control Debug info output */
-int  fFlg;
-char *  fStrng;
 int  hFlg;
 int  I_Flg;			/* Control Index column output */
+int  oFlg;
+char *  oStrng;
+FILE * ofp;			/* Output file pointer */
 int  vFlg, verbosityLevel;
 char *  vStrng;
 int  wFlg, byteDisplayWidth;
@@ -57,17 +76,18 @@ char *  wStrng;
 
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
-  printf( "%s -A -d -D -f fileName -h -I -vX -wX inputFile1 inputFile2 .. inputFileN\n", programName );
+  printf( "%s -A -d -D -h -I -o outfileName -vX -wX [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
   printf( "  where; -\n" );
   printf( "   -A .. Ascii output disable\n" );
   printf( "   -d .. Decimal index output enable\n" );
   printf( "   -D .. Debug output enable\n" );
-  printf( "   -f fileName .. Specify a file\n" );
   printf( "   -h .. Print out this help message\n" );
   printf( "   -I .. Index output disable\n" );
+  printf( "   -o outfileName .. Specify a output file instead of output going to stdout\n" );
   printf( "   -vX .. Set verbosity level to X (where 0 < X < 4)\n" );
   printf( "   -wX .. Set bytes per line to X (where 0 < X <= %d)\n", MAX_WIDTH );
-  printf( "   inputFile1 inputFile2 .. inputFileN  file name(s) of files to dump \n\n" );
+  printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  optional file name(s) of file(s) to dump in hex & ascii\n" );
+  printf( "    Note that if no input file is specified then input is taken from stdin.\n\n" );
 }
 
 
@@ -79,12 +99,14 @@ int  main( int  argc, char *  argv[] )  {
   opterr = 0;	/* Suppress error messages from getopt() to stderr */
 
 /* Preset command line options */
-  A_Flg = 0;
+  A_Flg = 0;			/* Default is Ascii column output */
   dFlg = 0;
   D_Flg = 0;
-  fFlg = 0;
-  fStrng = ( char * ) NULL;
   hFlg = 0;
+  I_Flg = 0;			/* Default is Index column output */
+  oFlg = 0;
+  oStrng = ( char * ) NULL;
+  ofp = stdout;			/* Output file pointer defaults to stdout */
   vFlg = verbosityLevel = 0; 
   vStrng = ( char * ) NULL;
   wFlg = 0;
@@ -97,9 +119,9 @@ int  main( int  argc, char *  argv[] )  {
       case 'A' :  A_Flg = 1; break;
       case 'd' :  dFlg = 1; break;
       case 'D' :  D_Flg = 1; break;
-      case 'f' :  fFlg = 1; fStrng = optarg; break;
       case 'h' :  hFlg = 1; break;
       case 'I' :  I_Flg = 1; break;
+      case 'o' :  oFlg = 1; oStrng = optarg; break;
       case 'v' :  vFlg = 1; vStrng = optarg; break;
       case 'w' :  wFlg = 1; wStrng = optarg; break;
       default :
@@ -155,19 +177,28 @@ int  main( int  argc, char *  argv[] )  {
   }
   if( D_Flg )  printf( "byte Display Width is %d\n", byteDisplayWidth );
   
-/* Postprocess -f switch option */
-  if( fFlg )  {
-    if( D_Flg )  printf( "Flag for option '-f' is %d\n", fFlg );
-    if( fStrng == ( char * ) NULL )  {
-      printf( "?? String for option '-f fileName' is uninitialised\n" );
-      fFlg = 0;
+/* Postprocess -o switch option */
+  if( oFlg )  {
+    if( D_Flg )  printf( "Flag for option '-o' is %d\n", oFlg );
+    if( oStrng == ( char * ) NULL )  {
+      printf( "?? String for option '-o outfileName' is uninitialised\n" );
+      oFlg = 0;
+      ofp = stdout;
+      fprintf( stderr, "Defaulting to writing output to stdout\n" );
     }
     else  {
-      if( D_Flg )  printf( "String part of option '-f' is '%s'\n", fStrng );
+      if( D_Flg )  printf( "String part of option '-o' is '%s'\n", oStrng );
+      result = (( ofp = fopen( oStrng, "w" ) ) != NULL );
+      if( ! result )  {
+        printf( "?? Unable to open a file named '%s' for writing output\n", oStrng );
+        perror( "processA_SingleCommandLineParameter" );
+	ofp = stdout;
+	fprintf( stderr, "Defaulting to writing output to stdout\n" );
+      }
     }
   }
   else  {
-    if( D_Flg )  printf( "switch '-f fileName' was not found in the command line options\n" );
+    if( D_Flg )  printf( "switch '-o outfileName' was not found in the command line options\n" );
   }
 
 /* Postprocess -h switch option */
@@ -231,7 +262,7 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
         *bPtr = ' ';
         sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
       }
-      printf( "%s", outputString );	/* print line to stdout */
+      fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
       *outputString = '\0';		/* set string back to zero length */
     }
   }
@@ -244,7 +275,7 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
       *bPtr = ' ';
       sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
     }
-    printf( "%s", outputString );	/* print line to stdout */
+    fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
   }
   return( byteCnt );
 }
