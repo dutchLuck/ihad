@@ -5,6 +5,21 @@
  *
  * ihad.c, 0v1, last edited on Fri Nov 25 13:54:17 2016 by OFH.
  *
+ * This is not production code! It is a toy, PLEASE do not use it
+ * for anything serious! Instead use; -
+ *  hexdump -C yourFile
+ *  xxd yourFile
+ *  od -A x -t x1z -v yourFile
+ * OR
+ *  http://www.fileformat.info/tool/hexdump.htm 
+ *
+ * In addition, PLEASE do not look at the source code as an example
+ * of how to code!
+ * This code exists for my amusement & my education, but you are
+ * free to make use of it for any trivial purpose.
+ * It provides marginally cleaner output (i.e. just spaces as
+ * column / field delimiters) than do the command line
+ * utilities listed above.
  */
 
 /*
@@ -17,8 +32,8 @@
  * then a full stop is printed.
  *
  * e.g.
- * 00000000  54 68 69 73 20 69 73 20 61 20 73 74 72 69 6e 67  This is a string
- * 00000010  20 6f 66 20 63 68 61 72 61 63 74 65 72 73 0a 74   of characters.t
+ * 00000000 54686973206973206120737472696e67 This.is.a.string
+ * 00000010 206f6620636861726163746572730a74 .of.characters.t
  *
  * Output of the index may be switched off with the -I switch.
  * Output of the ascii may be switched off with the -A switch.
@@ -31,6 +46,10 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.2  2016/11/26 10:44:14  owen
+ * Added -s switch to allow spaces as printable chars.
+ * changed default format to 3 columns with a single space between columns.
+ *
  * Revision 0.1  2016/11/25 02:54:28  owen
  * Added functionality to write output to a file with the -o switch
  *
@@ -44,50 +63,59 @@
  */
 
 #include <stdio.h>	/* printf() fopen() perror() fgetc() fclose() fprintf() */
-#include <stdlib.h>	/* atoi() */
+#include <stdlib.h>	/* atoi() malloc() free() */
 #include <unistd.h>	/* getopt() */
-#include <string.h>	/* memset() */
+#include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.1 2016/11/25 02:54:28 owen Exp $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.2 2016/11/26 10:44:14 owen Exp $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
 #define  DEFAULT_WIDTH 16
 #define  DEFAULT_DECIMAL_WIDTH 10
-#define  MAX_WIDTH 64
+#define  MAX_WIDTH 32
+#define  HEX_BYTE_FIELD_WIDTH 2		/* Must be less than 5 but greater than 1 */
 
 int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char *  cmdLnStrngs[] );
 int  processA_SingleCommandLineParameter( char *  nameStrng );
 
-char  optionStr[] = "AdDhIo:v::w::";	/* Ascii, decimal, Debug, help, Index, outFile, verbosity, width */
+/* Optional Switches: */
+/*  Ascii, decimal, Debug, help, Index, outFile, space, verbosity, width */
+char  optionStr[] = "AdDhIo:sv::w::";
 int  A_Flg;			/* Control Ascii column output */
-int  dFlg;			/* use decimal index and a default hex width of 10 */
+int  dFlg;			/* use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg;			/* Control Debug info output */
-int  hFlg;
+int  hFlg;			/* Control help info output */
 int  I_Flg;			/* Control Index column output */
-int  oFlg;
-char *  oStrng;
-FILE * ofp;			/* Output file pointer */
-int  vFlg, verbosityLevel;
+int  oFlg;			/* Control output file output */
+char *  oStrng;			/* output file name */
+FILE * ofp;			/* output file pointer */
+int  sFlg;			/* Control output of space in ascii column */
+char  lowestPrintableAsciiChar;
+int  vFlg, verbosityLevel;	/* Control verbosity level */
 char *  vStrng;
-int  wFlg, byteDisplayWidth;
+int  wFlg, byteDisplayWidth;	/* Control number of bytes dealt with per line */
 char *  wStrng;
 
 
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
-  printf( "%s -A -d -D -h -I -o outfileName -vX -wX [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
-  printf( "  where; -\n" );
+  printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
+  printf( "  where options are '-A -d -D -h -I -o outfileName -s -vX -wX'; -\n" );
   printf( "   -A .. Ascii output disable\n" );
-  printf( "   -d .. Decimal index output enable\n" );
+  printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
-  printf( "   -h .. Print out this help message\n" );
+  printf( "   -h .. Print out this help message and exit\n" );
   printf( "   -I .. Index output disable\n" );
-  printf( "   -o outfileName .. Specify a output file instead of output going to stdout\n" );
+  printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
+  printf( "   -s .. classify space char as printable in Ascii output\n" );
   printf( "   -vX .. Set verbosity level to X (where 0 < X < 4)\n" );
-  printf( "   -wX .. Set bytes per line to X (where 0 < X <= %d)\n", MAX_WIDTH );
-  printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  optional file name(s) of file(s) to dump in hex & ascii\n" );
-  printf( "    Note that if no input file is specified then input is taken from stdin.\n\n" );
+  printf( "   -wX .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
+  printf( "  where; -\n" );
+  printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
+  printf( "    of file(s) to dump in hex & ascii\n" );
+  printf( "   Note that if no input file is specified then input is taken from stdin.\n\n" );
+  printf( "Note that if ihad output isn't acceptable you can try; -\nxxd\nhexdump -C\nod -A x -t x1z -v\n\n" );
 }
 
 
@@ -100,16 +128,18 @@ int  main( int  argc, char *  argv[] )  {
 
 /* Preset command line options */
   A_Flg = 0;			/* Default is Ascii column output */
-  dFlg = 0;
-  D_Flg = 0;
-  hFlg = 0;
+  dFlg = 0;			/* Default to output hex index rather than decimal index */
+  D_Flg = 0;			/* Default to Debug off */
+  hFlg = 0;			/* Default to no help text output */
   I_Flg = 0;			/* Default is Index column output */
-  oFlg = 0;
+  oFlg = 0;			/* Default to output to stdout */
   oStrng = ( char * ) NULL;
   ofp = stdout;			/* Output file pointer defaults to stdout */
-  vFlg = verbosityLevel = 0; 
+  sFlg = 0;			/* Default to replacing space with a '.' in ascii column */
+  lowestPrintableAsciiChar = '!';	/* '!' is next to space */
+  vFlg = verbosityLevel = 0;	/* Default to no verbose output */
   vStrng = ( char * ) NULL;
-  wFlg = 0;
+  wFlg = 0;			/* Default to DEFAULT_WIDTH bytes per line */
   byteDisplayWidth = DEFAULT_WIDTH;
   wStrng = ( char * ) NULL;
 
@@ -122,11 +152,12 @@ int  main( int  argc, char *  argv[] )  {
       case 'h' :  hFlg = 1; break;
       case 'I' :  I_Flg = 1; break;
       case 'o' :  oFlg = 1; oStrng = optarg; break;
+      case 's' :  sFlg = 1; lowestPrintableAsciiChar = ' '; break;
       case 'v' :  vFlg = 1; vStrng = optarg; break;
       case 'w' :  wFlg = 1; wStrng = optarg; break;
       default :
-        printf( "?? command line option -%c is unrecognised or incomplete and has been ignored\n", optopt );
-        printf( " for command line option help run '%s -h'\n", argv[0] );
+        printf( "?? command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
+        printf( " for help on command line options run '%s -h'\n", argv[0] );
         break;
     }
   }
@@ -205,6 +236,7 @@ int  main( int  argc, char *  argv[] )  {
   if( hFlg )  {
     if( D_Flg )  printf( "Flag for option '-h' is %d\n", hFlg );
     printOutHelpMessage( argv[0] );
+    return 1;
   }
   else  {
     if( D_Flg )  printf( "switch '-h' was not found in the command line options\n" );
@@ -225,13 +257,27 @@ int  main( int  argc, char *  argv[] )  {
 int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
   int  byte;
   int  byteCnt = 0;
-  int  byteAddr = 0;
-  char  outputString[ 512 ];
-  char *  bPtr;
-  char *  aPtr;
+  unsigned int  byteAddr = 0;
+  char  outputString[ 14+(HEX_BYTE_FIELD_WIDTH + 1)*MAX_WIDTH ];	/* must be big enough for MAX_WIDTH bytes per line */
+  char *  bPtr;	/* byte pointer */					/* output line space > 8+2+3*MAX_WIDTH+1+MAX_WIDTH+1 */
+  char *  aPtr; /* ascii pointer */
+  int  hexFldWdth;
+  char  hexFldFrmt[ 11 ];
 
+/* Setup the format for printing the hex bytes */
+  hexFldWdth = HEX_BYTE_FIELD_WIDTH;
+  if( hexFldWdth > ( sizeof( hexFldFrmt ) - 7))  hexFldWdth = ( sizeof( hexFldFrmt ) - 7);
+  else if( hexFldWdth < 2 )  hexFldWdth = 2;
+  sprintf( hexFldFrmt, "%c02x     ", '%' );
+  bPtr = hexFldFrmt + (2 + hexFldWdth);
+  *bPtr = '\0';
+  if( D_Flg )  {
+    printf( "hexFldWdth is %d and hexFldFrmt is '%s'\n", hexFldWdth, hexFldFrmt ); 
+    printf( "Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
+    printf( "Capacity of output string is %lu characters\n", sizeof( outputString ));
+  }
   *outputString = '\0';		/* in-case the stdin or file has 0 length */
-/* Read info from stdin or file */
+/* Read bytes from stdin or file */
   while(( byte = fgetc( fp )) != EOF )  {
     byte &= BYTE_MASK;
     byteCnt += 1;
@@ -239,43 +285,44 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
     if(( byteAddr % byteDisplayWidth ) == 0 )  {
       bPtr = ( char * ) memset( outputString, 0x20, sizeof( outputString ));
       if( ! I_Flg )  {
-        sprintf( bPtr, ( dFlg ) ? "%08d  " : "%08x  ", byteAddr );
+        sprintf( bPtr, ( dFlg ) ? "%08u " : "%08x ", byteAddr );
         bPtr += strlen( outputString );
       }
-      aPtr = bPtr + 3 * byteDisplayWidth + 1;
+      aPtr = bPtr + hexFldWdth * byteDisplayWidth + 1;
     }
-    sprintf( bPtr, "%02x ", byte );
-    bPtr += 3;
+ /* Put byte into outputString in hex form */
+    sprintf( bPtr, hexFldFrmt, byte );		/* Print byte as hex number */
+    bPtr += hexFldWdth;
+ /* If Ascii output is required put byte into outputString in char form */
     if( ! A_Flg )  {
-      if(( byte >= 0x20 ) && ( byte <= 0x7e ))  {
-        sprintf( aPtr, "%c", byte );
-      }
-      else  sprintf( aPtr, "." );
+      if(( byte >= lowestPrintableAsciiChar ) && ( byte <= 0x7e ))	/* Test for printable Ascii */
+        sprintf( aPtr, "%c", byte );		/* Print byte as ascii character */
+      else  sprintf( aPtr, "." );		/* Print a full stop instead of non-printable ascii */
       aPtr += 1;
     }
  /* Output current line if required */
     if(( ++byteAddr % byteDisplayWidth ) == 0 )  {
-      if( A_Flg )  {
-        sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
-      }
+      if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
       else  {
         *bPtr = ' ';
         sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
       }
       fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
+      if( D_Flg )
+        printf( "Output string is %lu characters\n", strlen( outputString ));
       *outputString = '\0';		/* set string back to zero length */
     }
   }
  /* Finish off last line if it is a short line */
   if( strlen( outputString ) > 0 )  {
-    if( A_Flg )  {
-      sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
-    }
+    if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
     else  {
       *bPtr = ' ';
       sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
     }
     fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
+    if( D_Flg )
+      printf( "Output string is %lu characters\n", strlen( outputString ));
   }
   return( byteCnt );
 }
@@ -291,14 +338,14 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
   result = (( fp = fopen( nameStrng, "r" ) ) != NULL );
   if( ! result )  {
     printf( "?? Unable to open a file named '%s' for reading\n", nameStrng );
-    perror( "processA_SingleCommandLineParameter" );
+    perror( "processA_SingleCommandLineParameter()" );
   }
   else  {
     byteCnt = readByteStreamAndPrintIndexHexAscii( fp );
     result = ( fclose( fp ) == 0 );
     if( ! result )  {
       printf( "?? Unable to close the file named '%s'\n", nameStrng );
-      perror( "processA_SingleCommandLineParameter" );
+      perror( "processA_SingleCommandLineParameter()" );
     }
     if( D_Flg || vFlg )  printf( "File %s is %d bytes\n", nameStrng, byteCnt );
   }
