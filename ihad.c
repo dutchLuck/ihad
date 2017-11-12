@@ -3,20 +3,12 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c, 0v1, last edited on Fri Nov 25 13:54:17 2016 by OFH.
- *
- * This is not production code! It is a toy, PLEASE do not use it
- * for anything serious! Instead use; -
  *  hexdump -C yourFile
  *  xxd yourFile
  *  od -A x -t x1z -v yourFile
  * OR
  *  http://www.fileformat.info/tool/hexdump.htm 
  *
- * In addition, PLEASE do not look at the source code as an example
- * of how to code!
- * This code exists for my amusement & my education, but you are
- * free to make use of it for any trivial purpose.
  * It provides marginally cleaner output (i.e. just spaces as
  * column / field delimiters) than do the command line
  * utilities listed above.
@@ -61,8 +53,6 @@
  * Revision 0.0  2016/11/12 12:05:18  owen
  * Outputs dump to stdout with adjustable width & index & ascii
  * can be suppressed. Doesn't implement all defined switches yet.
- *
- * ihad.c code developed from writeSimpleTemplateCode.c version 0.0.
  *
  *
  */
