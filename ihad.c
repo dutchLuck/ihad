@@ -3,11 +3,10 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c, 0v4, last edited on Sun Nov 12 12:25:17 2017 by OFH.
+ * ihad.c, 0v1, last edited on Fri Nov 25 13:54:17 2016 by OFH.
  *
- * This is not production code! Consider it only slightly tested.
- * PLEASE do not use it for anything serious! Instead use; -
- *
+ * This is not production code! It is a toy, PLEASE do not use it
+ * for anything serious! Instead use; -
  *  hexdump -C yourFile
  *  xxd yourFile
  *  od -A x -t x1z -v yourFile
@@ -15,12 +14,9 @@
  *  http://www.fileformat.info/tool/hexdump.htm 
  *
  * In addition, PLEASE do not look at the source code as an example
- * of how to code! or how not to code!
- *
- * ihad was written for my own education.
- *
- * This code is released under the MIT license
- *
+ * of how to code!
+ * This code exists for my amusement & my education, but you are
+ * free to make use of it for any trivial purpose.
  * It provides marginally cleaner output (i.e. just spaces as
  * column / field delimiters) than do the command line
  * utilities listed above.
@@ -76,7 +72,7 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.3 2016/11/26 13:12:37 owen Exp $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.3 2016/11/26 13:12:37 owen Exp dutchLuck $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
