@@ -3,11 +3,21 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
+ * This is not production code! Consider it only slightly tested.
+ * PLEASE do not use it for anything serious! Instead use; -
+ *
  *  hexdump -C yourFile
  *  xxd yourFile
  *  od -A x -t x1z -v yourFile
  * OR
  *  http://www.fileformat.info/tool/hexdump.htm 
+ *
+ * In addition, PLEASE do not look at the source code as an example
+ * of how to code! or how not to code!
+ *
+ * ihad was written for my own education.
+ *
+ * This code is released under the MIT license
  *
  * It provides marginally cleaner output (i.e. just spaces as
  * column / field delimiters) than do the command line
@@ -40,6 +50,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.4  2017/11/12 08:32:59  dutchLuck
+ * Added the MIT license stipulation into the comments in the top of the file.
+ *
  * Revision 0.3  2016/11/26 13:12:37  owen
  * Added -f switch to specify number of spaces between byte hex values.
  *
@@ -54,6 +67,8 @@
  * Outputs dump to stdout with adjustable width & index & ascii
  * can be suppressed. Doesn't implement all defined switches yet.
  *
+ * ihad.c code developed from writeSimpleTemplateCode.c version 0.0.
+ *
  *
  */
 
@@ -62,7 +77,7 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.3 2016/11/26 13:12:37 owen Exp dutchLuck $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.4 2017/11/12 08:32:59 dutchLuck Exp $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -76,7 +91,7 @@ int  processA_SingleCommandLineParameter( char *  nameStrng );
 
 /* Optional Switches: */
 /*  Ascii, decimal, Debug, help, Index, outFile, space, verbosity, width */
-char  optionStr[] = "AdDhf::Io:sv::w::";
+char  optionStr[] = "AdDhf:Io:sv:w:";
 int  A_Flg;			/* Control Ascii column output */
 int  dFlg;			/* use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg;			/* Control Debug info output */
@@ -98,17 +113,17 @@ char *  wStrng;
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
-  printf( "  where options are '-A -d -D -fX -h -I -o outfileName -s -vX -wX'; -\n" );
+  printf( "  where options are '-A -d -D -f X -h -I -o outfileName -s -v X -w X'; -\n" );
   printf( "   -A .. Ascii output disable\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
-  printf( "   -fX .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
+  printf( "   -f X .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
   printf( "   -h .. Print out this help message and exit\n" );
   printf( "   -I .. Index output disable\n" );
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. classify space char as printable in Ascii output\n" );
-  printf( "   -vX .. Set verbosity level to X (where 0 < X < 4)\n" );
-  printf( "   -wX .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
+  printf( "   -v X .. Set verbosity level to X (where 0 < X < 4)\n" );
+  printf( "   -w X .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
   printf( "  where; -\n" );
   printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
   printf( "    of file(s) to dump in hex & ascii\n" );
@@ -157,7 +172,7 @@ int  main( int  argc, char *  argv[] )  {
       case 'v' :  vFlg = 1; vStrng = optarg; break;
       case 'w' :  wFlg = 1; wStrng = optarg; break;
       default :
-        printf( "?? command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
+        fprintf( stderr, "\n?? command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
         printf( " for help on command line options run '%s -h'\n", argv[0] );
         break;
     }
@@ -221,7 +236,16 @@ int  main( int  argc, char *  argv[] )  {
     }
     else  {
       if( D_Flg )  printf( "String for option '-w' is %s\n", wStrng );
+   /* Convert width specification to integer */
       byteDisplayWidth = atoi( wStrng );
+      if( D_Flg )  printf( "The '%s' string for option '-w' was converted to %d\n", wStrng, byteDisplayWidth );
+   /* Rough check on atoi() output - was it a valid convertion */
+      if(( byteDisplayWidth == 0 ) &&
+          ( ! (( *wStrng == '0' ) || (( wStrng[ 1 ] == '0') && (( *wStrng == '+' ) || (*wStrng == '-' ))))))  {
+        fprintf( stderr, "\n?? Unable to convert '%s' to integer for option '-w'\n", wStrng );
+        printOutHelpMessage( argv[0] );
+        return 1;
+      }
       if( byteDisplayWidth > MAX_WIDTH )  byteDisplayWidth = MAX_WIDTH;
       else if( byteDisplayWidth < 1 )  byteDisplayWidth = DEFAULT_WIDTH; 
     }
@@ -373,12 +397,14 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
   if( D_Flg || ( verbosityLevel > 1 ))  {
     printf( "Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
   }
-  result = (( fp = fopen( nameStrng, "r" ) ) != NULL );
+/* Open the file for reading (in binary mode) */
+  result = (( fp = fopen( nameStrng, "rb" ) ) != NULL );
   if( ! result )  {
     printf( "?? Unable to open a file named '%s' for reading\n", nameStrng );
     perror( "processA_SingleCommandLineParameter()" );
   }
   else  {
+ /* Process the file just opened */
     byteCnt = readByteStreamAndPrintIndexHexAscii( fp );
     result = ( fclose( fp ) == 0 );
     if( ! result )  {
@@ -404,14 +430,15 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
     }
   }
   if(( lstIndx + 1 ) == frstIndx )  {
+/* There are no files specified in the command line so process stdin */
     chrCnt = readByteStreamAndPrintIndexHexAscii( stdin );
     if( D_Flg || vFlg )  printf( "Processed %d chars from stdin\n", chrCnt );
   }
   else  {
+/* Process each file specified in the command line */
     for( indx = frstIndx; indx <= lstIndx; indx++ )  {
       result = processA_SingleCommandLineParameter( cmdLnStrngs[ indx ] );
     }
   }
   return( result );
 }
-

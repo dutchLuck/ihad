@@ -1,0 +1,11 @@
+echo "+++++++++++ ihad Zero Length File check +++++++++++++++"
+../ihad test00.dat
+echo "+++++++++++ ihad 1 byte Length File check +++++++++++++++"
+../ihad test01.dat
+echo "+++++++++++ ihad -d 9 byte Length File check +++++++++++++++"
+../ihad -d test09.dat
+echo "+++++++++++ ihad -d 10 byte Length File check +++++++++++++++"
+../ihad -d test10.dat
+echo "+++++++++++ ihad -d 11 byte Length File check +++++++++++++++"
+../ihad -d test11.dat
+
