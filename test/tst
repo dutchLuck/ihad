@@ -8,4 +8,6 @@ echo "+++++++++++ ihad -d 10 byte Length File check +++++++++++++++"
 ../ihad -d test10.dat
 echo "+++++++++++ ihad -d 11 byte Length File check +++++++++++++++"
 ../ihad -d test11.dat
+echo "+++++++++++ ihad -d 52 byte Length File check +++++++++++++++"
+../ihad -d test52.dat
 
