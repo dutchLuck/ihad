@@ -2,13 +2,12 @@
 +++++++++++ ihad 1 byte Length File check +++++++++++++++
 00000000 55                               U
 +++++++++++ ihad 15 byte Length File check +++++++++++++++
-00000000 6162636465666768696a6b6c6d6e6f0a abcdefghijklmno.
+00000000 6162636465666768696a6b6c6d6e6f   abcdefghijklmno
 +++++++++++ ihad 16 byte Length File check +++++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-00000010 0a                               .
 +++++++++++ ihad 17 byte Length File check +++++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-00000010 710a                             q.
+00000010 71                               q
 +++++++++++ ihad 52 byte Length File check +++++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
