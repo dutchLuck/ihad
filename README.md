@@ -18,8 +18,12 @@ PLEASE do not use it for anything serious! Instead use; -
 
 
 hexdump -C yourFile
+
 xxd yourFile
+
 od -A x -t x1z -v yourFile
+
 OR
+
 http://www.fileformat.info/tool/hexdump.htm 
 
