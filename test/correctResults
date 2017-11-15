@@ -1,3 +1,36 @@
++++++++++++ ihad Zero Length File check +++++++++++++++
++++++++++++ ihad 1 byte Length File check +++++++++++++++
+00000000 55                               U
++++++++++++ ihad 15 byte Length File check +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f0a abcdefghijklmno.
++++++++++++ ihad 16 byte Length File check +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 0a                               .
++++++++++++ ihad 17 byte Length File check +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 710a                             q.
++++++++++++ ihad 52 byte Length File check +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
++++++++++++ ihad 256 byte Length File check +++++++++++++++
+00000000 000102030405060708090a0b0c0d0e0f ................
+00000010 101112131415161718191a1b1c1d1e1f ................
+00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
+00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
+00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
+00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~.
+00000080 808182838485868788898a8b8c8d8e8f ................
+00000090 909192939495969798999a9b9c9d9e9f ................
+000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ................
+000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ................
+000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ................
+000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
+000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
+000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
 +++++++++++ ihad -d Zero Length File check +++++++++++++++
 +++++++++++ ihad -d 1 byte Length File check +++++++++++++++
 00000000 55                   U
@@ -42,24 +75,84 @@
 00000230 e6e7e8e9eaebecedeeef ..........
 00000240 f0f1f2f3f4f5f6f7f8f9 ..........
 00000250 fafbfcfdfeff         ......
-+++++++++++ ihad Zero Length File check +++++++++++++++
-+++++++++++ ihad 1 byte Length File check +++++++++++++++
-00000000 55                               U
-+++++++++++ ihad 9 byte Length File check +++++++++++++++
-00000000 616263646566676869               abcdefghi
-+++++++++++ ihad 10 byte Length File check +++++++++++++++
-00000000 6162636465666768696a             abcdefghij
-+++++++++++ ihad 11 byte Length File check +++++++++++++++
-00000000 6162636465666768696a6b           abcdefghijk
-+++++++++++ ihad 52 byte Length File check +++++++++++++++
-00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
-00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
-00000030 5758595a                         WXYZ
-+++++++++++ ihad 256 byte Length File check +++++++++++++++
++++++++++++ ihad -w1 Zero Length File check +++++++++++++++
++++++++++++ ihad -w1 1 byte Length File check +++++++++++++++
+00000000 55 U
++++++++++++ ihad -w2 9 byte Length File check +++++++++++++++
+00000000 6162 ab
+00000002 6364 cd
+00000004 6566 ef
+00000006 6768 gh
+00000008 69   i
++++++++++++ ihad -w2 10 byte Length File check +++++++++++++++
+00000000 6162 ab
+00000002 6364 cd
+00000004 6566 ef
+00000006 6768 gh
+00000008 696a ij
++++++++++++ ihad -w3 11 byte Length File check +++++++++++++++
+00000000 616263 abc
+00000003 646566 def
+00000006 676869 ghi
+00000009 6a6b   jk
++++++++++++ ihad -w24 52 byte Length File check +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f707172737475767778 abcdefghijklmnopqrstuvwx
+00000018 797a4142434445464748494a4b4c4d4e4f50515253545556 yzABCDEFGHIJKLMNOPQRSTUV
+00000030 5758595a                                         WXYZ
++++++++++++ ihad -w32 256 byte Length File check +++++++++++++++
+00000000 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f ................................
+00000020 202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f .!"#$%&'()*+,-./0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f `abcdefghijklmnopqrstuvwxyz{|}~.
+00000080 808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f ................................
+000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf ................................
+000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................................
+000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................................
++++++++++++ ihad -I -A 256 byte Length File check +++++++++++++++
+000102030405060708090a0b0c0d0e0f
+101112131415161718191a1b1c1d1e1f
+202122232425262728292a2b2c2d2e2f
+303132333435363738393a3b3c3d3e3f
+404142434445464748494a4b4c4d4e4f
+505152535455565758595a5b5c5d5e5f
+606162636465666768696a6b6c6d6e6f
+707172737475767778797a7b7c7d7e7f
+808182838485868788898a8b8c8d8e8f
+909192939495969798999a9b9c9d9e9f
+a0a1a2a3a4a5a6a7a8a9aaabacadaeaf
+b0b1b2b3b4b5b6b7b8b9babbbcbdbebf
+c0c1c2c3c4c5c6c7c8c9cacbcccdcecf
+d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+e0e1e2e3e4e5e6e7e8e9eaebecedeeef
+f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
++++++++++++ ihad -I 52 byte Length File check +++++++++++++++
+6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+7172737475767778797a414243444546 qrstuvwxyzABCDEF
+4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+5758595a                         WXYZ
++++++++++++ ihad -A 52 byte Length File check +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70
+00000010 7172737475767778797a414243444546
+00000020 4748494a4b4c4d4e4f50515253545556
+00000030 5758595a
++++++++++++ ihad -f1 52 byte Length File check +++++++++++++++
+00000000  61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f 70  abcdefghijklmnop
+00000010  71 72 73 74 75 76 77 78 79 7a 41 42 43 44 45 46  qrstuvwxyzABCDEF
+00000020  47 48 49 4a 4b 4c 4d 4e 4f 50 51 52 53 54 55 56  GHIJKLMNOPQRSTUV
+00000030  57 58 59 5a                                      WXYZ
++++++++++++ ihad -w7 -f2 52 byte Length File check +++++++++++++++
+00000000  61  62  63  64  65  66  67   abcdefg
+00000007  68  69  6a  6b  6c  6d  6e   hijklmn
+0000000e  6f  70  71  72  73  74  75   opqrstu
+00000015  76  77  78  79  7a  41  42   vwxyzAB
+0000001c  43  44  45  46  47  48  49   CDEFGHI
+00000023  4a  4b  4c  4d  4e  4f  50   JKLMNOP
+0000002a  51  52  53  54  55  56  57   QRSTUVW
+00000031  58  59  5a                   XYZ
++++++++++++ ihad -s 256 byte Length File check +++++++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
-00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
+00000020 202122232425262728292a2b2c2d2e2f  !"#$%&'()*+,-./
 00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
 00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
 00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
@@ -73,3 +166,40 @@
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
++++++++++++ ihad -h                            +++++++++++++++
+
+Useage:
+../ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
+  where options are '-A -d -D -f X -h -I -o outfileName -s -v X -w X'; -
+   -A .. Ascii output disable
+   -d .. Decimal index output enable & default to 10 bytes per line
+   -D .. Debug output enable
+   -f X .. Set hex field separator to X spaces (where 0 < X < 2)
+   -h .. Print out this help message and exit
+   -I .. Index output disable
+   -o outfileName .. Specify an output file instead of sending output to stdout
+   -s .. classify space char as printable in Ascii output
+   -v X .. Set verbosity level to X (where 0 < X < 4)
+   -w X .. Set bytes per line to X (where 0 < X <= 32)
+
+  where; -
+   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)
+    of file(s) to dump in hex & ascii
+   Note that if no input file is specified then input is taken from stdin.
+
+Note that if ihad output isn't acceptable you can try; -
+xxd
+hexdump -C
+od -A x -t x1z -v
+
++++++++++++ ihad -o test.tmp test11.dat test52.dat  +++++++++++++
+00000000 6162636465666768696a6b           abcdefghijk
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
++++++++++++ cat test52.dat | ihad              +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ

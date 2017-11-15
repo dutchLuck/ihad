@@ -1,3 +1,17 @@
+echo "+++++++++++ ihad Zero Length File check +++++++++++++++"
+../ihad test00.dat
+echo "+++++++++++ ihad 1 byte Length File check +++++++++++++++"
+../ihad test01.dat
+echo "+++++++++++ ihad 15 byte Length File check +++++++++++++++"
+../ihad test15.dat
+echo "+++++++++++ ihad 16 byte Length File check +++++++++++++++"
+../ihad test16.dat
+echo "+++++++++++ ihad 17 byte Length File check +++++++++++++++"
+../ihad test17.dat
+echo "+++++++++++ ihad 52 byte Length File check +++++++++++++++"
+../ihad test52.dat
+echo "+++++++++++ ihad 256 byte Length File check +++++++++++++++"
+../ihad test256.dat
 echo "+++++++++++ ihad -d Zero Length File check +++++++++++++++"
 ../ihad -d test00.dat
 echo "+++++++++++ ihad -d 1 byte Length File check +++++++++++++++"
@@ -12,18 +26,38 @@ echo "+++++++++++ ihad -d 52 byte Length File check +++++++++++++++"
 ../ihad -d test52.dat
 echo "+++++++++++ ihad -d 256 byte Length File check +++++++++++++++"
 ../ihad -d test256.dat
-echo "+++++++++++ ihad Zero Length File check +++++++++++++++"
-../ihad test00.dat
-echo "+++++++++++ ihad 1 byte Length File check +++++++++++++++"
-../ihad test01.dat
-echo "+++++++++++ ihad 9 byte Length File check +++++++++++++++"
-../ihad test09.dat
-echo "+++++++++++ ihad 10 byte Length File check +++++++++++++++"
-../ihad test10.dat
-echo "+++++++++++ ihad 11 byte Length File check +++++++++++++++"
-../ihad test11.dat
-echo "+++++++++++ ihad 52 byte Length File check +++++++++++++++"
-../ihad test52.dat
-echo "+++++++++++ ihad 256 byte Length File check +++++++++++++++"
-../ihad test256.dat
+echo "+++++++++++ ihad -w1 Zero Length File check +++++++++++++++"
+../ihad -w1 test00.dat
+echo "+++++++++++ ihad -w1 1 byte Length File check +++++++++++++++"
+../ihad -w1 test01.dat
+echo "+++++++++++ ihad -w2 9 byte Length File check +++++++++++++++"
+../ihad -w2 test09.dat
+echo "+++++++++++ ihad -w2 10 byte Length File check +++++++++++++++"
+../ihad -w2 test10.dat
+echo "+++++++++++ ihad -w3 11 byte Length File check +++++++++++++++"
+../ihad -w3 test11.dat
+echo "+++++++++++ ihad -w24 52 byte Length File check +++++++++++++++"
+../ihad -w24 test52.dat
+echo "+++++++++++ ihad -w32 256 byte Length File check +++++++++++++++"
+../ihad -w32 test256.dat
+echo "+++++++++++ ihad -I -A 256 byte Length File check +++++++++++++++"
+../ihad -I -A test256.dat
+echo "+++++++++++ ihad -I 52 byte Length File check +++++++++++++++"
+../ihad -I test52.dat
+echo "+++++++++++ ihad -A 52 byte Length File check +++++++++++++++"
+../ihad -A test52.dat
+echo "+++++++++++ ihad -f1 52 byte Length File check +++++++++++++++"
+../ihad -f1 test52.dat
+echo "+++++++++++ ihad -w7 -f2 52 byte Length File check +++++++++++++++"
+../ihad -w7 -f2 test52.dat
+echo "+++++++++++ ihad -s 256 byte Length File check +++++++++++++++"
+../ihad -s test256.dat
+echo "+++++++++++ ihad -h                            +++++++++++++++"
+../ihad -h
+echo "+++++++++++ ihad -o test.tmp test11.dat test52.dat  +++++++++++++"
+../ihad -o test.tmp test11.dat test52.dat
+cat test.tmp
+rm test.tmp
+echo "+++++++++++ cat test52.dat | ihad              +++++++++++++++"
+cat test52.dat | ../ihad 
 
