@@ -1,8 +1,35 @@
 #! /bin/sh
 #
 #
+# Test known data
 #
+echo Test predefine data file dumps against known correct results
 #
 rm -f results
+#
 ./tst > results
 diff -s results correctResults
+#
+#
+# Test some randomly generated data
+#
+echo Test random file data by comparing ihad output against od output
+#
+TEST_FILE=test123
+rm -fr $TEST_FILE.dat $TEST_FILE.od $TEST_FILE.ihad
+#
+head -c 123 < /dev/urandom > $TEST_FILE.dat
+od -A n -t x1 -v $TEST_FILE.dat > $TEST_FILE.od
+../ihad -I -f1 -A $TEST_FILE.dat > $TEST_FILE.ihad
+diff -w -s $TEST_FILE.od $TEST_FILE.ihad
+#
+TEST_FILE=test12345
+rm -fr $TEST_FILE.dat $TEST_FILE.od $TEST_FILE.ihad
+#
+head -c 12345 < /dev/urandom > $TEST_FILE.dat
+od -A n -t x1z -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
+../ihad -I -f1 -s $TEST_FILE.dat > $TEST_FILE.ihad
+diff -s $TEST_FILE.od $TEST_FILE.ihad
+#
+#
+
