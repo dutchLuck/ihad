@@ -15,21 +15,39 @@ diff -s results correctResults
 #
 echo Test random file data by comparing ihad output against od output
 #
+#
+#
+# echo Small file of 123 random bytes
 TEST_FILE=test123
 rm -fr $TEST_FILE.dat $TEST_FILE.od $TEST_FILE.ihad
 #
 head -c 123 < /dev/urandom > $TEST_FILE.dat
-od -A n -t x1 -v $TEST_FILE.dat > $TEST_FILE.od
-../ihad -I -f1 -A $TEST_FILE.dat > $TEST_FILE.ihad
-diff -w -s $TEST_FILE.od $TEST_FILE.ihad
+if [ "$OSTYPE" = "darwin15" ]
+then
+  od -A n -t x1 -v $TEST_FILE.dat > $TEST_FILE.od
+  ../ihad -I -f1 -A $TEST_FILE.dat > $TEST_FILE.ihad
+  diff -B -w -s $TEST_FILE.od $TEST_FILE.ihad
+else
+  od -A n -t x1 -v $TEST_FILE.dat > $TEST_FILE.od
+  ../ihad -I -f1 -A $TEST_FILE.dat > $TEST_FILE.ihad
+  diff -w -s $TEST_FILE.od $TEST_FILE.ihad
+fi
 #
+#
+#
+# echo Large file of 12345 random bytes
 TEST_FILE=test12345
 rm -fr $TEST_FILE.dat $TEST_FILE.od $TEST_FILE.ihad
 #
 head -c 12345 < /dev/urandom > $TEST_FILE.dat
-od -A n -t x1z -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
-../ihad -I -f1 -s $TEST_FILE.dat > $TEST_FILE.ihad
-diff -s $TEST_FILE.od $TEST_FILE.ihad
+if [ "$OSTYPE" = "darwin15" ]
+then
+  od -A n -t x1 -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
+  ../ihad -I -f1 -s -A $TEST_FILE.dat > $TEST_FILE.ihad
+  diff -B -w -s $TEST_FILE.od $TEST_FILE.ihad
+else
+  od -A n -t x1z -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
+  ../ihad -I -f1 -s $TEST_FILE.dat > $TEST_FILE.ihad
+  diff -s $TEST_FILE.od $TEST_FILE.ihad
+fi
 #
-#
-
