@@ -4,6 +4,7 @@ ihad is named as such because it provides "index" "hex" "ascii" "dump" of a file
 separated by a space character. The first column is an index number representing an offset from the start of the
 file to the leftmost data byte in the second and third columns, the second column is hexadecimal representation
 of the bytes of data in the file and the third column is an ASCII representation of the bytes of data in the file.
+An example of the default output of ihad is; -
 
 ```
 $ ./ihad tmp.bin
@@ -37,6 +38,9 @@ OR
 ```
 format-hex yourFile   (Windows Power Shell)
 ```
+
+With so many well established utilites to dump a file, why bother to create another?
+Well... the output of ihad is somewhat cleaner (i.e. just a space between columns in the default output) than the output from the utility programs mentioned above.
 
 The ihad command has a number of options which are outlined in the useage information.
 
