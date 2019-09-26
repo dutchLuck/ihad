@@ -5,6 +5,7 @@ separated by a space character. The first column is an index number representing
 file to the leftmost data byte in the second and third columns, the second column is hexadecimal representation
 of the bytes of data in the file and the third column is an ASCII representation of the bytes of data in the file.
 
+```
 $ ./ihad tmp.bin
 
 00000000 54686973206973206120737472696e67 This.is.a.string
@@ -12,18 +13,27 @@ $ ./ihad tmp.bin
 00000010 206f6620636861726163746572730a   .of.characters.
 
 $
+```
 
 ihad is not production code! Consider it only slightly tested.
 PLEASE do not use it for anything serious! Instead use; -
 
-
-hexdump -C yourFile
-
+```
+hexdump -C yourFile     (linux)
+```
+```
 xxd yourFile
-
+```
+```
 od -A x -t x1z -v yourFile
-
+```
 OR
 
+```
 http://www.fileformat.info/tool/hexdump.htm 
+```
+OR
 
+```
+format-hex yourFile   (Windows Power Shell)
+```
