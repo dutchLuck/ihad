@@ -37,3 +37,34 @@ OR
 ```
 format-hex yourFile   (Windows Power Shell)
 ```
+
+The ihad command has a number of options which are outlined in the useage information.
+
+```
+$ ./ihad -h
+
+Useage:
+./ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
+  where options are '-A -d -D -f X -h -I -o outfileName -s -v X -w X'; -
+   -A .. Ascii output disable
+   -d .. Decimal index output enable & default to 10 bytes per line
+   -D .. Debug output enable
+   -f X .. Set hex field separator to X spaces (where 0 < X < 2)
+   -h .. Print out this help message and exit
+   -I .. Index output disable
+   -o outfileName .. Specify an output file instead of sending output to stdout
+   -s .. classify space char as printable in Ascii output
+   -v X .. Set verbosity level to X (where 0 < X < 4)
+   -w X .. Set bytes per line to X (where 0 < X <= 32)
+
+  where; -
+   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)
+    of file(s) to dump in hex & ascii
+   Note that if no input file is specified then input is taken from stdin.
+
+Note that if ihad output isn't acceptable you can try; -
+xxd
+hexdump -C
+od -A x -t x1z -v
+```
+
