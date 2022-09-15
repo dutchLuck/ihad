@@ -175,6 +175,7 @@ Useage:
    -D .. Debug output enable
    -f X .. Set hex field separator to X spaces (where 0 < X < 2)
    -h .. Print out this help message and exit
+   -H .. Hexadecimal output disable
    -I .. Index output disable
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. classify space char as printable in Ascii output
