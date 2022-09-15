@@ -3,6 +3,8 @@
 #
 FILE_SIZE=123
 #
+OS_NAME=`uname -s`
+#
 if [ "$1" != "" ]
 then
   FILE_SIZE=$1
@@ -16,19 +18,19 @@ rm -fr $TEST_FILE.dat $TEST_FILE.od $TEST_FILE.xxd $TEST_FILE.ihad
 #
 head -c $FILE_SIZE < /dev/urandom > $TEST_FILE.dat
 #
-if [ "$OSTYPE" = "darwin15" ]
+if [ "$OS_NAME" = "Darwin" ]
 then
 # OSX has a more limited version of od that doesn't have ascii "z" option
   od -A n -t x1 -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
   ../ihad -I -f1 -s -A $TEST_FILE.dat > $TEST_FILE.ihad
   diff -B -w -s $TEST_FILE.od $TEST_FILE.ihad
-# OSX has xxd which can be used to cross check index, hex and ascii
-  xxd -g 0  $TEST_FILE.dat | sed "s/^/0/;s/://" > $TEST_FILE.xxd
-  ../ihad -s $TEST_FILE.dat > $TEST_FILE.ihad
-  diff -w -s $TEST_FILE.xxd $TEST_FILE.ihad
 else
   od -A n -t x1z -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
   ../ihad -I -f1 -s $TEST_FILE.dat > $TEST_FILE.ihad
   diff -s $TEST_FILE.od $TEST_FILE.ihad
 fi
+# Use xxd which can be used to cross check index, hex and ascii
+  xxd -g 0  $TEST_FILE.dat | sed "s/://" > $TEST_FILE.xxd
+  ../ihad -s $TEST_FILE.dat > $TEST_FILE.ihad
+  diff -w -s $TEST_FILE.xxd $TEST_FILE.ihad
 #
