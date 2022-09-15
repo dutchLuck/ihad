@@ -1,16 +1,18 @@
 /*
- * I H A D
+ * I H A D . C
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
+ *
+ * ihad.c last edited on Thu Sep 15 22:20:49 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * PLEASE do not use it for anything serious! Instead use; -
  *
- *  hexdump -C yourFile
- *  xxd yourFile
- *  od -A x -t x1z -v yourFile
- * OR
- *  http://www.fileformat.info/tool/hexdump.htm 
+ *  hexdump with Canonical format i.e.  hexdump -C yourFile
+ * OR  xxd yourFile
+ * OR  od -A x -t x1z -v yourFile
+ * OR format-hex on Microsoft Windows in powershell i.e.  format-hex yourFile
+ * OR  http://www.fileformat.info/tool/hexdump.htm 
  *
  * In addition, PLEASE do not look at the source code as an example
  * of how to code! or how not to code!
@@ -19,8 +21,8 @@
  *
  * This code is released under the MIT license
  *
- * It provides marginally cleaner output (i.e. just spaces as
- * column / field delimiters) than do the command line
+ * It provides marginally cleaner default output (i.e. just three columns
+ * with spaces as column / field delimiters) than the command line
  * utilities listed above.
  */
 
@@ -50,6 +52,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.5  2022/09/15 12:35:33  owen
+ * Added a -H command line option to disable Hex output column
+ *
  * Revision 0.4  2017/11/12 08:32:59  dutchLuck
  * Added the MIT license stipulation into the comments in the top of the file.
  *
@@ -77,7 +82,7 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.4 2017/11/12 08:32:59 dutchLuck Exp $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.5 2022/09/15 12:35:33 owen Exp $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -91,13 +96,14 @@ int  processA_SingleCommandLineParameter( char *  nameStrng );
 
 /* Optional Switches: */
 /*  Ascii, decimal, Debug, help, Index, outFile, space, verbosity, width */
-char  optionStr[] = "AdDhf:Io:sv:w:";
+char  optionStr[] = "AdDhHf:Io:sv:w:";
 int  A_Flg;			/* Control Ascii column output */
 int  dFlg;			/* use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg;			/* Control Debug info output */
 int  fFlg, fieldSeparatorWidth;	/* Control hex field separation width */
 char *  fStrng;
 int  hFlg;			/* Control help info output */
+int  H_Flg;			/* Control Hexadecimal column output */
 int  I_Flg;			/* Control Index column output */
 int  oFlg;			/* Control output file output */
 char *  oStrng;			/* output file name */
@@ -119,6 +125,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "   -D .. Debug output enable\n" );
   printf( "   -f X .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
   printf( "   -h .. Print out this help message and exit\n" );
+  printf( "   -H .. Hexadecimal output disable\n" );
   printf( "   -I .. Index output disable\n" );
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. classify space char as printable in Ascii output\n" );
@@ -146,6 +153,7 @@ int  main( int  argc, char *  argv[] )  {
   fFlg = fieldSeparatorWidth = 0;	/* Default to no spaces between hex bytes */
   fStrng = ( char * ) NULL;
   hFlg = 0;			/* Default to no help text output */
+  H_Flg = 0;			/* Default is Hexadecimal column output */
   I_Flg = 0;			/* Default is Index column output */
   oFlg = 0;			/* Default to output to stdout */
   oStrng = ( char * ) NULL;
@@ -166,6 +174,7 @@ int  main( int  argc, char *  argv[] )  {
       case 'D' :  D_Flg = 1; break;
       case 'f' :  fFlg = 1; fStrng = optarg; break;
       case 'h' :  hFlg = 1; break;
+      case 'H' :  H_Flg = 1; break;
       case 'I' :  I_Flg = 1; break;
       case 'o' :  oFlg = 1; oStrng = optarg; break;
       case 's' :  sFlg = 1; lowestPrintableAsciiChar = ' '; break;
@@ -219,7 +228,7 @@ int  main( int  argc, char *  argv[] )  {
       if( D_Flg )  printf( "String for option '-f' is %s\n", fStrng );
       fieldSeparatorWidth = atoi( fStrng );
       if( fieldSeparatorWidth > 2 )  fieldSeparatorWidth = 2;
-      else if( fieldSeparatorWidth < 1 )  fieldSeparatorWidth = 1; 
+      else if( fieldSeparatorWidth < 0 )  fieldSeparatorWidth = 0; 
     }
     if( D_Flg )  printf( "field separator width is %d\n", fieldSeparatorWidth );
   }
@@ -305,10 +314,10 @@ int  main( int  argc, char *  argv[] )  {
 int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
   int  byte;
   int  byteCnt = 0;
-  unsigned int  byteAddr = 0;
-  char *  outputString;			/* pointer to string to print */
+  unsigned long  byteAddr = 0L;	/* Index of first byte in each output line */
+  char *  outputString;		/* pointer to character string to print to stdout or a file */
   int  outputStringSize;		/* must be big enough for MAX_WIDTH bytes per line */
-  char *  bPtr;	/* byte pointer */	/* output line space > 8+2+3*MAX_WIDTH+1+MAX_WIDTH+1 */
+  char *  bPtr; /* byte pointer */	/* output line space > 8+2+3*MAX_WIDTH+1+MAX_WIDTH+1 */
   char *  aPtr; /* ascii pointer */
   int  hexFldWdth;
   char  hexFldFrmt[ 11 ];
@@ -317,14 +326,14 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
   hexFldWdth = HEX_BYTE_FIELD_WIDTH + fieldSeparatorWidth;
   if( hexFldWdth > ( sizeof( hexFldFrmt ) - 7))  hexFldWdth = ( sizeof( hexFldFrmt ) - 7);
   else if( hexFldWdth < 2 )  hexFldWdth = 2;
-  sprintf( hexFldFrmt, "%c02x     ", '%' );
-  bPtr = hexFldFrmt + ( 2 + hexFldWdth );
-  *bPtr = '\0';
+  sprintf( hexFldFrmt, "%c02x     ", '%' );	/* Set up a string of the form "%02x  " */
+  bPtr = hexFldFrmt + ( 2 + hexFldWdth );	/* Temp use of bPtr to point to end of Hex format string */
+  *bPtr = '\0';	/* Terminate Hex format string with the correct number of spaces */
 /* Get a suitably sized buffer to hold the output string */
-  outputStringSize = (( I_Flg ) ? 4 : 14 ) + ( hexFldWdth + (( A_Flg ) ? 0 : 1 )) * byteDisplayWidth;
+  outputStringSize = (( I_Flg ) ? 4 : 14 ) + (( hexFldWdth ) + (( A_Flg ) ? 0 : 1 )) * byteDisplayWidth;
   outputString = malloc( outputStringSize );
   if( outputString == NULL )  {
-    fprintf( stderr, "?? malloc failed\n" );
+    fprintf( stderr, "?? malloc( %d ) failed\n", outputStringSize );
     perror( "readByteStreamAndPrintIndexHexAscii()" ); 
   }
   else  {
@@ -340,17 +349,22 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
       byteCnt += 1;
    /* Initialize new line if required */
       if(( byteAddr % byteDisplayWidth ) == 0 )  {
+     /* Make the line buffer all space characters */
         bPtr = ( char * ) memset( outputString, 0x20, outputStringSize );
+     /* Put the Index in the line buffer, if not disabled */
         if( ! I_Flg )  {
-          sprintf( bPtr, ( dFlg ) ? "%08u " : "%08x ", byteAddr );
+          sprintf( bPtr, ( dFlg ) ? "%08lu " : "%08lx ", byteAddr );
 	  if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), " " );
           bPtr += strlen( outputString );
         }
-        aPtr = bPtr + hexFldWdth * byteDisplayWidth + 1;
+        aPtr = bPtr + (( H_Flg ) ? 0 : ( hexFldWdth * byteDisplayWidth + 1 ));
       }
-   /* Put byte into outputString in hex form */
-      sprintf( bPtr, hexFldFrmt, byte );		/* Print byte as hex number */
-      bPtr += hexFldWdth;
+   /* If Hexadecimal output is required put byte into outputString in Hex form */
+      if( ! H_Flg )  {
+     /* Put byte into outputString in hex form */
+        sprintf( bPtr, hexFldFrmt, byte );		/* Print byte as hex number */
+        bPtr += hexFldWdth;
+      }
    /* If Ascii output is required put byte into outputString in char form */
       if( ! A_Flg )  {
         if(( byte >= lowestPrintableAsciiChar ) && ( byte <= 0x7e ))	/* Test for printable Ascii */
@@ -362,7 +376,7 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
       if(( ++byteAddr % byteDisplayWidth ) == 0 )  {
         if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
         else  {
-          *bPtr = ' ';
+          if( ! H_Flg )  *bPtr = ' ';	/* Don't use byte pointer if Hexadecimal is not being output */
           sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
         }
         fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
@@ -375,7 +389,7 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
     if( strlen( outputString ) > 0 )  {
       if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
       else  {
-        *bPtr = ' ';
+        if( ! H_Flg )  *bPtr = ' ';	/* Don't use byte pointer if Hexadecimal is not being output */
         sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
       }
       fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
