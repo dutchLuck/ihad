@@ -46,6 +46,10 @@ else
   ../ihad -I -f1 -s $TEST_FILE.dat > $TEST_FILE.ihad
   diff -s $TEST_FILE.od $TEST_FILE.ihad
   RESULT=$?
-  echo "Result of non-OSX od (Hex & Ascii) comparison is $RESULT"
+  if [ $RESULT -eq 0 ] ; then
+    echo "Hex & Ascii column comparison with non-OSX od is Ok"
+  else
+    echo "?? Hex & Ascii column comparison with non-OSX od Failed?"
+  fi
 fi
 #
