@@ -21,6 +21,7 @@ head -c $FILE_SIZE < /dev/urandom > $TEST_FILE.dat
 # First choice is to use xxd, if it exists, because it can be used to
 #  cross check all 3 columns of ihad output i.e. index, hex and ascii
 if [ -x /usr/bin/xxd ] ; then
+# remove ":" at end of xxd -g 0 output Index column
   xxd -g 0  $TEST_FILE.dat | sed "s/://" > $TEST_FILE.xxd
   ../ihad -s $TEST_FILE.dat > $TEST_FILE.ihad
   diff -w -s $TEST_FILE.xxd $TEST_FILE.ihad
@@ -29,6 +30,22 @@ if [ -x /usr/bin/xxd ] ; then
     echo "Index, Hex & Ascii column comparison with xxd output is Ok"
   else
     echo "?? Index, Hex & Ascii column comparison with xxd output Failed?"
+  fi
+#
+# Second choice is to use hexdump, if it exists, because it also can be
+# used to cross check all 3 columns of ihad output.
+elif [ -x /usr/bin/hexdump ] ; then
+# remove "|" bookends from hexdump -C output Ascii column 
+  hexdump -C $TEST_FILE.dat | sed 's/  |/ /' | sed 's/|$//' > $TEST_FILE.hd0
+# ignore last line
+  head -n -1 $TEST_FILE.hd0 > $TEST_FILE.hd
+  ../ihad -s $TEST_FILE.dat > $TEST_FILE.ihad
+  diff -w -s -b $TEST_FILE.hd $TEST_FILE.ihad
+  RESULT=$?
+  if [ $RESULT -eq 0 ] ; then
+    echo "Index, Hex & Ascii column comparison with hexdump -C output is Ok"
+  else
+    echo "?? Index, Hex & Ascii column comparison with hexdump -C output Failed?"
   fi
 elif [ "$OS_NAME" = "Darwin" ] ; then
 # OSX has a more limited version of od that doesn't have ascii "z" option
@@ -52,4 +69,6 @@ else
     echo "?? Hex & Ascii column comparison with non-OSX od Failed?"
   fi
 fi
+#
+exit $RESULT
 #
