@@ -14,14 +14,14 @@ diff -s results correctResults
 # Test some randomly generated data
 #
 #
-echo 2. Test random file data by comparing ihad output against at least od output
+echo "2. Test random file data by comparing ihad output against utility output"
 #
-# echo Small file of 123 random bytes
+echo "=== a) Small file of 123 random bytes ==="
 ./randomDataTest 123
 #
-echo Medium file of 12345 random bytes
+echo "=== b) Medium file of 12345 random bytes ==="
 ./randomDataTest 12345
 #
-echo Larger file of 23454321 random bytes
+echo "=== c) Larger file of 23454321 random bytes ==="
 ./randomDataTest 23454321
 #

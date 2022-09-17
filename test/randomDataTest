@@ -10,7 +10,7 @@ then
   FILE_SIZE=$1
 fi
 #
-echo Testing file of $FILE_SIZE random bytes
+echo "-- Testing file of $FILE_SIZE random bytes --"
 #
 TEST_FILE=test$FILE_SIZE
 #
@@ -18,22 +18,34 @@ rm -fr $TEST_FILE.dat $TEST_FILE.od $TEST_FILE.xxd $TEST_FILE.ihad
 #
 head -c $FILE_SIZE < /dev/urandom > $TEST_FILE.dat
 #
-if [ "$OS_NAME" = "Darwin" ]
-then
-# OSX has a more limited version of od that doesn't have ascii "z" option
-  od -A n -t x1 -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
-  ../ihad -I -f1 -s -A $TEST_FILE.dat > $TEST_FILE.ihad
-  diff -B -w -s $TEST_FILE.od $TEST_FILE.ihad
-else
-  od -A n -t x1z -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
-  ../ihad -I -f1 -s $TEST_FILE.dat > $TEST_FILE.ihad
-  diff -s $TEST_FILE.od $TEST_FILE.ihad
-fi
-# Use xxd which can be used to cross check index, hex and ascii
-if [ -x /usr/bin/xxd ]
-then
+# First choice is to use xxd, if it exists, because it can be used to
+#  cross check all 3 columns of ihad output i.e. index, hex and ascii
+if [ -x /usr/bin/xxd ] ; then
   xxd -g 0  $TEST_FILE.dat | sed "s/://" > $TEST_FILE.xxd
   ../ihad -s $TEST_FILE.dat > $TEST_FILE.ihad
   diff -w -s $TEST_FILE.xxd $TEST_FILE.ihad
+  RESULT=$?
+  if [ $RESULT -eq 0 ] ; then
+    echo "Index, Hex & Ascii column comparison with xxd output is Ok"
+  else
+    echo "?? Index, Hex & Ascii column comparison with xxd output Failed?"
+  fi
+elif [ "$OS_NAME" = "Darwin" ] ; then
+# OSX has a more limited version of od that doesn't have ascii "z" option
+# Use OSX od to compare the Hex column
+  od -A n -t x1 -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
+# Run ihad with no Index output, Hex spaced and no Ascii output
+  ../ihad -I -f1 -s -A $TEST_FILE.dat > $TEST_FILE.ihad
+  diff -B -w -s $TEST_FILE.od $TEST_FILE.ihad
+  RESULT=$?
+  echo "Result of OSX od (Hex only) comparison is $RESULT"
+else
+# Use od to compare the Hex & Ascii columns
+  od -A n -t x1z -v $TEST_FILE.dat | sed -e 's/^ //;s/  >/  /;s/<$//' > $TEST_FILE.od
+# Run ihad with no Index output and Hex spaced
+  ../ihad -I -f1 -s $TEST_FILE.dat > $TEST_FILE.ihad
+  diff -s $TEST_FILE.od $TEST_FILE.ihad
+  RESULT=$?
+  echo "Result of non-OSX od (Hex & Ascii) comparison is $RESULT"
 fi
 #
