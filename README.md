@@ -40,7 +40,8 @@ format-hex yourFile   (Windows Power Shell)
 ```
 
 With so many well established utilites to dump a file, why bother to create another?
-Well... the output of ihad is somewhat cleaner (i.e. just a space between columns in the default output) than the output from the utility programs mentioned above.
+Well... the output of ihad is somewhat cleaner (i.e. just a space between columns in the default output) than the output from the utility programs mentioned above. For example "xxd -g 0" puts a colon on the end of the index number, "hexdump -C" puts in lots of space characters and book-ends the
+Ascii column with the "|" character and "od -A x -t x1z -v" puts in lots of space characters and ">" "<" bookends around the Ascii column.
 
 The ihad command has a number of options which are outlined in the useage information.
 
@@ -55,6 +56,7 @@ Useage:
    -D .. Debug output enable
    -f X .. Set hex field separator to X spaces (where 0 < X < 2)
    -h .. Print out this help message and exit
+   -H .. Hexadecimal output disable
    -I .. Index output disable
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. classify space char as printable in Ascii output
@@ -67,7 +69,7 @@ Useage:
    Note that if no input file is specified then input is taken from stdin.
 
 Note that if ihad output isn't acceptable you can try; -
-xxd
+xxd -g 0 
 hexdump -C
 od -A x -t x1z -v
 ```
