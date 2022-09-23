@@ -5,10 +5,10 @@
 #
 echo 1. Test predefine data file dumps against known correct results
 #
-rm -f results
+rm -f tstResults
 #
-./tst > results
-diff -s results correctResults
+./tst > tstResults
+diff -s tstResults correctResults
 #
 #
 # Test some randomly generated data

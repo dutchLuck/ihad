@@ -52,6 +52,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.6  2022/09/23 10:49:36  owen
+ * shifted code to make main() easier to understand. Corrected help output.
+ *
  * Revision 0.5  2022/09/15 12:35:33  owen
  * Added a -H command line option to disable Hex output column
  *
@@ -82,7 +85,7 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.5 2022/09/15 12:35:33 owen Exp $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.6 2022/09/23 10:49:36 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -91,12 +94,12 @@
 #define  MAX_WIDTH 32
 #define  HEX_BYTE_FIELD_WIDTH 2		/* Default is 2 which is no spaces */
 
-int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char *  cmdLnStrngs[] );
-int  processA_SingleCommandLineParameter( char *  nameStrng );
 
-/* Optional Switches: */
-/*  Ascii, decimal, Debug, help, Index, outFile, space, verbosity, width */
-char  optionStr[] = "AdDhHf:Io:sv:w:";
+/* Command line Optional Switches: */
+/*  Ascii, decimal, Debug, fieldSepWidth, help, Hex, Index, outFile, space, verbosity, width */
+const char  optionStr[] = "AdDf:hHIo:sv::w:";
+
+/* Global Flags & Data */
 int  A_Flg;			/* Control Ascii column output */
 int  dFlg;			/* use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg;			/* Control Debug info output */
@@ -116,36 +119,7 @@ int  wFlg, byteDisplayWidth;	/* Control number of bytes dealt with per line */
 char *  wStrng;
 
 
-void  printOutHelpMessage( char * programName )  {
-  printf( "\nUseage:\n" );
-  printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
-  printf( "  where options are '-A -d -D -f X -h -I -o outfileName -s -v X -w X'; -\n" );
-  printf( "   -A .. Ascii output disable\n" );
-  printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
-  printf( "   -D .. Debug output enable\n" );
-  printf( "   -f X .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
-  printf( "   -h .. Print out this help message and exit\n" );
-  printf( "   -H .. Hexadecimal output disable\n" );
-  printf( "   -I .. Index output disable\n" );
-  printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
-  printf( "   -s .. classify space char as printable in Ascii output\n" );
-  printf( "   -v X .. Set verbosity level to X (where 0 < X < 4)\n" );
-  printf( "   -w X .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
-  printf( "  where; -\n" );
-  printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
-  printf( "    of file(s) to dump in hex & ascii\n" );
-  printf( "   Note that if no input file is specified then input is taken from stdin.\n\n" );
-  printf( "Note that if ihad output isn't acceptable you can try; -\nxxd\nhexdump -C\nod -A x -t x1z -v\n\n" );
-}
-
-
-int  main( int  argc, char *  argv[] )  {
-  int  result, indx;
-  extern char *  optarg;
-  extern int  optind, opterr, optopt;
-
-  opterr = 0;	/* Suppress error messages from getopt() to stderr */
-
+void  setGlobalFlagDefaults( void )  {
 /* Preset command line options */
   A_Flg = 0;			/* Default is Ascii column output */
   dFlg = 0;			/* Default to output hex index rather than decimal index */
@@ -165,7 +139,38 @@ int  main( int  argc, char *  argv[] )  {
   wFlg = 0;			/* Default to DEFAULT_WIDTH bytes per line */
   byteDisplayWidth = DEFAULT_WIDTH;
   wStrng = ( char * ) NULL;
+}
 
+
+void  printOutHelpMessage( char * programName )  {
+  printf( "\nUseage:\n" );
+  printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
+  printf( "  where options are '-A -d -D -f X -h -H -I -o outfileName -s -v[X] -w X'; -\n" );
+  printf( "   -A .. Ascii output disable\n" );
+  printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
+  printf( "   -D .. Debug output enable\n" );
+  printf( "   -f X .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
+  printf( "   -h .. Print out this help message and exit\n" );
+  printf( "   -H .. Hexadecimal output disable\n" );
+  printf( "   -I .. Index output disable\n" );
+  printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
+  printf( "   -s .. Classify space char as printable in Ascii output\n" );
+  printf( "   -v[X] .. Verbose output enable, if X is used then set level to X (where 0 < X < 4)\n" );
+  printf( "   -w X .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
+  printf( "  where; -\n" );
+  printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
+  printf( "    of file(s) to dump in hex & ascii\n" );
+  printf( "   Note that if no input file is specified then input is taken from stdin.\n\n" );
+  printf( "Note that if ihad output isn't acceptable you can try; -\nxxd\nhexdump -C\nod -A x -t x1z -v\n\n" );
+}
+
+
+int  processCommandLineOptions( int  argc, char *  argv[] )  {
+  int  result;
+  extern char *  optarg;
+  extern int  optind, opterr, optopt;
+
+  opterr = 0;	/* Suppress error messages from getopt() to stderr */
 /* Process switch options from the command line */
   while(( result = getopt( argc, argv, optionStr )) != -1 )  {
     switch( result )  {
@@ -210,12 +215,6 @@ int  main( int  argc, char *  argv[] )  {
   else  {
     if( D_Flg )  printf( "switch '-v' was not found in the command line options\n" );
   }
-
-  if( D_Flg || ( verbosityLevel > 1 ))  {
-    printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
-    printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
-  }
-
   
 /* Postprocess -f (fieldSeparatorWidth) switch option */
   if( D_Flg )  printf( "Flag for option '-f' is %d\n", fFlg );
@@ -248,12 +247,10 @@ int  main( int  argc, char *  argv[] )  {
    /* Convert width specification to integer */
       byteDisplayWidth = atoi( wStrng );
       if( D_Flg )  printf( "The '%s' string for option '-w' was converted to %d\n", wStrng, byteDisplayWidth );
-   /* Rough check on atoi() output - was it a valid convertion */
+   /* Rough check on atoi() output - was it a valid conversion */
       if(( byteDisplayWidth == 0 ) &&
           ( ! (( *wStrng == '0' ) || (( wStrng[ 1 ] == '0') && (( *wStrng == '+' ) || (*wStrng == '-' ))))))  {
         fprintf( stderr, "\n?? Unable to convert '%s' to integer for option '-w'\n", wStrng );
-        printOutHelpMessage( argv[0] );
-        return 1;
       }
       if( byteDisplayWidth > MAX_WIDTH )  byteDisplayWidth = MAX_WIDTH;
       else if( byteDisplayWidth < 1 )  byteDisplayWidth = DEFAULT_WIDTH; 
@@ -288,26 +285,17 @@ int  main( int  argc, char *  argv[] )  {
   else  {
     if( D_Flg )  printf( "switch '-o outfileName' was not found in the command line options\n" );
   }
-
-/* Postprocess -h switch option */
+  
+/* Report on -h switch option */
   if( hFlg )  {
     if( D_Flg )  printf( "Flag for option '-h' is %d\n", hFlg );
-    printOutHelpMessage( argv[0] );
-    return 1;
   }
   else  {
     if( D_Flg )  printf( "switch '-h' was not found in the command line options\n" );
   }
 
-/* Process rest of non-switch command line options if there are any */
-  if( D_Flg )  {
-    printf( "argc is %d and optind is %d\n", argc, optind );
-    for( indx = optind; indx < argc; indx++ )  {
-      printf( "argv[ %d ] string is '%s'\n", indx, argv[ indx ] );
-    }
-  }
-  processNonSwitchCommandLineParameters( optind, argc - 1, argv );
-  return 0;
+/* return the index of the first positional argument (i.e. input file name?) */
+  return( optind );
 }
 
 
@@ -456,3 +444,37 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
   }
   return( result );
 }
+
+
+int  main( int  argc, char *  argv[] )  {
+  int  resultIndex, indx;
+
+/* Preset switch option Flags and Data */
+  setGlobalFlagDefaults();
+
+/* Process switch options from the command line */
+  resultIndex = processCommandLineOptions( argc, argv );
+
+/* If Debug or high verbosity then print code details */
+  if( D_Flg || ( verbosityLevel > 1 ))  {
+    printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
+    printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
+  }
+
+/* If -h switch option used then print help message and exit */
+  if( hFlg )  {
+    printOutHelpMessage( argv[0] );
+    return( 1 );
+  }
+
+/* Process rest of non-switch command line options if there are any */
+  if( D_Flg )  {
+    printf( "argc is %d and option index is %d\n", argc, resultIndex );
+    for( indx = resultIndex; indx < argc; indx++ )  {
+      printf( "argv[ %d ] string is '%s'\n", indx, argv[ indx ] );
+    }
+  }
+  processNonSwitchCommandLineParameters( resultIndex, argc - 1, argv );
+  return 0;
+}
+
