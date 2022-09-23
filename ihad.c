@@ -52,6 +52,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.7  2022/09/23 14:18:45  owen
+ * Made sure multiple input files worked with an output file
+ *
  * Revision 0.6  2022/09/23 10:49:36  owen
  * shifted code to make main() easier to understand. Corrected help output.
  *
@@ -85,7 +88,7 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.6 2022/09/23 10:49:36 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.7 2022/09/23 14:18:45 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -131,7 +134,7 @@ void  setGlobalFlagDefaults( void )  {
   I_Flg = 0;			/* Default is Index column output */
   oFlg = 0;			/* Default to output to stdout */
   oStrng = ( char * ) NULL;
-  ofp = stdout;			/* Output file pointer defaults to stdout */
+  ofp = stdout;		/* Output file pointer defaults to stdout */
   sFlg = 0;			/* Default to replacing space with a '.' in ascii column */
   lowestPrintableAsciiChar = '!';	/* '!' is next to space */
   vFlg = verbosityLevel = 0;	/* Default to no verbose output */
@@ -266,20 +269,13 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   if( oFlg )  {
     if( D_Flg )  printf( "Flag for option '-o' is %d\n", oFlg );
     if( oStrng == ( char * ) NULL )  {
-      printf( "?? String for option '-o outfileName' is uninitialised\n" );
+      printf( "?? File name string for option '-o outfileName' is uninitialised\n" );
       oFlg = 0;
       ofp = stdout;
       fprintf( stderr, "Defaulting to writing output to stdout\n" );
     }
     else  {
-      if( D_Flg )  printf( "String part of option '-o' is '%s'\n", oStrng );
-      result = (( ofp = fopen( oStrng, "w" ) ) != NULL );
-      if( ! result )  {
-        printf( "?? Unable to open a file named '%s' for writing output\n", oStrng );
-        perror( "processA_SingleCommandLineParameter" );
-	ofp = stdout;
-	fprintf( stderr, "Defaulting to writing output to stdout\n" );
-      }
+      if( D_Flg )  printf( "File name string part of option '-o' is '%s'\n", oStrng );
     }
   }
   else  {
@@ -431,15 +427,34 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
       printf( "cmdLnStrngs[ %d ] string is '%s'\n", indx, cmdLnStrngs[ indx ] );
     }
   }
-  if(( lstIndx + 1 ) == frstIndx )  {
-/* There are no files specified in the command line so process stdin */
-    chrCnt = readByteStreamAndPrintIndexHexAscii( stdin );
-    if( D_Flg || vFlg )  printf( "Processed %d chars from stdin\n", chrCnt );
+  if(( oFlg ) && ( oStrng == ( char * ) NULL ))  {
+      fprintf( stderr, "?? -o specified, but no output file name specified - aborting\n" );
   }
   else  {
-/* Process each file specified in the command line */
-    for( indx = frstIndx; indx <= lstIndx; indx++ )  {
-      result = processA_SingleCommandLineParameter( cmdLnStrngs[ indx ] );
+  /* Attempt to open the output file if required */
+    result = ( oFlg ) ? (( ofp = fopen( oStrng, "w" )) != NULL ) : 1;
+    if( ! result )  {
+      fprintf( stderr, "?? Unable to open a file named '%s' for writing output\n", oStrng );
+      perror( "processNonSwitchCommandLineParameters" );
+    }
+    else  {
+      if(( lstIndx + 1 ) == frstIndx )  {
+   /* There are no files specified in the command line so process stdin */
+        chrCnt = readByteStreamAndPrintIndexHexAscii( stdin );
+        if( D_Flg || vFlg )  printf( "Processed %d chars from stdin\n", chrCnt );
+      }
+      else  {
+   /* Process each file specified in the command line */
+        for( indx = frstIndx; indx <= lstIndx; indx++ )  {
+          result = processA_SingleCommandLineParameter( cmdLnStrngs[ indx ] );
+        }
+      }
+   /* Close output file specified in the command line */
+      result = ( oFlg ) ? (fclose( ofp ) == 0) : 1;
+      if( ! result )  {
+        fprintf( stderr, "?? Attempt to close the output file named '%s' failed\n", oStrng );
+        perror( "processNonSwitchCommandLineParameters" );
+      }
     }
   }
   return( result );
@@ -467,14 +482,15 @@ int  main( int  argc, char *  argv[] )  {
     return( 1 );
   }
 
-/* Process rest of non-switch command line options if there are any */
+/* If Debug then show rest of non-switch command line options if there are any */
   if( D_Flg )  {
     printf( "argc is %d and option index is %d\n", argc, resultIndex );
     for( indx = resultIndex; indx < argc; indx++ )  {
       printf( "argv[ %d ] string is '%s'\n", indx, argv[ indx ] );
     }
   }
-  processNonSwitchCommandLineParameters( resultIndex, argc - 1, argv );
-  return 0;
+  
+/* Attempt to dump Index, Hex and Ascii and return 0 if successful */
+  return( ! processNonSwitchCommandLineParameters( resultIndex, argc - 1, argv ));
 }
 
