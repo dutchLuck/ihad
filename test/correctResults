@@ -169,8 +169,9 @@ f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
 
 Useage:
 ../ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
-  where options are '-A -d -D -f X -h -H -I -o outfileName -s -v[X] -w X'; -
+  where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -v X -w X'; -
    -A .. Ascii output disable
+   -c C .. Set char C as non-ASCII indicator
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
    -f X .. Set hex field separator to X spaces (where 0 < X < 2)
@@ -179,7 +180,7 @@ Useage:
    -I .. Index output disable
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
-   -v[X] .. Verbose output enable, if X is used then set level to X (where 0 < X < 4)
+   -v X .. Verbose output enable, set level to X (where 0 < X < 4)
    -w X .. Set bytes per line to X (where 0 < X <= 32)
 
   where; -

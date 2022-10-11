@@ -99,11 +99,14 @@
 
 
 /* Command line Optional Switches: */
-/*  Ascii, decimal, Debug, fieldSepWidth, help, Hex, Index, outFile, space, verbosity, width */
-const char  optionStr[] = "AdDf:hHIo:sv::w:";
+/*  Ascii, charAlternate, decimal, Debug, fieldSepWidth, help, Hex, Index, outFile, space, verbosity, width */
+const char  optionStr[] = "Ac:dDf:hHIo:sv::w:";
 
 /* Global Flags & Data */
 int  A_Flg;			/* Control Ascii column output */
+int  cFlg;			/* use alternate char instead of full stops for non-ASCII */
+char *  cStrng;
+char defaultCharStrng[] = ".";
 int  dFlg;			/* use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg;			/* Control Debug info output */
 int  fFlg, fieldSeparatorWidth;	/* Control hex field separation width */
@@ -125,6 +128,8 @@ char *  wStrng;
 void  setGlobalFlagDefaults( void )  {
 /* Preset command line options */
   A_Flg = 0;			/* Default is Ascii column output */
+  cFlg = 0;			/* Default to output full-stops */
+  cStrng = defaultCharStrng;
   dFlg = 0;			/* Default to output hex index rather than decimal index */
   D_Flg = 0;			/* Default to Debug off */
   fFlg = fieldSeparatorWidth = 0;	/* Default to no spaces between hex bytes */
@@ -148,8 +153,9 @@ void  setGlobalFlagDefaults( void )  {
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
-  printf( "  where options are '-A -d -D -f X -h -H -I -o outfileName -s -v[X] -w X'; -\n" );
+  printf( "  where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -v X -w X'; -\n" );
   printf( "   -A .. Ascii output disable\n" );
+  printf( "   -c C .. Set char C as non-ASCII indicator\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
   printf( "   -f X .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
@@ -158,7 +164,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "   -I .. Index output disable\n" );
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. Classify space char as printable in Ascii output\n" );
-  printf( "   -v[X] .. Verbose output enable, if X is used then set level to X (where 0 < X < 4)\n" );
+  printf( "   -v X .. Verbose output enable, set level to X (where 0 < X < 4)\n" );
   printf( "   -w X .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
   printf( "  where; -\n" );
   printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
@@ -178,6 +184,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   while(( result = getopt( argc, argv, optionStr )) != -1 )  {
     switch( result )  {
       case 'A' :  A_Flg = 1; break;
+      case 'c' :  cFlg = 1; cStrng = optarg; break;
       case 'd' :  dFlg = 1; break;
       case 'D' :  D_Flg = 1; break;
       case 'f' :  fFlg = 1; fStrng = optarg; break;
@@ -282,6 +289,23 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     if( D_Flg )  printf( "switch '-o outfileName' was not found in the command line options\n" );
   }
   
+/* Postprocess -c switch option */
+  if( cFlg )  {
+    if( D_Flg )  printf( "Flag for option '-c' is %d\n", oFlg );
+    if( cStrng == ( char * ) NULL )  {
+      printf( "?? Character string for option '-c alternateChar' is uninitialised\n" );
+      cFlg = 0;
+      cStrng  = defaultCharStrng;
+      fprintf( stderr, "Defaulting to writing non-ASCII as '.'\n" );
+    }
+    else  {
+      if( D_Flg )  printf( "Alternate Char string part of option '-c' is '%s'\n", cStrng );
+    }
+  }
+  else  {
+    if( D_Flg )  printf( "switch '-c alternateChar' was not found in the command line options\n" );
+  }
+  
 /* Report on -h switch option */
   if( hFlg )  {
     if( D_Flg )  printf( "Flag for option '-h' is %d\n", hFlg );
@@ -353,7 +377,7 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
       if( ! A_Flg )  {
         if(( byte >= lowestPrintableAsciiChar ) && ( byte <= 0x7e ))	/* Test for printable Ascii */
           sprintf( aPtr, "%c", byte );		/* Print byte as ascii character */
-        else  sprintf( aPtr, "." );		/* Print a full stop instead of non-printable ascii */
+        else  *aPtr =  *cStrng;		/* Print a full stop or alternate char instead of non-printable ascii */
         aPtr += 1;
       }
    /* Output current line if required */
