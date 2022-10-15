@@ -17,7 +17,7 @@ $
 ```
 
 ihad is not production code! Consider it only slightly tested.
-PLEASE do not use it for anything serious! Instead use; -
+Please do not use it for anything serious! Instead use; -
 
 ```
 hexdump -C yourFile     (linux)
@@ -50,7 +50,7 @@ The ihad command has a number of options which are outlined in the useage inform
 
 Useage:
 ihad.exe [options] [inputFile1 [inputFile2 [.. inputFileN]]]
-  where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -v X -w X'; -
+  where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -v[X] -w X'; -
    -A .. Ascii output disable
    -c C .. Set char C as non-ASCII indicator
    -d .. Decimal index output enable & default to 10 bytes per line
@@ -61,7 +61,8 @@ ihad.exe [options] [inputFile1 [inputFile2 [.. inputFileN]]]
    -I .. Index output disable
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
-   -v X .. Verbose output enable, set level to X (where 0 < X < 4)
+   -S C .. Set char C as column separator
+   -v[X] .. Verbose output enable, set level to X (where 0 < X < 4)
    -w X .. Set bytes per line to X (where 0 < X <= 32)
 
   where; -
@@ -74,5 +75,8 @@ xxd
 hexdump -C
 od -A x -t x1z -v
 ```
-If the full stop at end of a ASCII sentences is important then the -c C option enables the choice of a different
-indicator of non-ASCII bytes, for example underscore could be specified with -c _
+If the full stop at end of ASCII sentences is important then the -c C option enables the choice of a different
+indicator of non-ASCII bytes, for example underscore could be specified with "-c _". If a different column separator
+is desirable, instead of the space character then it may be specified with the -S C option. For example a pseudo
+comma separated variable (CSV) output may be simulated with "-S ,". Note however, that the last line in this case
+will have too many commas, if it is shorter than the normal line length.

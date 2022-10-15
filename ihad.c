@@ -400,7 +400,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
      /* Put the Index in the line buffer, if not disabled */
         if( ! I_Flg )  {
           sprintf( bPtr, ( dFlg ) ? "%08lu%c" : "%08lx%c", byteAddr, *S_Strng );
-	  if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), S_Strng );
+	  if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), "%s", S_Strng );
           bPtr += strlen( outputString );
         }
         aPtr = bPtr + (( H_Flg ) ? 0 : ( hexFldWdth * byteDisplayWidth + 1 ));
