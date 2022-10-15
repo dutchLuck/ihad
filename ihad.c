@@ -11,7 +11,7 @@
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
  * OR  xxd yourFile
  * OR  od -A x -t x1z -v yourFile
- * OR format-hex on Microsoft Windows in powershell i.e.  format-hex yourFile
+ * OR  format-hex on Microsoft Windows in powershell i.e.  format-hex yourFile
  * OR  http://www.fileformat.info/tool/hexdump.htm 
  *
  * In addition, PLEASE do not look at the source code as an example
@@ -33,7 +33,9 @@
  *  index  hex digit 1 .. hex digit N  ascii char 1 .. ascii char N
  *
  * if there is no ascii printable character corresponding to a byte of input
- * then a full stop is printed. By default space is not considered printable.
+ * then a full stop or a character specified by the -c option is printed.
+ *
+ * by default space is not considered printable.
  *
  * e.g.
  * $ ./ihad tmp.bin
@@ -42,6 +44,7 @@
  * $
  *
  * Output of the index (first column) may be switched off with the -I switch.
+ * Output of the hexadecimal (second column) may be switched off with the -H switch.
  * Output of the ascii (third column) may be switched off with the -A switch.
  *
  * For useage help type the switch -h;
@@ -52,6 +55,12 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.9  2022/10/15 06:30:54  dutchLuck
+ * Added -S option to specify alternate column separator to space char
+ *
+ * Revision 0.8  2022/10/12 09:27:42  dutchLuck
+ * Added -c option to change character used to indicate non-ASCII bytes
+ *
  * Revision 0.7  2022/09/23 14:18:45  owen
  * Made sure multiple input files worked with an output file
  *
@@ -80,7 +89,6 @@
  *
  * ihad.c code developed from writeSimpleTemplateCode.c version 0.0.
  *
- *
  */
 
 #include <stdio.h>	/* printf() fopen() perror() fgetc() fclose() fprintf() */
@@ -88,7 +96,7 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.7 2022/09/23 14:18:45 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.9 2022/10/15 06:30:54 dutchLuck Exp dutchLuck $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -99,8 +107,8 @@
 
 
 /* Command line Optional Switches: */
-/*  Ascii, charAlternate, decimal, Debug, fieldSepWidth, help, Hex, Index, outFile, space, verbosity, width */
-const char  optionStr[] = "Ac:dDf:hHIo:sv::w:";
+/*  Ascii, charAlternate, decimal, Debug, fieldSepWidth, help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
+const char  optionStr[] = "Ac:dDf:hHIo:sS:v::w:";
 
 /* Global Flags & Data */
 int  A_Flg;			/* Control Ascii column output */
@@ -119,6 +127,9 @@ char *  oStrng;			/* output file name */
 FILE * ofp;			/* output file pointer */
 int  sFlg;			/* Control output of space in ascii column */
 char  lowestPrintableAsciiChar;
+int  S_Flg;			/* Control Char used between columns */
+char *  S_Strng;
+char defaultColumnChar[] = " ";
 int  vFlg, verbosityLevel;	/* Control verbosity level */
 char *  vStrng;
 int  wFlg, byteDisplayWidth;	/* Control number of bytes dealt with per line */
@@ -142,6 +153,8 @@ void  setGlobalFlagDefaults( void )  {
   ofp = stdout;		/* Output file pointer defaults to stdout */
   sFlg = 0;			/* Default to replacing space with a '.' in ascii column */
   lowestPrintableAsciiChar = '!';	/* '!' is next to space */
+  S_Flg = 0;			/* Default to using space as the column separator */
+  S_Strng = defaultColumnChar;
   vFlg = verbosityLevel = 0;	/* Default to no verbose output */
   vStrng = ( char * ) NULL;
   wFlg = 0;			/* Default to DEFAULT_WIDTH bytes per line */
@@ -153,9 +166,9 @@ void  setGlobalFlagDefaults( void )  {
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
-  printf( "  where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -v X -w X'; -\n" );
+  printf( "  where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -\n" );
   printf( "   -A .. Ascii output disable\n" );
-  printf( "   -c C .. Set char C as non-ASCII indicator\n" );
+  printf( "   -c C .. Set char C as non-ASCII indicator & overide -A option\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
   printf( "   -f X .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
@@ -164,7 +177,8 @@ void  printOutHelpMessage( char * programName )  {
   printf( "   -I .. Index output disable\n" );
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. Classify space char as printable in Ascii output\n" );
-  printf( "   -v X .. Verbose output enable, set level to X (where 0 < X < 4)\n" );
+  printf( "   -S C .. Set char C as column separator\n" );
+  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X < 4)\n" );
   printf( "   -w X .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
   printf( "  where; -\n" );
   printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
@@ -193,6 +207,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
       case 'I' :  I_Flg = 1; break;
       case 'o' :  oFlg = 1; oStrng = optarg; break;
       case 's' :  sFlg = 1; lowestPrintableAsciiChar = ' '; break;
+      case 'S' :  S_Flg = 1; S_Strng = optarg; break;
       case 'v' :  vFlg = 1; vStrng = optarg; break;
       case 'w' :  wFlg = 1; wStrng = optarg; break;
       default :
@@ -203,60 +218,64 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   }
 
 /* Postprocess -D (debug) switch option */
+  if( D_Flg )  printf( "Option '-D' is %s (%d)\n", D_Flg ? "True" : "False", D_Flg );
   if( D_Flg )  {
-    printf( "Flag for option '-D' is %d\n", D_Flg );
+    if( ! vFlg )  {
+      vFlg = 1;     /* -v processing still to come will set level to 0 if not specified */
+      printf( "Warning: verbose option '-v' set True by -D option\n" );
+    }
   }
 
 /* Postprocess -v (verbosityLevel) switch option */
-  if( D_Flg )  printf( "Flag for option '-v' is %d\n", vFlg );
+  if( D_Flg )  printf( "Debug: Option '-v' is %s (%d)\n", vFlg ? "True" : "False", vFlg );
   if( vFlg )  {
     if( vStrng == ( char * ) NULL )  {
-      if( D_Flg )  printf( "String for option '-v' is uninitialised, using default value of 1\n" );
-      verbosityLevel = 1;
+      if( D_Flg )  printf( "? String for option '-v' is uninitialised, using default value of 0\n" );
+      verbosityLevel = 0;
     }
     else  {
-      if( D_Flg )  printf( "String for option '-v' is %s\n", vStrng );
+      if( D_Flg )  printf( "Debug: String for option '-v' is %s\n", vStrng );
       verbosityLevel = atoi( vStrng );
-      if( verbosityLevel > 4 )  verbosityLevel = 4;
-      else if( verbosityLevel < 1 )  verbosityLevel = 1; 
+      if( verbosityLevel > 3 )  verbosityLevel = 3;
+      else if( verbosityLevel < 1 )  verbosityLevel = 0; 
     }
-    if( D_Flg )  printf( "verbosity level is %d\n", verbosityLevel );
+    if( D_Flg )  printf( "Debug: verbosity level is %d\n", verbosityLevel );
   }
   else  {
-    if( D_Flg )  printf( "switch '-v' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option '-v' was not found in the command line options\n" );
   }
   
 /* Postprocess -f (fieldSeparatorWidth) switch option */
-  if( D_Flg )  printf( "Flag for option '-f' is %d\n", fFlg );
+  if( D_Flg )  printf( "Debug: Option '-f' is %s (%d)\n", fFlg ? "True" : "False", fFlg );
   if( fFlg )  {
     if( fStrng == ( char * ) NULL )  {
-      if( D_Flg )  printf( "String for option '-f' is uninitialised, using default value of 1\n" );
+      printf( "? String for option '-f' is uninitialised, using default value of 1\n" );
       fieldSeparatorWidth = 1;
     }
     else  {
-      if( D_Flg )  printf( "String for option '-f' is %s\n", fStrng );
+      if( D_Flg )  printf( "Debug: String for option '-f' is %s\n", fStrng );
       fieldSeparatorWidth = atoi( fStrng );
       if( fieldSeparatorWidth > 2 )  fieldSeparatorWidth = 2;
       else if( fieldSeparatorWidth < 0 )  fieldSeparatorWidth = 0; 
     }
-    if( D_Flg )  printf( "field separator width is %d\n", fieldSeparatorWidth );
+    if( D_Flg )  printf( "Debug: field separator width is %d\n", fieldSeparatorWidth );
   }
   else  {
-    if( D_Flg )  printf( "switch '-f' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option '-f' was not found in the command line options\n" );
   }
   
 /* Postprocess -w (width) switch option */
-  if( D_Flg )  printf( "Flag for option '-w' is %d\n", wFlg );
+  if( D_Flg )  printf( "Debug: Option '-w' is %s (%d)\n", wFlg ? "True" : "False", wFlg );
   if( wFlg )  {
     if( wStrng == ( char * ) NULL )  {
       byteDisplayWidth = DEFAULT_WIDTH;
-      if( D_Flg )  printf( "String for option '-w' is uninitialised, using default value of %d\n", byteDisplayWidth );
+      printf( "? String for option '-w' is uninitialised, using default value of %d\n", byteDisplayWidth );
     }
     else  {
-      if( D_Flg )  printf( "String for option '-w' is %s\n", wStrng );
+      if( D_Flg )  printf( "Debug: String for option '-w' is %s\n", wStrng );
    /* Convert width specification to integer */
       byteDisplayWidth = atoi( wStrng );
-      if( D_Flg )  printf( "The '%s' string for option '-w' was converted to %d\n", wStrng, byteDisplayWidth );
+      if( D_Flg )  printf( "Debug: The '%s' string for option '-w' was converted to %d\n", wStrng, byteDisplayWidth );
    /* Rough check on atoi() output - was it a valid conversion */
       if(( byteDisplayWidth == 0 ) &&
           ( ! (( *wStrng == '0' ) || (( wStrng[ 1 ] == '0') && (( *wStrng == '+' ) || (*wStrng == '-' ))))))  {
@@ -267,14 +286,14 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     }
   }
   else  {
-    if( D_Flg )  printf( "switch '-w' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option '-w' was not found in the command line options\n" );
     byteDisplayWidth = (( dFlg ) ? DEFAULT_DECIMAL_WIDTH : DEFAULT_WIDTH );
   }
-  if( D_Flg )  printf( "byte Display Width is %d\n", byteDisplayWidth );
+  if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
   
 /* Postprocess -o switch option */
+  if( D_Flg )  printf( "Debug: Option '-o' is %s (%d)\n", oFlg ? "True" : "False", oFlg );
   if( oFlg )  {
-    if( D_Flg )  printf( "Flag for option '-o' is %d\n", oFlg );
     if( oStrng == ( char * ) NULL )  {
       printf( "?? File name string for option '-o outfileName' is uninitialised\n" );
       oFlg = 0;
@@ -282,16 +301,16 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
       fprintf( stderr, "Defaulting to writing output to stdout\n" );
     }
     else  {
-      if( D_Flg )  printf( "File name string part of option '-o' is '%s'\n", oStrng );
+      if( D_Flg )  printf( "Debug: File name string part of option '-o' is '%s'\n", oStrng );
     }
   }
   else  {
-    if( D_Flg )  printf( "switch '-o outfileName' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option '-o outfileName' was not found in the command line options\n" );
   }
-  
+
 /* Postprocess -c switch option */
+  if( D_Flg )  printf( "Debug: Option '-c' is %s (%d)\n", cFlg ? "True" : "False", cFlg );
   if( cFlg )  {
-    if( D_Flg )  printf( "Flag for option '-c' is %d\n", oFlg );
     if( cStrng == ( char * ) NULL )  {
       printf( "?? Character string for option '-c alternateChar' is uninitialised\n" );
       cFlg = 0;
@@ -299,19 +318,38 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
       fprintf( stderr, "Defaulting to writing non-ASCII as '.'\n" );
     }
     else  {
-      if( D_Flg )  printf( "Alternate Char string part of option '-c' is '%s'\n", cStrng );
+      if( D_Flg )  printf( "Debug: Alternate Char string part of option '-c' is '%s'\n", cStrng );
+      if( A_Flg )  {
+        A_Flg = 0;
+        printf( "Warning: -A option reset as a valid -c option overides it\n" );
+      }
     }
   }
   else  {
-    if( D_Flg )  printf( "switch '-c alternateChar' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option '-c alternateChar' was not found in the command line options\n" );
+  }
+  
+/* Postprocess -S switch option */
+  if( D_Flg )  printf( "Debug: Option '-S' is %s (%d)\n", S_Flg ? "True" : "False", S_Flg );
+  if( S_Flg )  {
+    if( S_Strng == ( char * ) NULL )  {
+      printf( "?? Character string for option '-S char' is uninitialised\n" );
+      S_Flg = 0;
+      S_Strng  = defaultColumnChar;
+      fprintf( stderr, "Defaulting to space as column separator\n" );
+    }
+    else  {
+      if( D_Flg )  printf( "Debug: Column separator Char string part of option '-S' is '%s'\n", S_Strng );
+    }
+  }
+  else  {
+    if( D_Flg )  printf( "Debug: Option '-S char' was not found in the command line options\n" );
   }
   
 /* Report on -h switch option */
-  if( hFlg )  {
-    if( D_Flg )  printf( "Flag for option '-h' is %d\n", hFlg );
-  }
-  else  {
-    if( D_Flg )  printf( "switch '-h' was not found in the command line options\n" );
+  if( D_Flg )  printf( "Debug: Option '-h' is %s (%d)\n", hFlg ? "True" : "False", hFlg );
+  if( ! hFlg )  {
+    if( D_Flg )  printf( "Debug: Option '-h' was not found in the command line options\n" );
   }
 
 /* return the index of the first positional argument (i.e. input file name?) */
@@ -319,9 +357,9 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 }
 
 
-int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
+long  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
   int  byte;
-  int  byteCnt = 0;
+  long  byteCnt = 0L;
   unsigned long  byteAddr = 0L;	/* Index of first byte in each output line */
   char *  outputString;		/* pointer to character string to print to stdout or a file */
   int  outputStringSize;		/* must be big enough for MAX_WIDTH bytes per line */
@@ -334,9 +372,9 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
   hexFldWdth = HEX_BYTE_FIELD_WIDTH + fieldSeparatorWidth;
   if( hexFldWdth > ( sizeof( hexFldFrmt ) - 7))  hexFldWdth = ( sizeof( hexFldFrmt ) - 7);
   else if( hexFldWdth < 2 )  hexFldWdth = 2;
-  sprintf( hexFldFrmt, "%c02x     ", '%' );	/* Set up a string of the form "%02x  " */
+  sprintf( hexFldFrmt, "%c02x%c%c%c%c%c", '%', *S_Strng, *S_Strng, *S_Strng, *S_Strng, *S_Strng );	/* Set up a string of the form "%02x  " */
   bPtr = hexFldFrmt + ( 2 + hexFldWdth );	/* Temp use of bPtr to point to end of Hex format string */
-  *bPtr = '\0';	/* Terminate Hex format string with the correct number of spaces */
+  *bPtr = '\0';	/* Terminate Hex format string with the correct number of column separators (Defaults to space) */
 /* Get a suitably sized buffer to hold the output string */
   outputStringSize = (( I_Flg ) ? 4 : 14 ) + (( hexFldWdth ) + (( A_Flg ) ? 0 : 1 )) * byteDisplayWidth;
   outputString = malloc( outputStringSize );
@@ -346,9 +384,9 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
   }
   else  {
     if( D_Flg )  {
-      printf( "hexFldWdth is %d and hexFldFrmt is '%s'\n", hexFldWdth, hexFldFrmt ); 
-      printf( "Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
-      printf( "Capacity of output string is %d characters\n", outputStringSize );
+      printf( "Debug: hexFldWdth is %d and hexFldFrmt is '%s'\n", hexFldWdth, hexFldFrmt ); 
+      printf( "Debug: Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
+      printf( "Debug: Capacity of output string is %d characters\n", outputStringSize );
     }
     *outputString = '\0';		/* in-case the stdin or file has 0 length */
  /* Read bytes from stdin or file */
@@ -357,12 +395,12 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
       byteCnt += 1;
    /* Initialize new line if required */
       if(( byteAddr % byteDisplayWidth ) == 0 )  {
-     /* Make the line buffer all space characters */
-        bPtr = ( char * ) memset( outputString, 0x20, outputStringSize );
+     /* Make the line buffer all column spearator characters (defaults to space characters) */
+        bPtr = ( char * ) memset( outputString, *S_Strng, outputStringSize );
      /* Put the Index in the line buffer, if not disabled */
         if( ! I_Flg )  {
-          sprintf( bPtr, ( dFlg ) ? "%08lu " : "%08lx ", byteAddr );
-	  if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), " " );
+          sprintf( bPtr, ( dFlg ) ? "%08lu%c" : "%08lx%c", byteAddr, *S_Strng );
+	  if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), S_Strng );
           bPtr += strlen( outputString );
         }
         aPtr = bPtr + (( H_Flg ) ? 0 : ( hexFldWdth * byteDisplayWidth + 1 ));
@@ -384,12 +422,12 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
       if(( ++byteAddr % byteDisplayWidth ) == 0 )  {
         if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
         else  {
-          if( ! H_Flg )  *bPtr = ' ';	/* Don't use byte pointer if Hexadecimal is not being output */
+          if( ! H_Flg )  *bPtr = *S_Strng;	/* Don't use byte pointer if Hexadecimal is not being output */
           sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
         }
         fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
         if( D_Flg )
-          printf( "Output string is %lu characters\n", strlen( outputString ));
+          printf( "Debug: Output string is %lu characters\n", strlen( outputString ));
         *outputString = '\0';		/* set string back to zero length */
       }
     }
@@ -397,12 +435,12 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
     if( strlen( outputString ) > 0 )  {
       if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
       else  {
-        if( ! H_Flg )  *bPtr = ' ';	/* Don't use byte pointer if Hexadecimal is not being output */
+        if( ! H_Flg )  *bPtr = *S_Strng;	/* Don't use byte pointer if Hexadecimal is not being output */
         sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
       }
       fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
       if( D_Flg )
-        printf( "Output string is %lu characters\n", strlen( outputString ));
+        printf( "Debug: Output string is %lu characters\n", strlen( outputString ));
     }
     if( outputString != NULL )  {
       free( outputString );
@@ -413,11 +451,12 @@ int  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
 
 
 int  processA_SingleCommandLineParameter( char *  nameStrng )  {
-  int  result, byteCnt;
+  int  result;
+  long  byteCnt;
   FILE *  fp;
 
   if( D_Flg || ( verbosityLevel > 1 ))  {
-    printf( "Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
+    printf( "! Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
   }
 /* Open the file for reading (in binary mode) */
   result = (( fp = fopen( nameStrng, "rb" ) ) != NULL );
@@ -433,7 +472,7 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
       printf( "?? Unable to close the file named '%s'\n", nameStrng );
       perror( "processA_SingleCommandLineParameter()" );
     }
-    if( D_Flg || vFlg )  printf( "File %s is %d bytes\n", nameStrng, byteCnt );
+    if( D_Flg || vFlg )  printf( "Dumped '%s' (%ld bytes)\n", nameStrng, byteCnt );
   }
   return( result );
 }
@@ -445,10 +484,10 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
 
   result = 0;
   if( D_Flg )  {
-    printf( "Executing: processNonSwitchCommandLineParameters()\n" );
-    printf( "first index is %d and last index is %d\n", frstIndx, lstIndx );
+    printf( "Debug: Executing: processNonSwitchCommandLineParameters()\n" );
+    printf( "Debug: first index is %d and last index is %d\n", frstIndx, lstIndx );
     for( indx = frstIndx; indx <= lstIndx; indx++ )  {
-      printf( "cmdLnStrngs[ %d ] string is '%s'\n", indx, cmdLnStrngs[ indx ] );
+      printf( "Debug: cmdLnStrngs[ %d ] string is '%s'\n", indx, cmdLnStrngs[ indx ] );
     }
   }
   if(( oFlg ) && ( oStrng == ( char * ) NULL ))  {
@@ -494,8 +533,8 @@ int  main( int  argc, char *  argv[] )  {
 /* Process switch options from the command line */
   resultIndex = processCommandLineOptions( argc, argv );
 
-/* If Debug or high verbosity then print code details */
-  if( D_Flg || ( verbosityLevel > 1 ))  {
+/* If Debug or verbose options are True then print code details */
+  if( D_Flg || ( verbosityLevel > 0 ))  {
     printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
     printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
   }
@@ -508,9 +547,9 @@ int  main( int  argc, char *  argv[] )  {
 
 /* If Debug then show rest of non-switch command line options if there are any */
   if( D_Flg )  {
-    printf( "argc is %d and option index is %d\n", argc, resultIndex );
+    printf( "Debug: argc is %d and option index is %d\n", argc, resultIndex );
     for( indx = resultIndex; indx < argc; indx++ )  {
-      printf( "argv[ %d ] string is '%s'\n", indx, argv[ indx ] );
+      printf( "Debug: argv[ %d ] string is '%s'\n", indx, argv[ indx ] );
     }
   }
   
