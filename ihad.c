@@ -55,6 +55,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.10  2022/10/17 00:18:15  dutchLuck
+ * Cleaned up 1 remaining debug statement not prefaced by Debug:
+ *
  * Revision 0.9  2022/10/15 06:30:54  dutchLuck
  * Added -S option to specify alternate column separator to space char
  *
@@ -96,7 +99,7 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.9 2022/10/15 06:30:54 dutchLuck Exp dutchLuck $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.10 2022/10/17 00:18:15 dutchLuck Exp dutchLuck $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -218,7 +221,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   }
 
 /* Postprocess -D (debug) switch option */
-  if( D_Flg )  printf( "Option '-D' is %s (%d)\n", D_Flg ? "True" : "False", D_Flg );
+  if( D_Flg )  printf( "Debug: Option '-D' is %s (%d)\n", D_Flg ? "True" : "False", D_Flg );
   if( D_Flg )  {
     if( ! vFlg )  {
       vFlg = 1;     /* -v processing still to come will set level to 0 if not specified */
