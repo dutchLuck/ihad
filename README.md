@@ -89,7 +89,27 @@ $
 ```
 
 ```
-xxd -g 0 yourFile
+$ xxd -g 0 tmp.dat
+00000000: 000102030405060708090a0b0c0d0e0f  ................
+00000010: 101112131415161718191a1b1c1d1e1f  ................
+00000020: 202122232425262728292a2b2c2d2e2f   !"#$%&'()*+,-./
+00000030: 303132333435363738393a3b3c3d3e3f  0123456789:;<=>?
+00000040: 404142434445464748494a4b4c4d4e4f  @ABCDEFGHIJKLMNO
+00000050: 505152535455565758595a5b5c5d5e5f  PQRSTUVWXYZ[\]^_
+00000060: 606162636465666768696a6b6c6d6e6f  `abcdefghijklmno
+00000070: 707172737475767778797a7b7c7d7e7f  pqrstuvwxyz{|}~.
+00000080: 808182838485868788898a8b8c8d8e8f  ................
+00000090: 909192939495969798999a9b9c9d9e9f  ................
+000000a0: a0a1a2a3a4a5a6a7a8a9aaabacadaeaf  ................
+000000b0: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf  ................
+000000c0: c0c1c2c3c4c5c6c7c8c9cacbcccdcecf  ................
+000000d0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf  ................
+000000e0: e0e1e2e3e4e5e6e7e8e9eaebecedeeef  ................
+000000f0: f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff  ................
+00000100: 54686973206973206120737472696e67  This is a string
+00000110: 206f6620415343494920636861726163   of ASCII charac
+00000120: 746572730a                        ters.
+$
 ```
 
 OR an on-line alternative is; -
@@ -98,10 +118,10 @@ OR an on-line alternative is; -
 http://www.fileformat.info/tool/hexdump.htm 
 ```
 
-OR if you are on Microsoft Windows and are ok with unicode text, instead of strictly ASCII, output; -
+OR if you have Microsoft Windows powershell and are ok with unicode text, instead of strictly ASCII, output; -
 
 ```
-> format-hex tmp.dat
+> format-hex C:\test\tmp.dat
 
 
            Path: C:\test\tmp.dat
@@ -132,10 +152,10 @@ OR if you are on Microsoft Windows and are ok with unicode text, instead of stri
 
 With so many well established utilites to dump a file, why bother to create another?
 Well... the output of ihad is somewhat cleaner than the output from the utility programs mentioned above.
-The default output of ihad has just a single space between each of the three columns in the default ihad output,
-except that there are multiple padding spaces in the last line if it is short on bytes.
+The default output of ihad has just a single space between each of the three columns of output,
+except that there may be multiple padding spaces in the last line if it is short on bytes.
 For example "hexdump -C" puts in extra space characters and book-ends the
-Ascii column with the "|" character and "od -A x -t x1z" also puts extra space characters
+Ascii column with the "|" character and "od -A x -t x1z" also puts in extra space characters
 and puts ">" "<" bookends around the Ascii column and "xxd -g 0" puts a colon on the end of the index number.
 
 The ihad command has a number of options which are outlined in the useage information.
@@ -166,7 +186,7 @@ Useage:
    Note that if no input file is specified then input is taken from stdin.
 
 Note that if ihad output isn't acceptable you can try; -
-xxd
+xxd -g 0
 hexdump -C
 od -A x -t x1z -v
 ```
