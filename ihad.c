@@ -9,7 +9,7 @@
  * PLEASE do not use it for anything serious! Instead use; -
  *
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
- * OR  xxd yourFile
+ * OR  xxd -g 0 yourFile
  * OR  od -A x -t x1z -v yourFile
  * OR  format-hex on Microsoft Windows in powershell i.e.  format-hex yourFile
  * OR  http://www.fileformat.info/tool/hexdump.htm 
@@ -55,6 +55,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.11  2022/10/23 14:13:51  dutchLuck
+ * Added -b X option to begin dumping the file after skipping X bytes.
+ *
  * Revision 0.10  2022/10/17 00:18:15  dutchLuck
  * Cleaned up 1 remaining debug statement not prefaced by Debug:
  *
@@ -94,12 +97,12 @@
  *
  */
 
-#include <stdio.h>	/* printf() fopen() perror() fgetc() fclose() fprintf() */
-#include <stdlib.h>	/* atoi() malloc() free() */
+#include <stdio.h>	/* printf() fopen() perror() fgetc() fclose() fprintf() fseek() */
+#include <stdlib.h>	/* atoi() malloc() free() atol() */
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.10 2022/10/17 00:18:15 dutchLuck Exp dutchLuck $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.11 2022/10/23 14:13:51 dutchLuck Exp dutchLuck $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -110,11 +113,14 @@
 
 
 /* Command line Optional Switches: */
-/*  Ascii, charAlternate, decimal, Debug, fieldSepWidth, help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
-const char  optionStr[] = "Ac:dDf:hHIo:sS:v::w:";
+/*  Ascii, beginOffset, charAlternate, decimal, Debug, fieldSepWidth, help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
+const char  optionStr[] = "Ab:c:dDf:hHIo:sS:v::w:";
 
 /* Global Flags & Data */
 int  A_Flg;			/* Control Ascii column output */
+int  bFlg;		    /* begin offset bytes from the start of the file */
+long  beginOffset;
+char *  bStrng;
 int  cFlg;			/* use alternate char instead of full stops for non-ASCII */
 char *  cStrng;
 char defaultCharStrng[] = ".";
@@ -141,7 +147,10 @@ char *  wStrng;
 
 void  setGlobalFlagDefaults( void )  {
 /* Preset command line options */
-  A_Flg = 0;			/* Default is Ascii column output */
+  A_Flg = 0;		/* Default is Ascii column output */
+  bFlg = 0;		    /* Default to begin the dump at the beginning of the file */
+  beginOffset = 0L;
+  bStrng = ( char * ) NULL;
   cFlg = 0;			/* Default to output full-stops */
   cStrng = defaultCharStrng;
   dFlg = 0;			/* Default to output hex index rather than decimal index */
@@ -171,6 +180,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
   printf( "  where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -\n" );
   printf( "   -A .. Ascii output disable\n" );
+  printf( "   -b X .. Set beginning of file dumps by skipping X bytes at the start of each file\n" );
   printf( "   -c C .. Set char C as non-ASCII indicator & overide -A option\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
@@ -187,7 +197,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
   printf( "    of file(s) to dump in hex & ascii\n" );
   printf( "   Note that if no input file is specified then input is taken from stdin.\n\n" );
-  printf( "Note that if ihad output isn't acceptable you can try; -\nxxd\nhexdump -C\nod -A x -t x1z -v\n\n" );
+  printf( "Note that if ihad output isn't acceptable you can try; -\nxxd -g 0\nhexdump -C\nod -A x -t x1z -v\n\n" );
 }
 
 
@@ -201,6 +211,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   while(( result = getopt( argc, argv, optionStr )) != -1 )  {
     switch( result )  {
       case 'A' :  A_Flg = 1; break;
+      case 'b' :  bFlg = 1; bStrng = optarg; break;
       case 'c' :  cFlg = 1; cStrng = optarg; break;
       case 'd' :  dFlg = 1; break;
       case 'D' :  D_Flg = 1; break;
@@ -266,7 +277,32 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   else  {
     if( D_Flg )  printf( "Debug: Option '-f' was not found in the command line options\n" );
   }
-  
+
+/* Postprocess -b (begin at offset) switch option */
+  if( D_Flg )  printf( "Debug: Option '-b' is %s (%d)\n", bFlg ? "True" : "False", bFlg );
+  if( bFlg )  {
+    if( bStrng == ( char * ) NULL )  {
+      beginOffset = 0L;
+      printf( "? String for option '-b' is uninitialised, using default value of %ld\n", beginOffset );
+    }
+    else  {
+      if( D_Flg )  printf( "Debug: String for option '-b' is %s\n", bStrng );
+   /* Convert offset specification to unsigned long */
+      beginOffset = atol( bStrng );
+      if( D_Flg )  printf( "Debug: The '%s' string for option '-b' was converted to %ld\n", bStrng, beginOffset );
+   /* Rough check on atol() output - was it a valid conversion */
+      if(( beginOffset == 0L ) &&
+          ( ! (( *bStrng == '0' ) || (( bStrng[ 1 ] == '0') && (( *bStrng == '+' ) || (*bStrng == '-' ))))))  {
+        fprintf( stderr, "\n?? Unable to convert '%s' to unsigned long for option '-b'\n", bStrng );
+      }
+    }
+  }
+  else  {
+    if( D_Flg )  printf( "Debug: Option '-w' was not found in the command line options\n" );
+    byteDisplayWidth = (( dFlg ) ? DEFAULT_DECIMAL_WIDTH : DEFAULT_WIDTH );
+  }
+  if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
+
 /* Postprocess -w (width) switch option */
   if( D_Flg )  printf( "Debug: Option '-w' is %s (%d)\n", wFlg ? "True" : "False", wFlg );
   if( wFlg )  {
@@ -293,7 +329,8 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     byteDisplayWidth = (( dFlg ) ? DEFAULT_DECIMAL_WIDTH : DEFAULT_WIDTH );
   }
   if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
-  
+
+
 /* Postprocess -o switch option */
   if( D_Flg )  printf( "Debug: Option '-o' is %s (%d)\n", oFlg ? "True" : "False", oFlg );
   if( oFlg )  {
@@ -360,14 +397,14 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 }
 
 
-long  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
+long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
   int  byte;
   long  byteCnt = 0L;
   unsigned long  byteAddr = 0L;	/* Index of first byte in each output line */
-  char *  outputString;		/* pointer to character string to print to stdout or a file */
+  char *  outputString;         /* pointer to character string to print to stdout or a file */
   int  outputStringSize;		/* must be big enough for MAX_WIDTH bytes per line */
-  char *  bPtr; /* byte pointer */	/* output line space > 8+2+3*MAX_WIDTH+1+MAX_WIDTH+1 */
-  char *  aPtr; /* ascii pointer */
+  char *  bPtr;     /* byte pointer */	/* output line space > 8+2+3*MAX_WIDTH+1+MAX_WIDTH+1 */
+  char *  aPtr;     /* ascii pointer */
   int  hexFldWdth;
   char  hexFldFrmt[ 11 ];
 
@@ -392,18 +429,19 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
       printf( "Debug: Capacity of output string is %d characters\n", outputStringSize );
     }
     *outputString = '\0';		/* in-case the stdin or file has 0 length */
+ /* Take any fseek() skip into account if there was one */
+    byteAddr = startOffset;
  /* Read bytes from stdin or file */
     while(( byte = fgetc( fp )) != EOF )  {
       byte &= BYTE_MASK;
-      byteCnt += 1;
    /* Initialize new line if required */
-      if(( byteAddr % byteDisplayWidth ) == 0 )  {
+      if(( byteCnt++ % byteDisplayWidth ) == 0 )  {
      /* Make the line buffer all column spearator characters (defaults to space characters) */
         bPtr = ( char * ) memset( outputString, *S_Strng, outputStringSize );
      /* Put the Index in the line buffer, if not disabled */
         if( ! I_Flg )  {
           sprintf( bPtr, ( dFlg ) ? "%08lu%c" : "%08lx%c", byteAddr, *S_Strng );
-	  if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), "%s", S_Strng );
+	      if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), "%s", S_Strng );
           bPtr += strlen( outputString );
         }
         aPtr = bPtr + (( H_Flg ) ? 0 : ( hexFldWdth * byteDisplayWidth + 1 ));
@@ -422,7 +460,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
         aPtr += 1;
       }
    /* Output current line if required */
-      if(( ++byteAddr % byteDisplayWidth ) == 0 )  {
+      if(( byteCnt % byteDisplayWidth ) == 0 )  {
         if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
         else  {
           if( ! H_Flg )  *bPtr = *S_Strng;	/* Don't use byte pointer if Hexadecimal is not being output */
@@ -432,6 +470,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp )  {
         if( D_Flg )
           printf( "Debug: Output string is %lu characters\n", strlen( outputString ));
         *outputString = '\0';		/* set string back to zero length */
+        byteAddr = startOffset + byteCnt;
       }
     }
  /* Finish off last line if it is a short line */
@@ -468,8 +507,22 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
     perror( "processA_SingleCommandLineParameter()" );
   }
   else  {
+ /* If begin option has set an offset then seek to the new start */
+    if( bFlg )  {
+      if( beginOffset > 0 )  {
+        result = fseek( fp, beginOffset, SEEK_SET );
+      }
+      if( D_Flg )  {
+        printf( "Debug: result of fseek() was %d\n", result );
+      }
+ /* If there was a problem with the seek make sure it starts at 0 */
+      if( result != 0 )  {
+        rewind( fp );
+        beginOffset = 0L;
+      }
+    }
  /* Process the file just opened */
-    byteCnt = readByteStreamAndPrintIndexHexAscii( fp );
+    byteCnt = readByteStreamAndPrintIndexHexAscii( fp, beginOffset );
     result = ( fclose( fp ) == 0 );
     if( ! result )  {
       printf( "?? Unable to close the file named '%s'\n", nameStrng );
@@ -506,7 +559,7 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
     else  {
       if(( lstIndx + 1 ) == frstIndx )  {
    /* There are no files specified in the command line so process stdin */
-        chrCnt = readByteStreamAndPrintIndexHexAscii( stdin );
+        chrCnt = readByteStreamAndPrintIndexHexAscii( stdin, 0L );
         if( D_Flg || vFlg )  printf( "Processed %d chars from stdin\n", chrCnt );
       }
       else  {

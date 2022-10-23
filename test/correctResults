@@ -171,6 +171,7 @@ Useage:
 ../ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
   where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -
    -A .. Ascii output disable
+   -b X .. Set beginning of file dumps by skipping X bytes at the start of each file
    -c C .. Set char C as non-ASCII indicator & overide -A option
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
@@ -190,7 +191,7 @@ Useage:
    Note that if no input file is specified then input is taken from stdin.
 
 Note that if ihad output isn't acceptable you can try; -
-xxd
+xxd -g 0
 hexdump -C
 od -A x -t x1z -v
 
