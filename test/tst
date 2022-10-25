@@ -60,4 +60,10 @@ cat test.tmp
 rm test.tmp
 echo "+++++++++++ cat test52.dat | ihad              +++++++++++++++"
 cat test52.dat | ../ihad 
+echo "+++++++++++ ihad -c_ test256.dat                +++++++++++++++"
+../ihad -c_ test256.dat 
+echo "+++++++++++ ihad -S, test52.dat                +++++++++++++++"
+../ihad -S, test52.dat 
+echo "+++++++++++ ihad -b 26 test52.dat              +++++++++++++++"
+../ihad -b 26 test52.dat 
 
