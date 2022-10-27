@@ -178,7 +178,7 @@ void  setGlobalFlagDefaults( void )  {
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
-  printf( "  where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -\n" );
+  printf( "  where options are '-A -b X -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -\n" );
   printf( "   -A .. Ascii output disable\n" );
   printf( "   -b X .. Set beginning of file dumps by skipping X bytes at the start of each file\n" );
   printf( "   -c C .. Set char C as non-ASCII indicator & overide -A option\n" );
@@ -293,15 +293,14 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
    /* Rough check on atol() output - was it a valid conversion */
       if(( beginOffset == 0L ) &&
           ( ! (( *bStrng == '0' ) || (( bStrng[ 1 ] == '0') && (( *bStrng == '+' ) || (*bStrng == '-' ))))))  {
-        fprintf( stderr, "\n?? Unable to convert '%s' to unsigned long for option '-b'\n", bStrng );
+        fprintf( stderr, "\n?? Unable to convert '%s' into a long integer for option '-b'\n", bStrng );
       }
     }
   }
   else  {
-    if( D_Flg )  printf( "Debug: Option '-w' was not found in the command line options\n" );
-    byteDisplayWidth = (( dFlg ) ? DEFAULT_DECIMAL_WIDTH : DEFAULT_WIDTH );
+    if( D_Flg )  printf( "Debug: Option '-b' was not found in the command line options\n" );
   }
-  if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
+  if( D_Flg )  printf( "Debug: Begin at an offset in the file of %ld bytes\n", beginOffset );
 
 /* Postprocess -w (width) switch option */
   if( D_Flg )  printf( "Debug: Option '-w' is %s (%d)\n", wFlg ? "True" : "False", wFlg );
@@ -507,18 +506,18 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
     perror( "processA_SingleCommandLineParameter()" );
   }
   else  {
- /* If begin option has set an offset then seek to the new start */
+ /* If begin option has set an offset greater than zero then seek to the new start */
     if( bFlg )  {
-      if( beginOffset > 0 )  {
+      if( beginOffset > 0L )  {
         result = fseek( fp, beginOffset, SEEK_SET );
-      }
-      if( D_Flg )  {
-        printf( "Debug: result of fseek() was %d\n", result );
-      }
- /* If there was a problem with the seek make sure it starts at 0 */
-      if( result != 0 )  {
-        rewind( fp );
-        beginOffset = 0L;
+        if( D_Flg )  {
+          printf( "Debug: result of fseek() was %d\n", result );
+        }
+   /* If there was a problem with the seek make sure it starts at 0 */
+        if( result != 0 )  {
+          rewind( fp );
+          beginOffset = 0L;
+        }
       }
     }
  /* Process the file just opened */

@@ -169,7 +169,7 @@ f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
 
 Useage:
 ../ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
-  where options are '-A -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -
+  where options are '-A -b X -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -
    -A .. Ascii output disable
    -b X .. Set beginning of file dumps by skipping X bytes at the start of each file
    -c C .. Set char C as non-ASCII indicator & overide -A option
