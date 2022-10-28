@@ -55,6 +55,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.13  2022/10/28 12:18:01  dutchLuck
+ * Limit begin offset to size of files.
+ *
  * Revision 0.12  2022/10/28 06:18:40  dutchLuck
  * Fixed -b begin at offset in file if negetive value is specified
  *
@@ -105,8 +108,9 @@
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
 #include <limits.h> /* LONG_MIN INT_MIN */
+#include <sys/stat.h>   /* fstat() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.12 2022/10/28 06:18:40 dutchLuck Exp dutchLuck $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.13 2022/10/28 12:18:01 dutchLuck Exp dutchLuck $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -508,6 +512,7 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
   int  result;
   long  byteCnt;
   FILE *  fp;
+  long  fileSize;
 
   if( D_Flg || ( verbosityLevel > 1 ))  {
     printf( "! Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
@@ -519,9 +524,18 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
     perror( "processA_SingleCommandLineParameter()" );
   }
   else  {
+ /* obtain file size for the file that was just opened */
+    result = fseek( fp, 0L, SEEK_END );
+    if( result == 0 )  fileSize = ( long ) ftell( fp );
+    else  fileSize = LONG_MIN;
+    rewind( fp );
+    if( D_Flg )  printf( "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
  /* If begin option has set an offset greater than zero then seek to the new start */
     if( bFlg )  {
       if( beginOffset > 0L )  {
+     /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
+        if(( fileSize > 0L ) && ( beginOffset > fileSize ))  beginOffset = fileSize;
+     /* Start dumping at the begin offset */
         result = fseek( fp, beginOffset, SEEK_SET );
         if( D_Flg )  {
           printf( "Debug: result of fseek() was %d\n", result );
