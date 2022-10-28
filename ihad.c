@@ -55,6 +55,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.12  2022/10/28 06:18:40  dutchLuck
+ * Fixed -b begin at offset in file if negetive value is specified
+ *
  * Revision 0.11  2022/10/23 14:13:51  dutchLuck
  * Added -b X option to begin dumping the file after skipping X bytes.
  *
@@ -101,8 +104,9 @@
 #include <stdlib.h>	/* atoi() malloc() free() atol() */
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
+#include <limits.h> /* LONG_MIN INT_MIN */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.11 2022/10/23 14:13:51 dutchLuck Exp dutchLuck $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.12 2022/10/28 06:18:40 dutchLuck Exp dutchLuck $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -281,6 +285,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 /* Postprocess -b (begin at offset) switch option */
   if( D_Flg )  printf( "Debug: Option '-b' is %s (%d)\n", bFlg ? "True" : "False", bFlg );
   if( bFlg )  {
+    beginOffset = LONG_MIN;     /* set offset to a very unlikely number */
     if( bStrng == ( char * ) NULL )  {
       beginOffset = 0L;
       printf( "? String for option '-b' is uninitialised, using default value of %ld\n", beginOffset );
@@ -290,9 +295,8 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
    /* Convert offset specification to unsigned long */
       beginOffset = atol( bStrng );
       if( D_Flg )  printf( "Debug: The '%s' string for option '-b' was converted to %ld\n", bStrng, beginOffset );
-   /* Rough check on atol() output - was it a valid conversion */
-      if(( beginOffset == 0L ) &&
-          ( ! (( *bStrng == '0' ) || (( bStrng[ 1 ] == '0') && (( *bStrng == '+' ) || (*bStrng == '-' ))))))  {
+   /* Rough check on atol() output - did it reset beginOffset to zero when option value likely wasn't zero */
+      if(( beginOffset == 0L ) && ( *bStrng != '0' ))  {
         fprintf( stderr, "\n?? Unable to convert '%s' into a long integer for option '-b'\n", bStrng );
       }
     }
@@ -300,11 +304,17 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   else  {
     if( D_Flg )  printf( "Debug: Option '-b' was not found in the command line options\n" );
   }
+/* Ensure the begin point in the file is not negetive */
+  if( beginOffset < 0L )  {
+    beginOffset = 0L;
+    if( bFlg )  fprintf( stderr, "\n?? Reset negetive begin offset to %ld bytes\n", beginOffset );
+  }
   if( D_Flg )  printf( "Debug: Begin at an offset in the file of %ld bytes\n", beginOffset );
 
 /* Postprocess -w (width) switch option */
   if( D_Flg )  printf( "Debug: Option '-w' is %s (%d)\n", wFlg ? "True" : "False", wFlg );
   if( wFlg )  {
+    byteDisplayWidth = INT_MIN;
     if( wStrng == ( char * ) NULL )  {
       byteDisplayWidth = DEFAULT_WIDTH;
       printf( "? String for option '-w' is uninitialised, using default value of %d\n", byteDisplayWidth );
@@ -315,19 +325,22 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
       byteDisplayWidth = atoi( wStrng );
       if( D_Flg )  printf( "Debug: The '%s' string for option '-w' was converted to %d\n", wStrng, byteDisplayWidth );
    /* Rough check on atoi() output - was it a valid conversion */
-      if(( byteDisplayWidth == 0 ) &&
-          ( ! (( *wStrng == '0' ) || (( wStrng[ 1 ] == '0') && (( *wStrng == '+' ) || (*wStrng == '-' ))))))  {
+      if(( byteDisplayWidth == 0 ) && ( *wStrng != '0' ))  {
         fprintf( stderr, "\n?? Unable to convert '%s' to integer for option '-w'\n", wStrng );
       }
       if( byteDisplayWidth > MAX_WIDTH )  byteDisplayWidth = MAX_WIDTH;
-      else if( byteDisplayWidth < 1 )  byteDisplayWidth = DEFAULT_WIDTH; 
     }
   }
   else  {
     if( D_Flg )  printf( "Debug: Option '-w' was not found in the command line options\n" );
     byteDisplayWidth = (( dFlg ) ? DEFAULT_DECIMAL_WIDTH : DEFAULT_WIDTH );
   }
-  if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
+/* Ensure the display width is not zero and not negetive */
+  if( byteDisplayWidth < 1 )  {
+    byteDisplayWidth = DEFAULT_WIDTH;
+    if( wFlg )  fprintf( stderr, "\n?? Reset zero or negetive display width to %d bytes\n", byteDisplayWidth );
+  }
+ if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
 
 
 /* Postprocess -o switch option */
