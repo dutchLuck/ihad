@@ -55,6 +55,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.14  2022/10/29 12:12:13  dutchLuck
+ * Allowed -b to have negetive values that make the begin point relative to the file end.
+ *
  * Revision 0.13  2022/10/28 12:18:01  dutchLuck
  * Limit begin offset to size of files.
  *
@@ -110,7 +113,7 @@
 #include <limits.h> /* LONG_MIN INT_MIN */
 #include <sys/stat.h>   /* fstat() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.13 2022/10/28 12:18:01 dutchLuck Exp dutchLuck $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.14 2022/10/29 12:12:13 dutchLuck Exp dutchLuck $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -307,11 +310,6 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   }
   else  {
     if( D_Flg )  printf( "Debug: Option '-b' was not found in the command line options\n" );
-  }
-/* Ensure the begin point in the file is not negetive */
-  if( beginOffset < 0L )  {
-    beginOffset = 0L;
-    if( bFlg )  fprintf( stderr, "\n?? Reset negetive begin offset to %ld bytes\n", beginOffset );
   }
   if( D_Flg )  printf( "Debug: Begin at an offset in the file of %ld bytes\n", beginOffset );
 
@@ -520,14 +518,19 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
 /* Open the file for reading (in binary mode) */
   result = (( fp = fopen( nameStrng, "rb" ) ) != NULL );
   if( ! result )  {
-    printf( "?? Unable to open a file named '%s' for reading\n", nameStrng );
+    fprintf( stderr, "?? Unable to open a file named '%s' for reading\n", nameStrng );
     perror( "processA_SingleCommandLineParameter()" );
   }
   else  {
  /* obtain file size for the file that was just opened */
     result = fseek( fp, 0L, SEEK_END );
     if( result == 0 )  fileSize = ( long ) ftell( fp );
-    else  fileSize = LONG_MIN;
+    else  {
+      fileSize = LONG_MIN;
+      fprintf( stderr, "?? Unable to seek to end of the file named '%s'\n", nameStrng );
+      perror( "processA_SingleCommandLineParameter()" );
+    }
+  /* Ensure file is reset back to starting at 0 */
     rewind( fp );
     if( D_Flg )  printf( "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
  /* If begin option has set an offset greater than zero then seek to the new start */
@@ -535,16 +538,28 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
       if( beginOffset > 0L )  {
      /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
         if(( fileSize > 0L ) && ( beginOffset > fileSize ))  beginOffset = fileSize;
-     /* Start dumping at the begin offset */
+     /* Set up the start of the dumping at the begin offset */
         result = fseek( fp, beginOffset, SEEK_SET );
         if( D_Flg )  {
-          printf( "Debug: result of fseek() was %d\n", result );
+          printf( "Debug: result of fseek() from start of file was %d\n", result );
         }
-   /* If there was a problem with the seek make sure it starts at 0 */
-        if( result != 0 )  {
-          rewind( fp );
-          beginOffset = 0L;
+      }
+      else if( beginOffset < 0L )  {
+     /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
+        if(( beginOffset + fileSize ) < 0L )  beginOffset = -fileSize;
+        if( D_Flg )  printf( "Debug: beginOffset for SEEK_END is %ld\n", beginOffset );
+     /* Set up to start dumping at the begin offset from the end of the file */
+        result = fseek( fp, beginOffset, SEEK_END );
+     /* Adjust beginOffset to print correct Index */
+        if( result == 0 )  beginOffset += fileSize;
+        if( D_Flg )  {
+          printf( "Debug: result of fseek() from end of file was %d\n", result );
         }
+      }
+ /* If there was a problem with the seek make sure it starts at 0 */
+      if( result != 0 )  {
+        rewind( fp );
+        beginOffset = 0L;
       }
     }
  /* Process the file just opened */
