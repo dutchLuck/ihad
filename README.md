@@ -167,7 +167,7 @@ Useage:
 ihad.exe [options] [inputFile1 [inputFile2 [.. inputFileN]]]
   where options are '-A -b X -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -
    -A .. Ascii output disable
-   -b X .. Set beginning of file dumps by skipping X bytes at the start of each file
+   -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
    -c C .. Set char C as non-ASCII indicator & overide -A option
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
@@ -190,7 +190,6 @@ Note that if ihad output isn't acceptable you can try; -
 xxd -g 0
 hexdump -C
 od -A x -t x1z -v
-
 ```
 
 If the full stop at end of ASCII sentences is important then the -c C option enables the choice of a different
@@ -200,4 +199,6 @@ instead of the space character then it may be specified with the -S C option.
 For example a pseudo comma separated variable (CSV) output may be simulated with "-S ,".
 Note however, that the last line in this case will have too many commas,
 if it is shorter than the normal line length.
-The dump can be started at an offset into a file, using the -b X option.
+The dump can begin at an offset into a file, using the -b X option.
+If the X value is greater than zero then the offset is applied from the start of the file.
+If the X value is negetive then the offset is applied bacl from the end of the file.
