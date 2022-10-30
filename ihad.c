@@ -55,6 +55,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.15  2022/10/30 12:08:09  dutchLuck
+ * Updated usage to show change to -b option
+ *
  * Revision 0.14  2022/10/29 12:12:13  dutchLuck
  * Allowed -b to have negetive values that make the begin point relative to the file end.
  *
@@ -113,7 +116,7 @@
 #include <limits.h> /* LONG_MIN INT_MIN */
 #include <sys/stat.h>   /* fstat() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.14 2022/10/29 12:12:13 dutchLuck Exp dutchLuck $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.15 2022/10/30 12:08:09 dutchLuck Exp dutchLuck $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -191,7 +194,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
   printf( "  where options are '-A -b X -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -\n" );
   printf( "   -A .. Ascii output disable\n" );
-  printf( "   -b X .. Set beginning of file dumps by skipping X bytes at the start of each file\n" );
+  printf( "   -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)\n" );
   printf( "   -c C .. Set char C as non-ASCII indicator & overide -A option\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );

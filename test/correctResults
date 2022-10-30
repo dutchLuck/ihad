@@ -171,7 +171,7 @@ Useage:
 ../ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
   where options are '-A -b X -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -
    -A .. Ascii output disable
-   -b X .. Set beginning of file dumps by skipping X bytes at the start of each file
+   -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
    -c C .. Set char C as non-ASCII indicator & overide -A option
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
@@ -231,3 +231,6 @@ od -A x -t x1z -v
 +++++++++++ ihad -b 26 test52.dat              +++++++++++++++
 0000001a 4142434445464748494a4b4c4d4e4f50 ABCDEFGHIJKLMNOP
 0000002a 5152535455565758595a             QRSTUVWXYZ
++++++++++++ ihad -b -32 test52.dat            +++++++++++++++
+00000014 75767778797a4142434445464748494a uvwxyzABCDEFGHIJ
+00000024 4b4c4d4e4f505152535455565758595a KLMNOPQRSTUVWXYZ
