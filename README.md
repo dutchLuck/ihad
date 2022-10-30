@@ -201,4 +201,4 @@ Note however, that the last line in this case will have too many commas,
 if it is shorter than the normal line length.
 The dump can begin at an offset into a file, using the -b X option.
 If the X value is greater than zero then the offset is applied from the start of the file.
-If the X value is negetive then the offset is applied bacl from the end of the file.
+If the X value is negetive then the offset is applied back from the end of the file.
