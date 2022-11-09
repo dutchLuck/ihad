@@ -115,6 +115,7 @@
 #include <string.h>	/* memset() strlen() */
 #include <limits.h> /* LONG_MIN INT_MIN */
 #include <sys/stat.h>   /* fstat() */
+#include <ctype.h>	/* isprint() */
 
 #define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.15 2022/10/30 12:08:09 dutchLuck Exp dutchLuck $"
 
@@ -416,7 +417,15 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 
 long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
   int  byte;
+  int  collectSummary;	/* Flag that summary information is required */
   long  byteCnt = 0L;
+  long  isasciiCnt = 0L;
+  long  isprintCnt = 0L;
+  long  iscntrlCnt = 0L;
+  long  ispunctCnt = 0L;
+  long  isalphaCnt = 0L;
+  long  isdigitCnt = 0L;
+  long  freqArray[ 256 ];	/* track frequency of bytes */
   unsigned long  byteAddr = 0L;	/* Index of first byte in each output line */
   char *  outputString;         /* pointer to character string to print to stdout or a file */
   int  outputStringSize;		/* must be big enough for MAX_WIDTH bytes per line */
@@ -425,6 +434,9 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
   int  hexFldWdth;
   char  hexFldFrmt[ 11 ];
 
+/* set or reset flag according to the need to print summary information */
+  collectSummary = ( D_Flg || ( verbosityLevel > 1 ));
+  for( byte = 0; byte < 256; byte++ )  freqArray[ byte ] = 0L;
 /* Setup the format for printing the hex bytes */
   hexFldWdth = HEX_BYTE_FIELD_WIDTH + fieldSeparatorWidth;
   if( hexFldWdth > ( sizeof( hexFldFrmt ) - 7))  hexFldWdth = ( sizeof( hexFldFrmt ) - 7);
@@ -450,10 +462,21 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
     byteAddr = startOffset;
  /* Read bytes from stdin or file */
     while(( byte = fgetc( fp )) != EOF )  {
+      if( collectSummary )  {
+        if( isascii( byte ))  {
+          isasciiCnt++;	/* Count ASCII chars as defined by isascii() */
+          if( isprint( byte ))  isprintCnt++;	/* Count ASCII printable char as defined by isprint() i.e. includes space */
+          if( isalpha( byte ))  isalphaCnt++;	/* Count ASCII alphabet char as defined by isalpha() */
+          if( isdigit( byte ))  isdigitCnt++;	/* Count ASCII digit char as defined by isdigit() */
+          if( ispunct( byte ))  ispunctCnt++;	/* Count ASCII punctuation char as defined by ispunct() */
+          if( iscntrl( byte ))  iscntrlCnt++;	/* Count ASCII control char as defined by iscntrl() */
+          freqArray[ byte ]++;
+        }
+      }
       byte &= BYTE_MASK;
    /* Initialize new line if required */
       if(( byteCnt++ % byteDisplayWidth ) == 0 )  {
-     /* Make the line buffer all column spearator characters (defaults to space characters) */
+     /* Make the line buffer all column separator characters (defaults to space characters) */
         bPtr = ( char * ) memset( outputString, *S_Strng, outputStringSize );
      /* Put the Index in the line buffer, if not disabled */
         if( ! I_Flg )  {
@@ -483,7 +506,9 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
           if( ! H_Flg )  *bPtr = *S_Strng;	/* Don't use byte pointer if Hexadecimal is not being output */
           sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
         }
-        fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
+        if( ! ( I_Flg && H_Flg && A_Flg ))  {	/* Don't print lines of column separators if all 3 columns are off */
+          fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
+        }
         if( D_Flg )
           printf( "Debug: Output string is %lu characters\n", strlen( outputString ));
         *outputString = '\0';		/* set string back to zero length */
@@ -497,13 +522,23 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
         if( ! H_Flg )  *bPtr = *S_Strng;	/* Don't use byte pointer if Hexadecimal is not being output */
         sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
       }
-      fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
+      if( ! ( I_Flg && H_Flg && A_Flg ))  {	/* Don't print last line of column separators if all 3 columns are off */
+        fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
+      }
       if( D_Flg )
         printf( "Debug: Output string is %lu characters\n", strlen( outputString ));
     }
     if( outputString != NULL )  {
       free( outputString );
     }
+  }
+  if( collectSummary )  {
+    printf( "%ld ASCII chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
+    printf( "%ld ASCII alphabet, %ld digit, %ld punctuation and %ld control chars\n",
+      isalphaCnt, isdigitCnt, ispunctCnt, iscntrlCnt );
+    printf( "%ld space and %ld horizontal tab chars\n", freqArray[ (int) ' '], freqArray[ (int) '\t'] );
+    printf( "%ld carriage return, %ld line feed and %ld full stop chars\n",
+      freqArray[ (int) '\r'], freqArray[ (int) '\n'], freqArray[ (int) '.'] );
   }
   return( byteCnt );
 }
@@ -515,9 +550,8 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
   FILE *  fp;
   long  fileSize;
 
-  if( D_Flg || ( verbosityLevel > 1 ))  {
-    printf( "! Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
-  }
+  if( D_Flg )
+    printf( "Debug:  Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
 /* Open the file for reading (in binary mode) */
   result = (( fp = fopen( nameStrng, "rb" ) ) != NULL );
   if( ! result )  {
@@ -527,7 +561,11 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
   else  {
  /* obtain file size for the file that was just opened */
     result = fseek( fp, 0L, SEEK_END );
-    if( result == 0 )  fileSize = ( long ) ftell( fp );
+    if( result == 0 )  {
+      fileSize = ( long ) ftell( fp );
+      if( vFlg )
+        printf( "File: '%s' is %ld bytes\n", nameStrng, fileSize );
+    }
     else  {
       fileSize = LONG_MIN;
       fprintf( stderr, "?? Unable to seek to end of the file named '%s'\n", nameStrng );
@@ -535,7 +573,8 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
     }
   /* Ensure file is reset back to starting at 0 */
     rewind( fp );
-    if( D_Flg )  printf( "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
+    if( D_Flg )
+      printf( "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
  /* If begin option has set an offset greater than zero then seek to the new start */
     if( bFlg )  {
       if( beginOffset > 0L )  {
@@ -569,10 +608,11 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
     byteCnt = readByteStreamAndPrintIndexHexAscii( fp, beginOffset );
     result = ( fclose( fp ) == 0 );
     if( ! result )  {
-      printf( "?? Unable to close the file named '%s'\n", nameStrng );
+      fprintf( stderr, "?? Unable to close the file named '%s'\n", nameStrng );
       perror( "processA_SingleCommandLineParameter()" );
     }
-    if( D_Flg || vFlg )  printf( "Dumped '%s' (%ld bytes)\n", nameStrng, byteCnt );
+    if( D_Flg || vFlg )
+      printf( "File: '%s' (%ld bytes dumped)\n", nameStrng, byteCnt );
   }
   return( result );
 }
