@@ -55,6 +55,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 1.1  2022/11/10 11:15:05  owen
+ * Initial revision
+ *
  * Revision 0.15  2022/10/30 12:08:09  dutchLuck
  * Updated usage to show change to -b option
  *
@@ -117,7 +120,7 @@
 #include <sys/stat.h>   /* fstat() */
 #include <ctype.h>	/* isprint() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.15 2022/10/30 12:08:09 dutchLuck Exp dutchLuck $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 1.1 2022/11/10 11:15:05 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -133,8 +136,8 @@ const char  optionStr[] = "Ab:c:dDf:hHIo:sS:v::w:";
 
 /* Global Flags & Data */
 int  A_Flg;			/* Control Ascii column output */
-int  bFlg;		    /* begin offset bytes from the start of the file */
-long  beginOffset;
+int  bFlg;			/* begin offset bytes from the start of the file */
+long  beginOffset;		/* or if < 0 then measure back from end of the file */
 char *  bStrng;
 int  cFlg;			/* use alternate char instead of full stops for non-ASCII */
 char *  cStrng;
@@ -462,6 +465,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
     byteAddr = startOffset;
  /* Read bytes from stdin or file */
     while(( byte = fgetc( fp )) != EOF )  {
+      byte &= BYTE_MASK;
       if( collectSummary )  {
         if( isascii( byte ))  {
           isasciiCnt++;	/* Count ASCII chars as defined by isascii() */
@@ -473,7 +477,6 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
           freqArray[ byte ]++;
         }
       }
-      byte &= BYTE_MASK;
    /* Initialize new line if required */
       if(( byteCnt++ % byteDisplayWidth ) == 0 )  {
      /* Make the line buffer all column separator characters (defaults to space characters) */
@@ -549,9 +552,12 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
   long  byteCnt;
   FILE *  fp;
   long  fileSize;
+  long  fileOffset;
 
   if( D_Flg )
     printf( "Debug:  Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
+/* Keep beginOffset global variable safe from modification in case there are multiple files */
+  fileOffset = beginOffset;
 /* Open the file for reading (in binary mode) */
   result = (( fp = fopen( nameStrng, "rb" ) ) != NULL );
   if( ! result )  {
@@ -577,23 +583,23 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
       printf( "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
  /* If begin option has set an offset greater than zero then seek to the new start */
     if( bFlg )  {
-      if( beginOffset > 0L )  {
+      if( fileOffset > 0L )  {
      /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
-        if(( fileSize > 0L ) && ( beginOffset > fileSize ))  beginOffset = fileSize;
+        if(( fileSize > 0L ) && ( fileOffset > fileSize ))  fileOffset = fileSize;
      /* Set up the start of the dumping at the begin offset */
-        result = fseek( fp, beginOffset, SEEK_SET );
+        result = fseek( fp, fileOffset, SEEK_SET );
         if( D_Flg )  {
           printf( "Debug: result of fseek() from start of file was %d\n", result );
         }
       }
-      else if( beginOffset < 0L )  {
+      else if( fileOffset < 0L )  {
      /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
-        if(( beginOffset + fileSize ) < 0L )  beginOffset = -fileSize;
-        if( D_Flg )  printf( "Debug: beginOffset for SEEK_END is %ld\n", beginOffset );
+        if(( fileOffset + fileSize ) < 0L )  fileOffset = -fileSize;
+        if( D_Flg )  printf( "Debug: fileOffset for SEEK_END is %ld\n", fileOffset );
      /* Set up to start dumping at the begin offset from the end of the file */
-        result = fseek( fp, beginOffset, SEEK_END );
-     /* Adjust beginOffset to print correct Index */
-        if( result == 0 )  beginOffset += fileSize;
+        result = fseek( fp, fileOffset, SEEK_END );
+     /* Adjust fileOffset to print correct Index */
+        if( result == 0 )  fileOffset += fileSize;
         if( D_Flg )  {
           printf( "Debug: result of fseek() from end of file was %d\n", result );
         }
@@ -601,11 +607,11 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
  /* If there was a problem with the seek make sure it starts at 0 */
       if( result != 0 )  {
         rewind( fp );
-        beginOffset = 0L;
+        fileOffset = 0L;
       }
     }
  /* Process the file just opened */
-    byteCnt = readByteStreamAndPrintIndexHexAscii( fp, beginOffset );
+    byteCnt = readByteStreamAndPrintIndexHexAscii( fp, fileOffset );
     result = ( fclose( fp ) == 0 );
     if( ! result )  {
       fprintf( stderr, "?? Unable to close the file named '%s'\n", nameStrng );
