@@ -202,3 +202,7 @@ if it is shorter than the normal line length.
 The dump can begin at an offset into a file, using the -b X option.
 If the X value is greater than zero then the offset is applied from the start of the file.
 If the X value is negetive then the offset is applied back from the end of the file.
+Summary information about the characters in files can be obtained by using "-v2" and
+above vebosity levels. For example  "ihad -I -H -A -v2 test.bin" could be used to
+show just summary information about file "test.bin". 
+
