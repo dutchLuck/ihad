@@ -68,6 +68,6 @@ echo "+++++++++++ ihad -b 26 test52.dat              +++++++++++++++"
 ../ihad -b 26 test52.dat 
 echo "+++++++++++ ihad -b -32 test52.dat            +++++++++++++++"
 ../ihad -b -32 test52.dat 
-echo "+++++++++++ ihad -b -16 -v test256.dat test52.dat  +++++++++++++++"
-../ihad -b -16 -v test256.dat test52.dat 
+echo "+++++++++++ ihad -b -16 -v0 test256.dat test52.dat  +++++++++++++++"
+../ihad -b -16 -v0 test256.dat test52.dat 
 

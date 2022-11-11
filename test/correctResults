@@ -234,7 +234,7 @@ od -A x -t x1z -v
 +++++++++++ ihad -b -32 test52.dat            +++++++++++++++
 00000014 75767778797a4142434445464748494a uvwxyzABCDEFGHIJ
 00000024 4b4c4d4e4f505152535455565758595a KLMNOPQRSTUVWXYZ
-+++++++++++ ihad -b -16 -v test256.dat test52.dat  +++++++++++++++
++++++++++++ ihad -b -16 -v0 test256.dat test52.dat  +++++++++++++++
 File: 'test256.dat' is 256 bytes
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
 File: 'test256.dat' (16 bytes dumped)
