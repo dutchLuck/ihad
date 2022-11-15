@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Thu Nov 10 22:27:59 2022 
+ * ihad.c last edited on Tue Nov 15 23:00:17 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -55,6 +55,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.17  2022/11/15 12:15:02  owen
+ * Output Summary: info for -v3
+ *
  * Revision 0.16  2022/11/10 12:28:49  dutchLuck
  * Fixed -b behaviour when more than 1 file is being dumped.
  *
@@ -121,7 +124,7 @@
 #include <sys/stat.h>   /* fstat() */
 #include <ctype.h>	/* isprint() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.16 2022/11/10 12:28:49 dutchLuck Exp dutchLuck $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.17 2022/11/15 12:15:02 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
