@@ -537,11 +537,11 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
     }
   }
   if( collectSummary )  {
-    printf( "%ld ASCII chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
-    printf( "%ld ASCII alphabet, %ld digit, %ld punctuation and %ld control chars\n",
+    printf( "Summary: %ld ASCII chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
+    printf( "Summary: %ld ASCII alphabet, %ld digit, %ld punctuation and %ld control chars\n",
       isalphaCnt, isdigitCnt, ispunctCnt, iscntrlCnt );
-    printf( "%ld space and %ld horizontal tab chars\n", freqArray[ (int) ' '], freqArray[ (int) '\t'] );
-    printf( "%ld carriage return, %ld line feed and %ld full stop chars\n",
+    printf( "Summary: %ld space and %ld horizontal tab chars\n", freqArray[ (int) ' '], freqArray[ (int) '\t'] );
+    printf( "Summary: %ld carriage return, %ld line feed and %ld full stop chars\n",
       freqArray[ (int) '\r'], freqArray[ (int) '\n'], freqArray[ (int) '.'] );
   }
   return( byteCnt );
@@ -681,7 +681,7 @@ int  main( int  argc, char *  argv[] )  {
   resultIndex = processCommandLineOptions( argc, argv );
 
 /* If Debug or verbose options are True then print code details */
-  if( D_Flg || ( verbosityLevel > 0 ))  {
+  if( D_Flg || (( verbosityLevel > 0 ) && ( verbosityLevel < 3 )))  {
     printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
     printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
   }

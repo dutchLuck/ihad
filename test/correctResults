@@ -241,3 +241,10 @@ File: 'test256.dat' (16 bytes dumped)
 File: 'test52.dat' is 52 bytes
 00000024 4b4c4d4e4f505152535455565758595a KLMNOPQRSTUVWXYZ
 File: 'test52.dat' (16 bytes dumped)
++++++++++++ ihad -I -H -A -v3 test256.dat +++++++++++++++
+File: 'test256.dat' is 256 bytes
+Summary: 128 ASCII chars in total of which 95 are printable (includes spaces)
+Summary: 52 ASCII alphabet, 10 digit, 32 punctuation and 33 control chars
+Summary: 1 space and 1 horizontal tab chars
+Summary: 1 carriage return, 1 line feed and 1 full stop chars
+File: 'test256.dat' (256 bytes dumped)
