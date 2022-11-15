@@ -1,0 +1,31 @@
+#! /bin/sh
+#
+#
+# Test known data
+#
+echo 1. Test predefine data file dumps against known correct results
+#
+rm -f tstResults
+#
+./tst > tstResults
+diff -s tstResults correctResults
+#
+#
+# Test some randomly generated data
+#
+#
+echo
+echo "2. Test random file data by comparing ihad output against utility output"
+#
+echo "=== a) Small file of 123 random bytes ==="
+./randomDataTest 123
+RESULT=$?
+#
+# Do a test on a larger file if the previous test succeeded
+if [ $RESULT -eq 0 ] ; then
+#
+  echo
+  echo "=== b) Medium file of 12345 random bytes ==="
+  ./randomDataTest 12345
+fi
+#

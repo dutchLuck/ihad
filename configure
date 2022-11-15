@@ -1,0 +1,32 @@
+#! /bin/bash
+#
+NAME=ihad
+#
+OP_FILE_NAME=Makefile
+COMPILER=cc
+OPTIONS=-Wall
+TRGT=$NAME
+SRC=$NAME.c
+#
+# echo $OSTYPE
+#
+if [[ "$OSTYPE" == "cygwin" ]] ; then
+  TRGT=$NAME.exe
+elif [[ "$OSTYPE" == "msys" ]] ; then
+  TRGT=$NAME.exe
+  COMPILER=gcc
+fi
+#
+echo "$TRGT: $SRC" > $OP_FILE_NAME
+echo -e "\t$COMPILER $OPTIONS -o $TRGT $SRC" >> $OP_FILE_NAME
+echo "" >> $OP_FILE_NAME
+#
+echo "check: $TRGT" >> $OP_FILE_NAME
+echo -e "\tcd test; ./check" >> $OP_FILE_NAME
+echo "" >> $OP_FILE_NAME
+#
+echo "clean:" >> $OP_FILE_NAME
+echo -e "\trm -f $TRGT $NAME.o" >> $OP_FILE_NAME
+echo "" >> $OP_FILE_NAME
+#
+
