@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Tue Nov 15 23:00:17 2022 
+ * ihad.c last edited on Wed Nov 16 23:14:44 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -55,6 +55,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.18  2022/11/16 12:15:10  owen
+ * Added call to external print frequency array.
+ *
  * Revision 0.17  2022/11/15 12:15:02  owen
  * Output Summary: info for -v3
  *
@@ -124,7 +127,9 @@
 #include <sys/stat.h>   /* fstat() */
 #include <ctype.h>	/* isprint() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.17 2022/11/15 12:15:02 owen Exp owen $"
+#include "byteFreq.h"	/* printByteFrequencies() */
+
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.18 2022/11/16 12:15:10 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -213,7 +218,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. Classify space char as printable in Ascii output\n" );
   printf( "   -S C .. Set char C as column separator\n" );
-  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X < 4)\n" );
+  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 5)\n" );
   printf( "   -w X .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
   printf( "  where; -\n" );
   printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
@@ -272,7 +277,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     else  {
       if( D_Flg )  printf( "Debug: String for option '-v' is %s\n", vStrng );
       verbosityLevel = atoi( vStrng );
-      if( verbosityLevel > 3 )  verbosityLevel = 3;
+      if( verbosityLevel > 5 )  verbosityLevel = 5;
       else if( verbosityLevel < 1 )  verbosityLevel = 0; 
     }
     if( D_Flg )  printf( "Debug: verbosity level is %d\n", verbosityLevel );
@@ -471,6 +476,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
     while(( byte = fgetc( fp )) != EOF )  {
       byte &= BYTE_MASK;
       if( collectSummary )  {
+        freqArray[ byte ]++;	/* Accumalate counts of all bytes */
         if( isascii( byte ))  {
           isasciiCnt++;	/* Count ASCII chars as defined by isascii() */
           if( isprint( byte ))  isprintCnt++;	/* Count ASCII printable char as defined by isprint() i.e. includes space */
@@ -478,7 +484,6 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
           if( isdigit( byte ))  isdigitCnt++;	/* Count ASCII digit char as defined by isdigit() */
           if( ispunct( byte ))  ispunctCnt++;	/* Count ASCII punctuation char as defined by ispunct() */
           if( iscntrl( byte ))  iscntrlCnt++;	/* Count ASCII control char as defined by iscntrl() */
-          freqArray[ byte ]++;
         }
       }
    /* Initialize new line if required */
@@ -543,9 +548,13 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
     printf( "Summary: %ld ASCII chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
     printf( "Summary: %ld ASCII alphabet, %ld digit, %ld punctuation and %ld control chars\n",
       isalphaCnt, isdigitCnt, ispunctCnt, iscntrlCnt );
-    printf( "Summary: %ld space and %ld horizontal tab chars\n", freqArray[ (int) ' '], freqArray[ (int) '\t'] );
-    printf( "Summary: %ld carriage return, %ld line feed and %ld full stop chars\n",
-      freqArray[ (int) '\r'], freqArray[ (int) '\n'], freqArray[ (int) '.'] );
+    if( verbosityLevel > 3 )
+      printByteFrequencies( freqArray, ( verbosityLevel == 4 ));
+    else  {
+      printf( "Summary: %ld space and %ld horizontal tab chars\n", freqArray[ (int) ' '], freqArray[ (int) '\t'] );
+      printf( "Summary: %ld carriage return, %ld line feed and %ld full stop chars\n",
+        freqArray[ (int) '\r'], freqArray[ (int) '\n'], freqArray[ (int) '.'] );
+    }
   }
   return( byteCnt );
 }

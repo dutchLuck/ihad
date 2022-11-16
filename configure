@@ -1,24 +1,37 @@
 #! /bin/bash
 #
-NAME=ihad
+NAME1=ihad
+NAME2=byteFreq
 #
 OP_FILE_NAME=Makefile
 COMPILER=cc
 OPTIONS=-Wall
-TRGT=$NAME
-SRC=$NAME.c
+TRGT=$NAME1
+SRC1=$NAME1.c
+SRC2=$NAME2.c
+OBJ1=$NAME1.o
+OBJ2=$NAME2.o
+HDR2=$NAME2.h
 #
 # echo $OSTYPE
 #
 if [[ "$OSTYPE" == "cygwin" ]] ; then
-  TRGT=$NAME.exe
+  TRGT=$NAME1.exe
 elif [[ "$OSTYPE" == "msys" ]] ; then
-  TRGT=$NAME.exe
+  TRGT=$NAME1.exe
   COMPILER=gcc
 fi
 #
-echo "$TRGT: $SRC" > $OP_FILE_NAME
-echo -e "\t$COMPILER $OPTIONS -o $TRGT $SRC" >> $OP_FILE_NAME
+echo "$TRGT: $OBJ1 $OBJ2" > $OP_FILE_NAME
+echo -e "\t$COMPILER -o "'$@ $^' >> $OP_FILE_NAME
+echo "" >> $OP_FILE_NAME
+#
+echo "$OBJ1: $SRC1 $HDR2" >> $OP_FILE_NAME
+echo -e "\t$COMPILER $OPTIONS -c "'$<' >> $OP_FILE_NAME
+echo "" >> $OP_FILE_NAME
+#
+echo "$OBJ2: $SRC2 $HDR2" >> $OP_FILE_NAME
+echo -e "\t$COMPILER $OPTIONS -c "'$<' >> $OP_FILE_NAME
 echo "" >> $OP_FILE_NAME
 #
 echo "check: $TRGT" >> $OP_FILE_NAME
