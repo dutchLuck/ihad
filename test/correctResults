@@ -253,15 +253,17 @@ File: 'test11.dat' is 11 bytes
 6162636465666768696a6b           abcdefghijk
 Summary: 11 ASCII chars in total of which 11 are printable (includes spaces)
 Summary: 11 ASCII alphabet, 0 digit, 0 punctuation and 0 control chars
-Frequency: 61 097 141 -> 1
-Frequency: 62 098 142 -> 1
-Frequency: 63 099 143 -> 1
-Frequency: 64 100 144 -> 1
-Frequency: 65 101 145 -> 1
-Frequency: 66 102 146 -> 1
-Frequency: 67 103 147 -> 1
-Frequency: 68 104 150 -> 1
-Frequency: 69 105 151 -> 1
-Frequency: 6a 106 152 -> 1
-Frequency: 6b 107 153 -> 1
+Frequency: 61  97 141   a   9.1% 1
+Frequency: 62  98 142   b   9.1% 1
+Frequency: 63  99 143   c   9.1% 1
+Frequency: 64 100 144   d   9.1% 1
+Frequency: 65 101 145   e   9.1% 1
+Frequency: 66 102 146   f   9.1% 1
+Frequency: 67 103 147   g   9.1% 1
+Frequency: 68 104 150   h   9.1% 1
+Frequency: 69 105 151   i   9.1% 1
+Frequency: 6a 106 152   j   9.1% 1
+Frequency: 6b 107 153   k   9.1% 1
+Highest:   61  97 141   a   9.1% 1
+Lowest:    00   0 000 NUL   0.0% 0
 File: 'test11.dat' (11 bytes dumped)
