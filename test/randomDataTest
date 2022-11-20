@@ -1,3 +1,4 @@
+#! /bin/bash
 #
 # R A N D O M D A T A T E S T
 #
@@ -5,9 +6,13 @@ FILE_SIZE=123
 #
 OS_NAME=`uname -s`
 #
-if [ "$1" != "" ]
-then
+if [ "$1" != "" ] ; then
   FILE_SIZE=$1
+else
+  FILE_SIZE=$RANDOM
+  if [ $FILE_SIZE -le 123 ] ; then
+    FILE_SIZE=123
+  fi
 fi
 #
 echo "-- Testing file of $FILE_SIZE random bytes --"
@@ -68,6 +73,13 @@ else
   else
     echo "?? Hex & Ascii column comparison with non-OSX od Failed?"
   fi
+fi
+#
+if [ $RESULT -eq 0 ] ; then
+  rm $TEST_FILE.*
+  echo "$TEST_FILE.* files removed"
+else
+  echo "$TEST_FILE.* files not removed for autopsy purposes"
 fi
 #
 exit $RESULT

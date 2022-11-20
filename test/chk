@@ -29,12 +29,12 @@ if [ $RESULT -eq 0 ] ; then
   ./randomDataTest 12345
   RESULT=$?
 #
-# Do a test on a larger file if the previous test succeeded
+# Do a test on a random size file if the previous test succeeded
   if [ $RESULT -eq 0 ] ; then
   #
     echo
-    echo "=== c) Larger file of 23454321 random bytes ==="
-    ./randomDataTest 23454321
+    echo "=== c) Random size file of random bytes ==="
+    ./randomDataTest
   fi
 #
 fi
