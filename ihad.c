@@ -12,7 +12,6 @@
  * OR  xxd -g 0 yourFile
  * OR  od -A x -t x1z -v yourFile
  * OR  format-hex on Microsoft Windows in powershell i.e.  format-hex yourFile
- * OR  http://www.fileformat.info/tool/hexdump.htm 
  *
  * In addition, PLEASE do not look at the source code as an example
  * of how to code! or how not to code!

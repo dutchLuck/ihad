@@ -112,13 +112,7 @@ $ xxd -g 0 tmp.dat
 $
 ```
 
-OR an on-line alternative is; -
-
-```
-http://www.fileformat.info/tool/hexdump.htm 
-```
-
-OR if you have Microsoft Windows powershell and are ok with unicode text, instead of strictly ASCII, output; -
+OR if you have Microsoft Windows powershell and are ok with unicode text output, instead of strictly ASCII output; -
 
 ```
 > format-hex C:\test\tmp.dat
@@ -178,7 +172,7 @@ ihad.exe [options] [inputFile1 [inputFile2 [.. inputFileN]]]
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
    -S C .. Set char C as column separator
-   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X < 4)
+   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 5)
    -w X .. Set bytes per line to X (where 0 < X <= 32)
 
   where; -
@@ -204,5 +198,7 @@ If the X value is greater than zero then the offset is applied from the start of
 If the X value is negetive then the offset is applied back from the end of the file.
 Summary information about the characters in files can be obtained by using "-v2" and
 above vebosity levels. For example  "ihad -I -H -A -v2 test.bin" could be used to
-show just summary information about file "test.bin". 
+show just summary information about file "test.bin". Option "-v5" provides more details
+including a listing of frequency of all bytes. Option "-v4" also provides a listing
+of only non-zero frequencies.
 
