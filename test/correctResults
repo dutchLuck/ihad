@@ -182,7 +182,7 @@ Useage:
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
    -S C .. Set char C as column separator
-   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 5)
+   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 6)
    -w X .. Set bytes per line to X (where 0 < X <= 32)
 
   where; -
@@ -244,7 +244,7 @@ File: 'test52.dat' (16 bytes dumped)
 +++++++++++ ihad -I -H -A -v3 test256.dat +++++++++++++++
 File: 'test256.dat' is 256 bytes
 Summary: 128 ASCII chars in total of which 95 are printable (includes spaces)
-Summary: 52 ASCII alphabet, 10 digit, 32 punctuation and 33 control chars
+Summary: 52 ASCII alphabet, 10 digit, 32 punctuation, 1 space and 33 control chars
 Summary: 1 space and 1 horizontal tab chars
 Summary: 1 carriage return, 1 line feed and 1 full stop chars
 File: 'test256.dat' (256 bytes dumped)
@@ -252,7 +252,7 @@ File: 'test256.dat' (256 bytes dumped)
 File: 'test11.dat' is 11 bytes
 6162636465666768696a6b           abcdefghijk
 Summary: 11 ASCII chars in total of which 11 are printable (includes spaces)
-Summary: 11 ASCII alphabet, 0 digit, 0 punctuation and 0 control chars
+Summary: 11 ASCII alphabet, 0 digit, 0 punctuation, 0 space and 0 control chars
 Frequency: 61  97 141   a   9.1% 1
 Frequency: 62  98 142   b   9.1% 1
 Frequency: 63  99 143   c   9.1% 1

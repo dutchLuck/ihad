@@ -3,7 +3,7 @@
  *
  * Header for byteFreq.
  *
- * byteFreq.h last edited on Wed Nov 16 23:14:53 2022 
+ * byteFreq.h last edited on Sun Nov 20 22:58:41 2022 
  *
  * This is not production code! Consider it only slightly tested.
  *
@@ -20,6 +20,9 @@
 
 /*
  * $Log: byteFreq.h,v $
+ * Revision 0.1  2022/11/20 12:00:21  owen
+ * Added cryptogram routine header.
+ *
  * Revision 0.0  2022/11/16 12:18:07  owen
  * Initial header info.
  *
@@ -29,4 +32,5 @@
 
 
 int  printByteFrequencies( long  byteFreq[], int  onlyNonZeroFlag );
+void  printCryptoGramFrequencies( long  byteFreq[] );
 

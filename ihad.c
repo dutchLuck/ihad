@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Wed Nov 16 23:14:44 2022 
+ * ihad.c last edited on Sun Nov 20 22:58:29 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -54,6 +54,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.19  2022/11/20 11:58:50  owen
+ * Added first attempt at cryptogram mode (-v6).
+ *
  * Revision 0.18  2022/11/16 12:15:10  owen
  * Added call to external print frequency array.
  *
@@ -128,7 +131,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.18 2022/11/16 12:15:10 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.19 2022/11/20 11:58:50 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -217,7 +220,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. Classify space char as printable in Ascii output\n" );
   printf( "   -S C .. Set char C as column separator\n" );
-  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 5)\n" );
+  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 6)\n" );
   printf( "   -w X .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
   printf( "  where; -\n" );
   printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
@@ -276,7 +279,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     else  {
       if( D_Flg )  printf( "Debug: String for option '-v' is %s\n", vStrng );
       verbosityLevel = atoi( vStrng );
-      if( verbosityLevel > 5 )  verbosityLevel = 5;
+      if( verbosityLevel > 6 )  verbosityLevel = 6;
       else if( verbosityLevel < 1 )  verbosityLevel = 0; 
     }
     if( D_Flg )  printf( "Debug: verbosity level is %d\n", verbosityLevel );
@@ -436,6 +439,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
   long  ispunctCnt = 0L;
   long  isalphaCnt = 0L;
   long  isdigitCnt = 0L;
+  long  isspaceCnt = 0L;
   long  freqArray[ 256 ];	/* track frequency of bytes */
   unsigned long  byteAddr = 0L;	/* Index of first byte in each output line */
   char *  outputString;         /* pointer to character string to print to stdout or a file */
@@ -478,11 +482,12 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
         freqArray[ byte ]++;	/* Accumalate counts of all bytes */
         if( isascii( byte ))  {
           isasciiCnt++;	/* Count ASCII chars as defined by isascii() */
-          if( isprint( byte ))  isprintCnt++;	/* Count ASCII printable char as defined by isprint() i.e. includes space */
-          if( isalpha( byte ))  isalphaCnt++;	/* Count ASCII alphabet char as defined by isalpha() */
-          if( isdigit( byte ))  isdigitCnt++;	/* Count ASCII digit char as defined by isdigit() */
-          if( ispunct( byte ))  ispunctCnt++;	/* Count ASCII punctuation char as defined by ispunct() */
-          if( iscntrl( byte ))  iscntrlCnt++;	/* Count ASCII control char as defined by iscntrl() */
+          if( isprint( byte ))  isprintCnt++;	/* Count ASCII printable chars as defined by isprint() i.e. includes space */
+          if( isalpha( byte ))  isalphaCnt++;	/* Count ASCII alphabet chars as defined by isalpha() */
+          else if( isdigit( byte ))  isdigitCnt++;	/* Count ASCII digit chars as defined by isdigit() */
+          else if( ispunct( byte ))  ispunctCnt++;	/* Count ASCII punctuation chars as defined by ispunct() */
+          else if( iscntrl( byte ))  iscntrlCnt++;	/* Count ASCII control chars as defined by iscntrl() */
+          else if( isspace( byte ))  isspaceCnt++;	/* Count ASCII space chars as defined by isspace() & not control chars */
         }
       }
    /* Initialize new line if required */
@@ -545,10 +550,11 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
   }
   if( collectSummary )  {
     printf( "Summary: %ld ASCII chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
-    printf( "Summary: %ld ASCII alphabet, %ld digit, %ld punctuation and %ld control chars\n",
-      isalphaCnt, isdigitCnt, ispunctCnt, iscntrlCnt );
+    printf( "Summary: %ld ASCII alphabet, %ld digit, %ld punctuation, %ld space and %ld control chars\n",
+      isalphaCnt, isdigitCnt, ispunctCnt, isspaceCnt, iscntrlCnt );
     if( verbosityLevel > 3 )
-      printByteFrequencies( freqArray, ( verbosityLevel == 4 ));
+      if( verbosityLevel > 5 )  printCryptoGramFrequencies( freqArray );
+      else  printByteFrequencies( freqArray, ( verbosityLevel == 4 ));
     else  {
       printf( "Summary: %ld space and %ld horizontal tab chars\n", freqArray[ (int) ' '], freqArray[ (int) '\t'] );
       printf( "Summary: %ld carriage return, %ld line feed and %ld full stop chars\n",

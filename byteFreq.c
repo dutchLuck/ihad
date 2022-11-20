@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * byteFreq.c last edited on Fri Nov 18 23:32:10 2022 
+ * byteFreq.c last edited on Sun Nov 20 22:58:38 2022 
  *
  * This is not production code! Consider it only slightly tested.
  *
@@ -20,6 +20,9 @@
 
 /*
  * $Log: byteFreq.c,v $
+ * Revision 0.2  2022/11/20 11:59:58  owen
+ * Added first attempt at cryptogram routine.
+ *
  * Revision 0.1  2022/11/18 12:32:43  owen
  * Added % frequency into Frequency: line for -v4 and -v5 options
  *
@@ -32,7 +35,7 @@
 #include <stdio.h>	/* printf() fprintf() */
 #include <limits.h> /* LONG_MIN LONG_MAX */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.1 2022/11/18 12:32:43 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.2 2022/11/20 11:59:58 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 
@@ -85,6 +88,7 @@ int  doByteFreqStats( long  byteFreq[], long long *  totalCount, int *  indxOfMa
   return( zeroFreqCount );
 }
 
+
 void  printFormattedLine( int  indx, long  freq, double  percentageFreq )  {
   printf( "%02x %3d %03o %3s ", indx, indx, indx, humanReadableASCII[ indx ] );
   printf( "%5.1lf%% %ld\n", percentageFreq, freq );
@@ -125,5 +129,17 @@ int  printByteFrequencies( long  byteFreq[], int  onlyNonZeroFlag )  {
   printf( "Lowest:    " );
   printFormattedLine( indxOfMin, byteFreq[ indxOfMin ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ indxOfMin ] / ( total * 0.01 ) );
   return( nonZeroFreqCount );
+}
+
+
+void  printCryptoGramFrequencies( long  byteFreq[] )  {
+  long  cryptoFreq[ 256 ];
+  int  indx;
+  
+  for( indx = 0; indx < 256; indx++ )  cryptoFreq[ indx ] = 0L;
+  for( indx = (int) 'A'; indx <= (int) 'Z'; indx++ )  {
+    cryptoFreq[ indx ] = byteFreq[ indx ] + byteFreq[ indx + 32 ];	/* Put both upper and lower case into uppercase */
+  }
+  printByteFrequencies( cryptoFreq, 1 );
 }
 
