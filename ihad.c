@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Sun Nov 20 22:58:29 2022 
+ * ihad.c last edited on Wed Nov 23 20:42:44 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -54,6 +54,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.20  2022/11/23 09:43:01  owen
+ * Added -C option to invoke Cryptogram info output mode.
+ *
  * Revision 0.19  2022/11/20 11:58:50  owen
  * Added first attempt at cryptogram mode (-v6).
  *
@@ -125,13 +128,13 @@
 #include <stdlib.h>	/* atoi() malloc() free() atol() */
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() */
-#include <limits.h> /* LONG_MIN INT_MIN */
-#include <sys/stat.h>   /* fstat() */
+#include <limits.h>	/* LONG_MIN INT_MIN */
+#include <sys/stat.h>	/* fstat() */
 #include <ctype.h>	/* isprint() */
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.19 2022/11/20 11:58:50 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.20 2022/11/23 09:43:01 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -143,7 +146,7 @@
 
 /* Command line Optional Switches: */
 /*  Ascii, beginOffset, charAlternate, decimal, Debug, fieldSepWidth, help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
-const char  optionStr[] = "Ab:c:dDf:hHIo:sS:v::w:";
+const char  optionStr[] = "Ab:c:CdDf:hHIo:sS:v::w:";
 
 /* Global Flags & Data */
 int  A_Flg;			/* Control Ascii column output */
@@ -153,6 +156,7 @@ char *  bStrng;
 int  cFlg;			/* use alternate char instead of full stops for non-ASCII */
 char *  cStrng;
 char defaultCharStrng[] = ".";
+int  C_Flg;			/* Force Cryptogram info output */
 int  dFlg;			/* use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg;			/* Control Debug info output */
 int  fFlg, fieldSeparatorWidth;	/* Control hex field separation width */
@@ -182,6 +186,7 @@ void  setGlobalFlagDefaults( void )  {
   bStrng = ( char * ) NULL;
   cFlg = 0;			/* Default to output full-stops */
   cStrng = defaultCharStrng;
+  C_Flg = 0;			/* Default to Cryptogram mode off */
   dFlg = 0;			/* Default to output hex index rather than decimal index */
   D_Flg = 0;			/* Default to Debug off */
   fFlg = fieldSeparatorWidth = 0;	/* Default to no spaces between hex bytes */
@@ -211,6 +216,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "   -A .. Ascii output disable\n" );
   printf( "   -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)\n" );
   printf( "   -c C .. Set char C as non-ASCII indicator & overide -A option\n" );
+  printf( "   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
   printf( "   -f X .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
@@ -242,6 +248,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
       case 'A' :  A_Flg = 1; break;
       case 'b' :  bFlg = 1; bStrng = optarg; break;
       case 'c' :  cFlg = 1; cStrng = optarg; break;
+      case 'C' :  C_Flg = 1; break;
       case 'd' :  dFlg = 1; break;
       case 'D' :  D_Flg = 1; break;
       case 'f' :  fFlg = 1; fStrng = optarg; break;
@@ -417,6 +424,21 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   else  {
     if( D_Flg )  printf( "Debug: Option '-S char' was not found in the command line options\n" );
   }
+
+/* Postprocess -C (cryptogram mode) switch option */
+  if( D_Flg )  printf( "Debug: Option '-C' is %s (%d)\n", C_Flg ? "True" : "False", C_Flg );
+  if( C_Flg )  {
+    I_Flg = 1;		/* don't print index */
+    H_Flg = 1;		/* don't print hex */
+    if( ! wFlg )  {	/* if user hasn't set the width then make it the max width */
+      wFlg = 1;
+      byteDisplayWidth = MAX_WIDTH;
+    }
+    if( ! vFlg )  {	/* if user hasn't set the verbosity then make it 6 */
+      vFlg = 1;
+      verbosityLevel = 6;
+    }
+  }
   
 /* Report on -h switch option */
   if( D_Flg )  printf( "Debug: Option '-h' is %s (%d)\n", hFlg ? "True" : "False", hFlg );
@@ -450,7 +472,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
   char  hexFldFrmt[ 11 ];
 
 /* set or reset flag according to the need to print summary information */
-  collectSummary = ( D_Flg || ( verbosityLevel > 1 ));
+  collectSummary = ( D_Flg || ( verbosityLevel > 1 ) || C_Flg );
   for( byte = 0; byte < 256; byte++ )  freqArray[ byte ] = 0L;
 /* Setup the format for printing the hex bytes */
   hexFldWdth = HEX_BYTE_FIELD_WIDTH + fieldSeparatorWidth;
@@ -552,9 +574,11 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
     printf( "Summary: %ld ASCII chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
     printf( "Summary: %ld ASCII alphabet, %ld digit, %ld punctuation, %ld space and %ld control chars\n",
       isalphaCnt, isdigitCnt, ispunctCnt, isspaceCnt, iscntrlCnt );
-    if( verbosityLevel > 3 )
-      if( verbosityLevel > 5 )  printCryptoGramFrequencies( freqArray );
-      else  printByteFrequencies( freqArray, ( verbosityLevel == 4 ));
+    if(( verbosityLevel > 3 ) || C_Flg )  {	/* Allow user to have -C -v4 to get both cryptogram and freq list info */
+      if( C_Flg || ( verbosityLevel == 6 ))  printCryptoGramFrequencies( freqArray );
+      if(( verbosityLevel == 4 ) || ( verbosityLevel == 5 ))
+        printByteFrequencies( freqArray, ( verbosityLevel == 4 ));
+    }
     else  {
       printf( "Summary: %ld space and %ld horizontal tab chars\n", freqArray[ (int) ' '], freqArray[ (int) '\t'] );
       printf( "Summary: %ld carriage return, %ld line feed and %ld full stop chars\n",

@@ -173,6 +173,7 @@ Useage:
    -A .. Ascii output disable
    -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
    -c C .. Set char C as non-ASCII indicator & overide -A option
+   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
    -f X .. Set hex field separator to X spaces (where 0 < X < 2)
@@ -267,3 +268,16 @@ Frequency: 6b 107 153   k   9.1% 1
 Highest:   61  97 141   a   9.1% 1
 Lowest:    00   0 000 NUL   0.0% 0
 File: 'test11.dat' (11 bytes dumped)
++++++++++++ ihad -C ASD_Coin_Level2.encoded +++++++++++++++
+File: 'ASD_Coin_Level2.encoded' is 79 bytes
+.MWNVGRXFOLFHRMVCVXFGRLM..URMWXO
+ZIRGBRM7DRWGSC5WVKGS..DVZIVZFWZX
+RLFHRMXLMXVKGZ.
+Summary: 75 ASCII chars in total of which 74 are printable (includes spaces)
+Summary: 71 ASCII alphabet, 2 digit, 1 punctuation, 0 space and 1 control chars
+Char:  B  C  D  F  G  H  I  K  L  M  N  O  R  S  U  V  W  X  Z 
+%Frq:  1  3  3  7  8  3  3  3  6 10  1  3 13  3  1 10  7  8  7 
+
+%Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
+Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
+File: 'ASD_Coin_Level2.encoded' (79 bytes dumped)

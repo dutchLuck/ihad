@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * byteFreq.c last edited on Tue Nov 22 22:56:26 2022 
+ * byteFreq.c last edited on Wed Nov 23 20:42:53 2022 
  *
  * This is not production code! Consider it only slightly tested.
  *
@@ -20,6 +20,9 @@
 
 /*
  * $Log: byteFreq.c,v $
+ * Revision 0.4  2022/11/23 09:44:13  owen
+ * Changed cryptogram freq sort to use A to Z as an index and sort it.
+ *
  * Revision 0.3  2022/11/22 11:58:21  owen
  * Added sorted frequency list to cryptogram routine.
  *
@@ -39,7 +42,7 @@
 #include <limits.h> /* LONG_MIN LONG_MAX */
 #include <stdlib.h> /* qsort() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.3 2022/11/22 11:58:21 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.4 2022/11/23 09:44:13 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 
@@ -61,6 +64,9 @@ char *  humanReadableASCII[] = {
  " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
  " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
 };
+
+/* define storage that allows index to this array to be sorted */
+int  globalFreq[ 26 ];
 
 
 int  doByteFreqStats( long  byteFreq[], long long *  totalCount, int *  indxOfMax, int *  indxOfMin )  {
@@ -136,6 +142,22 @@ int  printByteFrequencies( long  byteFreq[], int  onlyNonZeroFlag )  {
 }
 
 
+int  freqCompare( const void *  p1, const void *  p2 )  {
+  int *  intPtr1;
+  int *  intPtr2;
+  long  freq1;
+  long  freq2;
+  
+  intPtr1 = ( int * ) p1;
+  intPtr2 = ( int * ) p2;
+  freq1 = globalFreq[ *intPtr1 - (int) 'A' ];
+  freq2 = globalFreq[ *intPtr2 - (int) 'A' ];
+  if( freq1 > freq2 )  return -1;
+  else if( freq1 < freq2 )  return 1;
+  return 0;
+}
+
+
 int  longCompare( const void *  p1, const void *  p2 )  {
   long *  l1;
   long *  l2;
@@ -150,11 +172,10 @@ int  longCompare( const void *  p1, const void *  p2 )  {
 
 void  printCryptoGramFrequencies( long  byteFreq[] )  {
   long  cryptoFreq[ 256 ];
-  long  sortFreq[ 26 ];
-  long  origSortFreq[ 26 ];
   long long  charTotal;
   double  total;
-  int  indx, cnt;
+  int  indx;
+  int  sortAscii[ 26 ];	/* A .. Z index to sort */
   
   for( indx = 0; indx < 256; indx++ )  cryptoFreq[ indx ] = 0L;	/* Zero the array */
   charTotal = 0LL;
@@ -163,35 +184,31 @@ void  printCryptoGramFrequencies( long  byteFreq[] )  {
     charTotal += (long long) cryptoFreq[ indx ];
   }
   if( charTotal > 0LL )  {
-    /* Print list of A to Z frequencies */
+    total = ( double ) charTotal;
+    /* Print 2 line horizontal list of non-zero A to Z frequencies */
     printf( "Char: " );
     /* Print a line of A to Z Characters */
     for( indx = (int) 'A'; indx <= (int) 'Z'; indx++ )
-      if( cryptoFreq[ indx ] > 0L )  printf( " %c ", ( char ) indx );
+      if( cryptoFreq[ indx ] > 0L )  printf( " %c ", ( char ) indx );	/* print chars with non-zero freqs */
     printf( "\n%%Frq: " );
-    total = ( double ) charTotal;
     /* Print a line of % frequencies associated with the Character on the line above it */
     for( indx = (int) 'A'; indx <= (int) 'Z'; indx++ )
       if( cryptoFreq[ indx ] > 0L )
         printf( "%2.0lf ", ( double ) cryptoFreq[ indx ] / ( total * 0.01 ));
+    /* Print 2 line horizontal list of frequencies sorted highest to lowest  */
     printf( "\n\n%%Frq: " );
-    /* Re-print list of highest to lowest frequencies */
     for( indx = 0; indx < 26; indx++ )  {
-      origSortFreq[ indx ] = sortFreq[ indx ] = cryptoFreq[ indx + (int) 'A' ];
+      sortAscii[ indx ] = indx + (int) 'A';	/* set up index values that can be sorted */
+      globalFreq[ indx ] = cryptoFreq[ indx + (int) 'A' ];	/* set up freq data that can be seen by freqCompare() */
     }
-    qsort( sortFreq, 26, sizeof( long ), &longCompare );
+    qsort( sortAscii, 26, sizeof( int ), &freqCompare );
     /* Print a line of % frequencies */
     for( indx = 0; indx < 26; indx++ )
-      printf( "%2.0lf ", ( double ) sortFreq[ indx ] / ( total * 0.01 ));
+      printf( "%2.0lf ", ( double ) cryptoFreq[ sortAscii[ indx ]] / ( total * 0.01 ));
     printf( "\nChar: " );
     /* Print a line of Characters associated with the frequency on the line above it */
-    for( indx = 0; indx < 26; indx++ )  {
-      for( cnt = 0; ( cnt < 26 ) && ( origSortFreq[ cnt ] != sortFreq[ indx ] ); cnt++ ) ;
-      if( cnt < 26 )  {
-        printf( " %c ", ( char ) ( cnt + (int) 'A' ));
-        origSortFreq[ cnt ] = -1L;	
-      }
-    }
+    for( indx = 0; indx < 26; indx++ )  
+      printf( " %c ", ( char ) sortAscii[ indx ]);
     printf( "\n" );
   }
 }
