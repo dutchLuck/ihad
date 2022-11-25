@@ -162,6 +162,7 @@ ihad.exe [options] [inputFile1 [inputFile2 [.. inputFileN]]]
   where options are '-A -b X -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -
    -A .. Ascii output disable
    -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
+   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
    -c C .. Set char C as non-ASCII indicator & overide -A option
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
@@ -172,7 +173,7 @@ ihad.exe [options] [inputFile1 [inputFile2 [.. inputFileN]]]
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
    -S C .. Set char C as column separator
-   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 5)
+   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 6)
    -w X .. Set bytes per line to X (where 0 < X <= 32)
 
   where; -
@@ -200,5 +201,5 @@ Summary information about the characters in files can be obtained by using "-v2"
 above vebosity levels. For example  "ihad -I -H -A -v2 test.bin" could be used to
 show just summary information about file "test.bin". Option "-v5" provides more details
 including a listing of frequency of all bytes. Option "-v4" also provides a listing
-of only non-zero frequencies.
-
+of only non-zero frequencies. A cryptogram mode has been added with the "-C" option.
+The "-C" option is just a shortcut to specifying "-I -H -w32 -v6".
