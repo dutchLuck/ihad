@@ -127,10 +127,11 @@
 #include <stdio.h>	/* printf() fopen() perror() fgetc() fclose() fprintf() fseek() */
 #include <stdlib.h>	/* atoi() malloc() free() atol() */
 #include <unistd.h>	/* getopt() */
-#include <string.h>	/* memset() strlen() */
+#include <string.h>	/* memset() strlen() strdup() */
 #include <limits.h>	/* LONG_MIN INT_MIN */
 #include <sys/stat.h>	/* fstat() */
 #include <ctype.h>	/* isprint() */
+#include <libgen.h>	/* basename() */
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
@@ -145,7 +146,8 @@
 
 
 /* Command line Optional Switches: */
-/*  Ascii, beginOffset, charAlternate, decimal, Debug, fieldSepWidth, help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
+/*  Ascii, beginOffset, charAlternate, Cryptogram, decimal, Debug, fieldSepWidth, */
+/*  help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
 const char  optionStr[] = "Ab:c:CdDf:hHIo:sS:v::w:";
 
 /* Global Flags & Data */
@@ -176,7 +178,8 @@ int  vFlg, verbosityLevel;	/* Control verbosity level */
 char *  vStrng;
 int  wFlg, byteDisplayWidth;	/* Control number of bytes dealt with per line */
 char *  wStrng;
-
+char *  exeName;		/* name of this executable */
+char *  exePath;		/* path of this executable */
 
 void  setGlobalFlagDefaults( void )  {
 /* Preset command line options */
@@ -241,6 +244,15 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   extern char *  optarg;
   extern int  optind, opterr, optopt;
 
+/* Isolate the name of the executable */
+  exeName = argv[0];	/* set global variable to default */
+  if(( exePath = strdup( argv[0] )) == NULL )
+    perror( "?? Unable to create duplicate of path to this executable" );
+  else if(( exeName = basename( exePath )) == NULL )  {
+    perror( "?? Unable to obtain the name of this executable" );
+    exeName = argv[0];	/* set back to the default again */
+  }
+/* Set all the global flags from command line options */
   opterr = 0;	/* Suppress error messages from getopt() to stderr */
 /* Process switch options from the command line */
   while(( result = getopt( argc, argv, optionStr )) != -1 )  {
@@ -262,7 +274,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
       case 'w' :  wFlg = 1; wStrng = optarg; break;
       default :
         fprintf( stderr, "\n?? command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
-        printf( " for help on command line options run '%s -h'\n", argv[0] );
+        printf( " for help on command line options run '%s -h'\n", exeName );
         break;
     }
   }
@@ -368,7 +380,6 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     if( wFlg )  fprintf( stderr, "\n?? Reset zero or negetive display width to %d bytes\n", byteDisplayWidth );
   }
  if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
-
 
 /* Postprocess -o switch option */
   if( D_Flg )  printf( "Debug: Option '-o' is %s (%d)\n", oFlg ? "True" : "False", oFlg );
@@ -729,7 +740,7 @@ int  main( int  argc, char *  argv[] )  {
 
 /* If -h switch option used then print help message and exit */
   if( hFlg )  {
-    printOutHelpMessage( argv[0] );
+    printOutHelpMessage( exeName );
     return( 1 );
   }
 
