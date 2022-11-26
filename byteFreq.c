@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * byteFreq.c last edited on Fri Nov 25 22:43:51 2022 
+ * byteFreq.c last edited on Sat Nov 26 22:39:26 2022 
  *
  * This is not production code! Consider it only slightly tested.
  *
@@ -20,6 +20,9 @@
 
 /*
  * $Log: byteFreq.c,v $
+ * Revision 0.6  2022/11/26 11:41:38  owen
+ * Extra information on RCS and compile details.
+ *
  * Revision 0.5  2022/11/25 11:44:04  owen
  * Cryptogram freq now sorted with work-around for qsort limitation.
  *
@@ -42,10 +45,10 @@
  */
 
 #include <stdio.h>	/* printf() fprintf() */
-#include <limits.h> /* LONG_MIN LONG_MAX */
-#include <stdlib.h> /* qsort() */
+#include <limits.h>	/* LONG_MIN LONG_MAX */
+#include <stdlib.h>	/* qsort() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.5 2022/11/25 11:44:04 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.6 2022/11/26 11:41:38 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 
@@ -67,6 +70,15 @@ char *  humanReadableASCII[] = {
  " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
  " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
 };
+
+void  print_byteFreq_SourceCodeControlIdentifier( void )  {
+  printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
+}
+
+
+void  print_byteFreq_SourceCompileDetails( void )  {
+  printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
+}
 
 
 int  doByteFreqStats( long  byteFreq[], long long *  totalCount, int *  indxOfMax, int *  indxOfMin )  {
@@ -185,7 +197,7 @@ void  printCryptoGramFrequencies( long  byteFreq[] )  {
     printf( "\n" );
     /* Print 2 line horizontal list of frequencies sorted highest to lowest  */
     /* Where two or more frequencies are the same ensure associated chars are in alphabetic order  */
-    if(( largestFreq << 5 ) < 0L )  {
+    if( largestFreq > ( LONG_MAX >> 5 ))  {
       printf( "? Unable to sort frequency values due to size of largest frequency (%ld)\n", largestFreq );
     }
     else  {

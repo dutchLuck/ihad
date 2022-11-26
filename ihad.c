@@ -54,6 +54,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.21  2022/11/26 11:31:36  owen
+ * Extra debug and ASCII summary information.
+ *
  * Revision 0.20  2022/11/23 09:43:01  owen
  * Added -C option to invoke Cryptogram info output mode.
  *
@@ -135,7 +138,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.20 2022/11/23 09:43:01 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.21 2022/11/26 11:31:36 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -471,6 +474,8 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
   long  iscntrlCnt = 0L;
   long  ispunctCnt = 0L;
   long  isalphaCnt = 0L;
+  long  isupperCnt = 0L;
+  long  islowerCnt = 0L;
   long  isdigitCnt = 0L;
   long  isspaceCnt = 0L;
   long  freqArray[ 256 ];	/* track frequency of bytes */
@@ -516,7 +521,11 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
         if( isascii( byte ))  {
           isasciiCnt++;	/* Count ASCII chars as defined by isascii() */
           if( isprint( byte ))  isprintCnt++;	/* Count ASCII printable chars as defined by isprint() i.e. includes space */
-          if( isalpha( byte ))  isalphaCnt++;	/* Count ASCII alphabet chars as defined by isalpha() */
+          if( isalpha( byte ))  {
+            isalphaCnt++;	/* Count ASCII alphabet chars as defined by isalpha() */
+            if( isupper( byte ))  isupperCnt++;
+            else if( islower( byte ))  islowerCnt++;
+          }
           else if( isdigit( byte ))  isdigitCnt++;	/* Count ASCII digit chars as defined by isdigit() */
           else if( ispunct( byte ))  ispunctCnt++;	/* Count ASCII punctuation chars as defined by ispunct() */
           else if( iscntrl( byte ))  iscntrlCnt++;	/* Count ASCII control chars as defined by iscntrl() */
@@ -582,17 +591,20 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
     }
   }
   if( collectSummary )  {
-    printf( "Summary: %ld ASCII chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
-    printf( "Summary: %ld ASCII alphabet, %ld digit, %ld punctuation, %ld space and %ld control chars\n",
-      isalphaCnt, isdigitCnt, ispunctCnt, isspaceCnt, iscntrlCnt );
+    printf( "Summary: ASCII: %ld chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
+    printf( "Summary: ASCII: %ld alphabet ( %ld upper case and %ld lower case ) chars\n",
+      isalphaCnt, isupperCnt, islowerCnt );
+    printf( "Summary: ASCII: %ld digit, %ld punctuation, %ld space and %ld control chars\n",
+      isdigitCnt, ispunctCnt, isspaceCnt, iscntrlCnt );
     if(( verbosityLevel > 3 ) || C_Flg )  {	/* Allow user to have -C -v4 to get both cryptogram and freq list info */
       if( C_Flg || ( verbosityLevel == 6 ))  printCryptoGramFrequencies( freqArray );
       if(( verbosityLevel == 4 ) || ( verbosityLevel == 5 ))
         printByteFrequencies( freqArray, ( verbosityLevel == 4 ));
     }
     else  {
-      printf( "Summary: %ld space and %ld horizontal tab chars\n", freqArray[ (int) ' '], freqArray[ (int) '\t'] );
-      printf( "Summary: %ld carriage return, %ld line feed and %ld full stop chars\n",
+      printf( "Summary: ASCII: %ld space (SP) and %ld horizontal tab (HT) chars\n",
+        freqArray[ (int) ' '], freqArray[ (int) '\t'] );
+      printf( "Summary: ASCII: %ld carriage return (CR), %ld line feed (LF) and %ld full stop chars\n",
         freqArray[ (int) '\r'], freqArray[ (int) '\n'], freqArray[ (int) '.'] );
     }
   }
@@ -701,12 +713,14 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
     }
     else  {
       if(( lstIndx + 1 ) == frstIndx )  {
-   /* There are no files specified in the command line so process stdin */
+     /* There are no files specified in the command line so process stdin */
         chrCnt = readByteStreamAndPrintIndexHexAscii( stdin, 0L );
         if( D_Flg || vFlg )  printf( "Processed %d chars from stdin\n", chrCnt );
       }
       else  {
-   /* Process each file specified in the command line */
+        if( D_Flg )
+          printf( "Debug: Largest file size that can be safely handled is %ld bytes\n", LONG_MAX );
+     /* Process each file specified in the command line */
         for( indx = frstIndx; indx <= lstIndx; indx++ )  {
           result = processA_SingleCommandLineParameter( cmdLnStrngs[ indx ] );
         }
@@ -735,7 +749,9 @@ int  main( int  argc, char *  argv[] )  {
 /* If Debug or verbose options are True then print code details */
   if( D_Flg || (( verbosityLevel > 0 ) && ( verbosityLevel < 3 )))  {
     printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
+    print_byteFreq_SourceCodeControlIdentifier();
     printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
+    print_byteFreq_SourceCompileDetails();
   }
 
 /* If -h switch option used then print help message and exit */
