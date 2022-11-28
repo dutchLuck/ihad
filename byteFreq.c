@@ -1,9 +1,9 @@
 /*
  * B Y T E F R E Q . C
  *
- * Index Hex Ascii Dump of a (binary) file or stdin.
+ * Support code for Index Hex Ascii Dump (ihad.c)
  *
- * byteFreq.c last edited on Sat Nov 26 22:39:26 2022 
+ * byteFreq.c last edited on Tue Nov 29 00:03:02 2022 
  *
  * This is not production code! Consider it only slightly tested.
  *
@@ -14,12 +14,15 @@
  */
 
 /*
- * Output a listing of byte freq from an array.
+ * Print routines to list byte frequencies from an array.
  * 
  */
 
 /*
  * $Log: byteFreq.c,v $
+ * Revision 0.7  2022/11/28 13:05:22  owen
+ * Switched from array offset use to pointer use.
+ *
  * Revision 0.6  2022/11/26 11:41:38  owen
  * Extra information on RCS and compile details.
  *
@@ -41,14 +44,13 @@
  * Revision 0.0  2022/11/16 12:24:45  owen
  * Print each byte frequency on a separate line.
  *
- *
  */
 
 #include <stdio.h>	/* printf() fprintf() */
 #include <limits.h>	/* LONG_MIN LONG_MAX */
 #include <stdlib.h>	/* qsort() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.6 2022/11/26 11:41:38 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.7 2022/11/28 13:05:22 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 
@@ -71,6 +73,7 @@ char *  humanReadableASCII[] = {
  " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
 };
 
+
 void  print_byteFreq_SourceCodeControlIdentifier( void )  {
   printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
 }
@@ -81,7 +84,7 @@ void  print_byteFreq_SourceCompileDetails( void )  {
 }
 
 
-int  doByteFreqStats( long  byteFreq[], long long *  totalCount, int *  indxOfMax, int *  indxOfMin )  {
+int  doByteFreqStats( long *  byteFreq, long long *  totalCount, int *  indxOfMax, int *  indxOfMin )  {
   int  byteIndx;
   int  zeroFreqCount = 0;
   long long  total = 0LL;
@@ -93,16 +96,16 @@ int  doByteFreqStats( long  byteFreq[], long long *  totalCount, int *  indxOfMa
   valueOfCurrentMax = LONG_MIN;
   valueOfCurrentMin = LONG_MAX;
   for( byteIndx = 0; byteIndx < 256; byteIndx++ )  {
-    total += (long long) byteFreq[ byteIndx ];
-    if( byteFreq[ byteIndx ] > valueOfCurrentMax )  {
-      valueOfCurrentMax = byteFreq[ byteIndx ];
+    total += (long long) *byteFreq;
+    if( *byteFreq > valueOfCurrentMax )  {
+      valueOfCurrentMax = *byteFreq;
       indxOfCurrentMax = byteIndx;
     }
-    if( byteFreq[ byteIndx ] < valueOfCurrentMin )  {
-      valueOfCurrentMin = byteFreq[ byteIndx ];
+    if( *byteFreq < valueOfCurrentMin )  {
+      valueOfCurrentMin = *byteFreq;
       indxOfCurrentMin = byteIndx;
     }
-    if( byteFreq[ byteIndx ] == 0L )  zeroFreqCount++;
+    if( *byteFreq++ == 0L )  zeroFreqCount++;
   }
   *totalCount = total;
   *indxOfMax = indxOfCurrentMax;
@@ -121,7 +124,7 @@ int  printByteFrequencies( long  byteFreq[], int  onlyNonZeroFlag )  {
   int  byteIndx;
   int  nonZeroFreqCount = 0;
   long long  byteTotal;
-  double  total;
+  double  total, percentMult;
   int  indxOfMax;
   int  indxOfMin;
   int  zeroFreqCount;
@@ -132,28 +135,33 @@ int  printByteFrequencies( long  byteFreq[], int  onlyNonZeroFlag )  {
   /* printf( "Debug: byte Total is %lld\n", byteTotal ); */
   dontCalcPercentage = (( zeroFreqCount == 256 ) || ( byteTotal <= 0LL ));	/* Check all zero array or accumulation error */
   total = ( double ) byteTotal;
+  percentMult = ( double ) 100.0 / total;	/* repeated multiply in loop is cheaper than divide */
   /* printf( "Debug: dontCalcPercentage is %d\n", dontCalcPercentage ); */
   /* printf( "Debug: total is %lg\n", total ); */
 /* Only print info for bytes that don't have zero counts if the onlyNonZeroFlag is true */
   for( byteIndx = 0; byteIndx < 256; byteIndx++ )  {
     if( byteFreq[ byteIndx ] != 0L )  {
       printf( "Frequency: " );
-      printFormattedLine( byteIndx, byteFreq[ byteIndx ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ byteIndx ] / ( total * 0.01 ));
+      printFormattedLine( byteIndx, byteFreq[ byteIndx ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ byteIndx ] * percentMult );
       nonZeroFreqCount += 1;
     }
     else if( ! onlyNonZeroFlag )  {
       printf( "Frequency: " );
-      printFormattedLine( byteIndx, byteFreq[ byteIndx ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ byteIndx ] / ( total * 0.01 ));
+      printFormattedLine( byteIndx, byteFreq[ byteIndx ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ byteIndx ] * percentMult );
     }
   }
   printf( "Highest:   " );
-  printFormattedLine( indxOfMax, byteFreq[ indxOfMax ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ indxOfMax ] / ( total * 0.01 ));
+  printFormattedLine( indxOfMax, byteFreq[ indxOfMax ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ indxOfMax ] * percentMult );
   printf( "Lowest:    " );
-  printFormattedLine( indxOfMin, byteFreq[ indxOfMin ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ indxOfMin ] / ( total * 0.01 ));
+  printFormattedLine( indxOfMin, byteFreq[ indxOfMin ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ indxOfMin ] * percentMult );
   return( nonZeroFreqCount );
 }
 
 
+/*
+ * Compare routine that is used by qsort() routine
+ */
+ 
 int  longCompare( const void *  p1, const void *  p2 )  {
   long *  l1;
   long *  l2;
@@ -171,20 +179,27 @@ void  printCryptoGramFrequencies( long  byteFreq[] )  {
   long  largestFreq;
   long long  charTotal;
   long *  lPtr;
-  double  total;
+  double  total, percentMult;
   int  indx;
   long  sortFreqAscii[ 26 ];	/* Combine Freq with associated Char to sort */
-  
+
+/* Cryptograms typically are all upper case and spaces, but may or may not have punctuation */  
   for( indx = 0; indx < 256; indx++ )  cryptoFreq[ indx ] = 0L;	/* Zero the array */
   largestFreq = byteFreq[ (int) 'A' ];
   charTotal = 0LL;
+  /* Only really interested in A to Z + a to z so don't bother with the rest of the byteFreq array */
   for( indx = (int) 'A', lPtr = cryptoFreq + indx; indx <= (int) 'Z'; indx++ )  {
     *lPtr = byteFreq[ indx ] + byteFreq[ indx + 32 ];	/* Put both upper and lower case into uppercase freq */
     if( *lPtr > largestFreq )  largestFreq = *lPtr;
     charTotal += (long long) *lPtr++;
   }
-  if( charTotal > 0LL )  {
+  if( charTotal == 0LL )
+    printf( "? There are no characters in the range of A to Z or a to z to print\n" );
+  else if( charTotal < 0LL )
+    printf( "?? %lld characters in the range of A to Z or a to z, which shouldn't occur\n",  charTotal );
+  else  {
     total = ( double ) charTotal;
+    percentMult = ( double ) 100.0 / total;
     /* Print 2 line horizontal list of non-zero A to Z frequencies */
     printf( "Char: " );
     /* Print a line of A to Z Characters */
@@ -193,7 +208,7 @@ void  printCryptoGramFrequencies( long  byteFreq[] )  {
     printf( "\n%%Frq: " );
     /* Print a line of % frequencies associated with the Character on the line above it */
     for( indx = (int) 'A'; indx <= (int) 'Z'; indx++ )
-      printf( "%2.0lf ", ( double ) cryptoFreq[ indx ] / ( total * 0.01 ));
+      printf( "%2.0lf ", ( double ) cryptoFreq[ indx ] * percentMult );
     printf( "\n" );
     /* Print 2 line horizontal list of frequencies sorted highest to lowest  */
     /* Where two or more frequencies are the same ensure associated chars are in alphabetic order  */
@@ -209,7 +224,7 @@ void  printCryptoGramFrequencies( long  byteFreq[] )  {
       qsort( sortFreqAscii, 26, sizeof( long ), &longCompare );
       /* Print a line of % frequencies */
       for( indx = 0; indx < 26; indx++ )
-        printf( "%2.0lf ", ( double ) ( sortFreqAscii[ indx ] >> 5 ) / ( total * 0.01 ));	/* recover just freq part and print % freq */
+        printf( "%2.0lf ", ( double ) ( sortFreqAscii[ indx ] >> 5 ) * percentMult );	/* recover just freq part and print % freq */
       printf( "\nChar: " );
       /* Print a line of Characters associated with the frequency on the line above it */
       for( indx = 0; indx < 26; indx++ )  

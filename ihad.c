@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Wed Nov 23 20:42:44 2022 
+ * ihad.c last edited on Tue Nov 29 00:02:53 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -54,6 +54,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.22  2022/11/28 13:03:09  owen
+ * Clarify logic so if unable to determine file size then starting at an offset is ignored.
+ *
  * Revision 0.21  2022/11/26 11:31:36  owen
  * Extra debug and ASCII summary information.
  *
@@ -138,7 +141,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.21 2022/11/26 11:31:36 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.22 2022/11/28 13:03:09 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -382,7 +385,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     byteDisplayWidth = DEFAULT_WIDTH;
     if( wFlg )  fprintf( stderr, "\n?? Reset zero or negetive display width to %d bytes\n", byteDisplayWidth );
   }
- if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
+  if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
 
 /* Postprocess -o switch option */
   if( D_Flg )  printf( "Debug: Option '-o' is %s (%d)\n", oFlg ? "True" : "False", oFlg );
@@ -480,8 +483,8 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
   long  isspaceCnt = 0L;
   long  freqArray[ 256 ];	/* track frequency of bytes */
   unsigned long  byteAddr = 0L;	/* Index of first byte in each output line */
-  char *  outputString;         /* pointer to character string to print to stdout or a file */
-  int  outputStringSize;		/* must be big enough for MAX_WIDTH bytes per line */
+  char *  outputString;	/* pointer to character string to print to stdout or a file */
+  int  outputStringSize;	/* must be big enough for MAX_WIDTH bytes per line */
   char *  bPtr;     /* byte pointer */	/* output line space > 8+2+3*MAX_WIDTH+1+MAX_WIDTH+1 */
   char *  aPtr;     /* ascii pointer */
   int  hexFldWdth;
@@ -629,52 +632,59 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
     fprintf( stderr, "?? Unable to open a file named '%s' for reading\n", nameStrng );
     perror( "processA_SingleCommandLineParameter()" );
   }
-  else  {
+  else  {	/* Begin file opened ok block */
  /* obtain file size for the file that was just opened */
     result = fseek( fp, 0L, SEEK_END );
-    if( result == 0 )  {
+    if( result != 0 )  {
+      fileSize = LONG_MIN;
+      fprintf( stderr, "?? Unable to determine file size by seeking to the end of the file named '%s'\n", nameStrng );
+      perror( "processA_SingleCommandLineParameter()" );
+   /* If there was a problem with the seek make sure it starts at 0 */
+      rewind( fp );
+      fileOffset = 0L;
+    }
+    else  {	/* Begin first fseek successful block */
       fileSize = ( long ) ftell( fp );
+      /* Ensure file is reset back to starting at 0 */
+      rewind( fp );
       if( vFlg )
         printf( "File: '%s' is %ld bytes\n", nameStrng, fileSize );
-    }
-    else  {
-      fileSize = LONG_MIN;
-      fprintf( stderr, "?? Unable to seek to end of the file named '%s'\n", nameStrng );
-      perror( "processA_SingleCommandLineParameter()" );
-    }
-  /* Ensure file is reset back to starting at 0 */
-    rewind( fp );
-    if( D_Flg )
-      printf( "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
- /* If begin option has set an offset greater than zero then seek to the new start */
-    if( bFlg )  {
-      if( fileOffset > 0L )  {
-     /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
-        if(( fileSize > 0L ) && ( fileOffset > fileSize ))  fileOffset = fileSize;
-     /* Set up the start of the dumping at the begin offset */
-        result = fseek( fp, fileOffset, SEEK_SET );
-        if( D_Flg )  {
-          printf( "Debug: result of fseek() from start of file was %d\n", result );
+      if( fileSize == 0L )  {	/* Is there any bytes in the file to process? */
+        if( vFlg )
+          printf( "? There are no bytes to dump in '%s'\n", nameStrng );
+      }
+      else if( fileSize < 0L )  {
+        printf( "?? There are less than zero (%ld)  bytes to dump in '%s'\n", fileSize, nameStrng );
+      }
+      else  {	/* Begin file size greater than zero block, so process the file */
+        if( D_Flg )
+          printf( "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
+     /* If begin option has been set then seek to the new start */
+        if( bFlg )  {
+          if( fileOffset > 0L )  {
+         /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
+            if(( fileSize > 0L ) && ( fileOffset > fileSize ))  fileOffset = fileSize;
+         /* Set up the start of the dumping at the begin offset */
+            result = fseek( fp, fileOffset, SEEK_SET );
+            if( D_Flg )  {
+              printf( "Debug: result of fseek() from start of file was %d\n", result );
+            }
+          }
+          else if( fileOffset < 0L )  {
+         /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
+            if(( fileOffset + fileSize ) < 0L )  fileOffset = -fileSize;
+            if( D_Flg )  printf( "Debug: fileOffset for SEEK_END is %ld\n", fileOffset );
+         /* Set up to start dumping at the begin offset from the end of the file */
+            result = fseek( fp, fileOffset, SEEK_END );
+         /* Adjust fileOffset to print correct Index */
+            if( result == 0 )  fileOffset += fileSize;
+            if( D_Flg )  {
+              printf( "Debug: result of fseek() from end of file was %d\n", result );
+            }
+          }
         }
-      }
-      else if( fileOffset < 0L )  {
-     /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
-        if(( fileOffset + fileSize ) < 0L )  fileOffset = -fileSize;
-        if( D_Flg )  printf( "Debug: fileOffset for SEEK_END is %ld\n", fileOffset );
-     /* Set up to start dumping at the begin offset from the end of the file */
-        result = fseek( fp, fileOffset, SEEK_END );
-     /* Adjust fileOffset to print correct Index */
-        if( result == 0 )  fileOffset += fileSize;
-        if( D_Flg )  {
-          printf( "Debug: result of fseek() from end of file was %d\n", result );
-        }
-      }
- /* If there was a problem with the seek make sure it starts at 0 */
-      if( result != 0 )  {
-        rewind( fp );
-        fileOffset = 0L;
-      }
-    }
+      }	/* End of file size is greater than 0 block */
+    }	/* End first fseek successful block */
  /* Process the file just opened */
     byteCnt = readByteStreamAndPrintIndexHexAscii( fp, fileOffset );
     result = ( fclose( fp ) == 0 );
@@ -684,7 +694,7 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
     }
     if( D_Flg || vFlg )
       printf( "File: '%s' (%ld bytes dumped)\n", nameStrng, byteCnt );
-  }
+  }	/* End of file opened ok block */
   return( result );
 }
 
