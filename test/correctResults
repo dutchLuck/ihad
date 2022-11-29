@@ -169,7 +169,7 @@ f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
 
 Useage:
 ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
-  where options are '-A -b X -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -
+  where options are '-A -b X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -
    -A .. Ascii output disable
    -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
    -c C .. Set char C as non-ASCII indicator & overide -A option
@@ -180,6 +180,7 @@ ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
    -h .. Print out this help message and exit
    -H .. Hexadecimal output disable
    -I .. Index output disable
+   -L X .. Limit file dumps to a maximum of X lines
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
    -S C .. Set char C as column separator
@@ -284,3 +285,9 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 %Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
 File: 'ASD_Coin_Level2.encoded' (79 bytes dumped)
++++++++++++ ihad -v0 -b 32 -L 3 -w 32 test256.dat  +++++++++++++++
+File: 'test256.dat' is 256 bytes
+00000020 202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f .!"#$%&'()*+,-./0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f `abcdefghijklmnopqrstuvwxyz{|}~.
+File: 'test256.dat' (96 bytes dumped)

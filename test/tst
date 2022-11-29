@@ -76,4 +76,6 @@ echo "+++++++++++ ihad -I -v4 test11.dat +++++++++++++++"
 ../ihad -I -v4 test11.dat
 echo "+++++++++++ ihad -C ASD_Coin_Level2.encoded +++++++++++++++"
 ../ihad -C ASD_Coin_Level2.encoded
+echo "+++++++++++ ihad -v0 -b 32 -L 3 -w 32 test256.dat  +++++++++++++++"
+../ihad -v0 -b 32 -L 3 -w 32 test256.dat
 
