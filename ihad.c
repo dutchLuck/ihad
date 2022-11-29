@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Tue Nov 29 00:02:53 2022 
+ * ihad.c last edited on Tue Nov 29 22:28:39 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -54,6 +54,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.23  2022/11/29 11:32:00  owen
+ * Increased information written to file when -o option is used.
+ *
  * Revision 0.22  2022/11/28 13:03:09  owen
  * Clarify logic so if unable to determine file size then starting at an offset is ignored.
  *
@@ -141,7 +144,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.22 2022/11/28 13:03:09 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.23 2022/11/29 11:32:00 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -468,7 +471,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 }
 
 
-long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
+long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOffset )  {
   int  byte;
   int  collectSummary;	/* Flag that summary information is required */
   long  byteCnt = 0L;
@@ -509,9 +512,9 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
   }
   else  {
     if( D_Flg )  {
-      printf( "Debug: hexFldWdth is %d and hexFldFrmt is '%s'\n", hexFldWdth, hexFldFrmt ); 
-      printf( "Debug: Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
-      printf( "Debug: Capacity of output string is %d characters\n", outputStringSize );
+      fprintf( ofp, "Debug: hexFldWdth is %d and hexFldFrmt is '%s'\n", hexFldWdth, hexFldFrmt ); 
+      fprintf( ofp, "Debug: Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
+      fprintf( ofp, "Debug: Capacity of output string is %d characters\n", outputStringSize );
     }
     *outputString = '\0';		/* in-case the stdin or file has 0 length */
  /* Take any fseek() skip into account if there was one */
@@ -569,9 +572,9 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
         }
         if( ! ( I_Flg && H_Flg && A_Flg ))  {	/* Don't print lines of column separators if all 3 columns are off */
           fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
+          if( D_Flg )
+            fprintf( ofp, "Debug: Output string is %lu characters\n", strlen( outputString ));
         }
-        if( D_Flg )
-          printf( "Debug: Output string is %lu characters\n", strlen( outputString ));
         *outputString = '\0';		/* set string back to zero length */
         byteAddr = startOffset + byteCnt;
       }
@@ -585,29 +588,29 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
       }
       if( ! ( I_Flg && H_Flg && A_Flg ))  {	/* Don't print last line of column separators if all 3 columns are off */
         fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
+        if( D_Flg )
+          fprintf( ofp, "Debug: Output string is %lu characters\n", strlen( outputString ));
       }
-      if( D_Flg )
-        printf( "Debug: Output string is %lu characters\n", strlen( outputString ));
     }
     if( outputString != NULL )  {
       free( outputString );
     }
   }
   if( collectSummary )  {
-    printf( "Summary: ASCII: %ld chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
-    printf( "Summary: ASCII: %ld alphabet ( %ld upper case and %ld lower case ) chars\n",
+    fprintf( ofp, "Summary: ASCII: %ld chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
+    fprintf( ofp, "Summary: ASCII: %ld alphabet ( %ld upper case and %ld lower case ) chars\n",
       isalphaCnt, isupperCnt, islowerCnt );
-    printf( "Summary: ASCII: %ld digit, %ld punctuation, %ld space and %ld control chars\n",
+    fprintf( ofp, "Summary: ASCII: %ld digit, %ld punctuation, %ld space and %ld control chars\n",
       isdigitCnt, ispunctCnt, isspaceCnt, iscntrlCnt );
-    if(( verbosityLevel > 3 ) || C_Flg )  {	/* Allow user to have -C -v4 to get both cryptogram and freq list info */
-      if( C_Flg || ( verbosityLevel == 6 ))  printCryptoGramFrequencies( freqArray );
+    if(( verbosityLevel > 3 ) || C_Flg )  {	/* Allow user to have both -C and -v4 to get both cryptogram and freq list info */
+      if( C_Flg || ( verbosityLevel == 6 ))  printCryptoGramFrequencies( ofp, freqArray );
       if(( verbosityLevel == 4 ) || ( verbosityLevel == 5 ))
-        printByteFrequencies( freqArray, ( verbosityLevel == 4 ));
+        printByteFrequencies( ofp, freqArray, ( verbosityLevel == 4 ));
     }
     else  {
-      printf( "Summary: ASCII: %ld space (SP) and %ld horizontal tab (HT) chars\n",
+      fprintf( ofp, "Summary: ASCII: %ld space (SP) and %ld horizontal tab (HT) chars\n",
         freqArray[ (int) ' '], freqArray[ (int) '\t'] );
-      printf( "Summary: ASCII: %ld carriage return (CR), %ld line feed (LF) and %ld full stop chars\n",
+      fprintf( ofp, "Summary: ASCII: %ld carriage return (CR), %ld line feed (LF) and %ld full stop chars\n",
         freqArray[ (int) '\r'], freqArray[ (int) '\n'], freqArray[ (int) '.'] );
     }
   }
@@ -615,7 +618,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, long startOffset )  {
 }
 
 
-int  processA_SingleCommandLineParameter( char *  nameStrng )  {
+int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
   int  result;
   long  byteCnt;
   FILE *  fp;
@@ -623,7 +626,7 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
   long  fileOffset;
 
   if( D_Flg )
-    printf( "Debug:  Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
+    fprintf( ofp, "Debug:  Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
 /* Keep beginOffset global variable safe from modification in case there are multiple files */
   fileOffset = beginOffset;
 /* Open the file for reading (in binary mode) */
@@ -648,17 +651,17 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
       /* Ensure file is reset back to starting at 0 */
       rewind( fp );
       if( vFlg )
-        printf( "File: '%s' is %ld bytes\n", nameStrng, fileSize );
+        fprintf( ofp, "File: '%s' is %ld bytes\n", nameStrng, fileSize );
       if( fileSize == 0L )  {	/* Is there any bytes in the file to process? */
         if( vFlg )
-          printf( "? There are no bytes to dump in '%s'\n", nameStrng );
+          fprintf( ofp, "? There are no bytes to dump in '%s'\n", nameStrng );
       }
       else if( fileSize < 0L )  {
-        printf( "?? There are less than zero (%ld)  bytes to dump in '%s'\n", fileSize, nameStrng );
+        fprintf( ofp, "?? There are less than zero (%ld)  bytes to dump in '%s'\n", fileSize, nameStrng );
       }
       else  {	/* Begin file size greater than zero block, so process the file */
         if( D_Flg )
-          printf( "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
+          fprintf( ofp, "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
      /* If begin option has been set then seek to the new start */
         if( bFlg )  {
           if( fileOffset > 0L )  {
@@ -667,33 +670,33 @@ int  processA_SingleCommandLineParameter( char *  nameStrng )  {
          /* Set up the start of the dumping at the begin offset */
             result = fseek( fp, fileOffset, SEEK_SET );
             if( D_Flg )  {
-              printf( "Debug: result of fseek() from start of file was %d\n", result );
+              fprintf( ofp, "Debug: result of fseek() from start of file was %d\n", result );
             }
           }
           else if( fileOffset < 0L )  {
          /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
             if(( fileOffset + fileSize ) < 0L )  fileOffset = -fileSize;
-            if( D_Flg )  printf( "Debug: fileOffset for SEEK_END is %ld\n", fileOffset );
+            if( D_Flg )  fprintf( ofp, "Debug: fileOffset for SEEK_END is %ld\n", fileOffset );
          /* Set up to start dumping at the begin offset from the end of the file */
             result = fseek( fp, fileOffset, SEEK_END );
          /* Adjust fileOffset to print correct Index */
             if( result == 0 )  fileOffset += fileSize;
             if( D_Flg )  {
-              printf( "Debug: result of fseek() from end of file was %d\n", result );
+              fprintf( ofp, "Debug: result of fseek() from end of file was %d\n", result );
             }
           }
         }
       }	/* End of file size is greater than 0 block */
     }	/* End first fseek successful block */
  /* Process the file just opened */
-    byteCnt = readByteStreamAndPrintIndexHexAscii( fp, fileOffset );
+    byteCnt = readByteStreamAndPrintIndexHexAscii( fp, ofp, fileOffset );
     result = ( fclose( fp ) == 0 );
     if( ! result )  {
       fprintf( stderr, "?? Unable to close the file named '%s'\n", nameStrng );
       perror( "processA_SingleCommandLineParameter()" );
     }
     if( D_Flg || vFlg )
-      printf( "File: '%s' (%ld bytes dumped)\n", nameStrng, byteCnt );
+      fprintf( ofp, "File: '%s' (%ld bytes dumped)\n", nameStrng, byteCnt );
   }	/* End of file opened ok block */
   return( result );
 }
@@ -724,7 +727,7 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
     else  {
       if(( lstIndx + 1 ) == frstIndx )  {
      /* There are no files specified in the command line so process stdin */
-        chrCnt = readByteStreamAndPrintIndexHexAscii( stdin, 0L );
+        chrCnt = readByteStreamAndPrintIndexHexAscii( stdin, ofp, 0L );
         if( D_Flg || vFlg )  printf( "Processed %d chars from stdin\n", chrCnt );
       }
       else  {
@@ -732,7 +735,7 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
           printf( "Debug: Largest file size that can be safely handled is %ld bytes\n", LONG_MAX );
      /* Process each file specified in the command line */
         for( indx = frstIndx; indx <= lstIndx; indx++ )  {
-          result = processA_SingleCommandLineParameter( cmdLnStrngs[ indx ] );
+          result = processA_SingleCommandLineParameter( ofp, cmdLnStrngs[ indx ] );
         }
       }
    /* Close output file specified in the command line */
@@ -759,9 +762,9 @@ int  main( int  argc, char *  argv[] )  {
 /* If Debug or verbose options are True then print code details */
   if( D_Flg || (( verbosityLevel > 0 ) && ( verbosityLevel < 3 )))  {
     printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
-    print_byteFreq_SourceCodeControlIdentifier();
+    print_byteFreq_SourceCodeControlIdentifier( stdout );
     printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
-    print_byteFreq_SourceCompileDetails();
+    print_byteFreq_SourceCompileDetails( stdout );
   }
 
 /* If -h switch option used then print help message and exit */

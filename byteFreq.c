@@ -3,7 +3,7 @@
  *
  * Support code for Index Hex Ascii Dump (ihad.c)
  *
- * byteFreq.c last edited on Tue Nov 29 00:03:02 2022 
+ * byteFreq.c last edited on Tue Nov 29 22:28:46 2022 
  *
  * This is not production code! Consider it only slightly tested.
  *
@@ -20,6 +20,9 @@
 
 /*
  * $Log: byteFreq.c,v $
+ * Revision 0.8  2022/11/29 11:29:02  owen
+ * Output to a file, rather than just stdout, if required.
+ *
  * Revision 0.7  2022/11/28 13:05:22  owen
  * Switched from array offset use to pointer use.
  *
@@ -50,7 +53,7 @@
 #include <limits.h>	/* LONG_MIN LONG_MAX */
 #include <stdlib.h>	/* qsort() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.7 2022/11/28 13:05:22 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.8 2022/11/29 11:29:02 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 
@@ -74,13 +77,13 @@ char *  humanReadableASCII[] = {
 };
 
 
-void  print_byteFreq_SourceCodeControlIdentifier( void )  {
-  printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
+void  print_byteFreq_SourceCodeControlIdentifier( FILE *  ofp )  {
+  fprintf( ofp, "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
 }
 
 
-void  print_byteFreq_SourceCompileDetails( void )  {
-  printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
+void  print_byteFreq_SourceCompileDetails( FILE *  ofp )  {
+  fprintf( ofp, "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
 }
 
 
@@ -114,13 +117,18 @@ int  doByteFreqStats( long *  byteFreq, long long *  totalCount, int *  indxOfMa
 }
 
 
-void  printFormattedLine( int  indx, long  freq, double  percentageFreq )  {
-  printf( "%02x %3d %03o %3s ", indx, indx, indx, humanReadableASCII[ indx ] );
-  printf( "%5.1lf%% %ld\n", percentageFreq, freq );
+/*
+ * Print Hex, Dec, Octal & ASCII representation of a byte
+ * then the frequency as a percentage and then as a count.
+ */
+ 
+void  printFormattedLine( FILE *  ofp, int  indx, long  freq, double  percentageFreq )  {
+  fprintf( ofp, "%02x %3d %03o %3s ", indx, indx, indx, humanReadableASCII[ indx ] );
+  fprintf( ofp, "%5.1lf%% %ld\n", percentageFreq, freq );
 }
 
 
-int  printByteFrequencies( long  byteFreq[], int  onlyNonZeroFlag )  {
+int  printByteFrequencies( FILE *  ofp, long  byteFreq[], int  onlyNonZeroFlag )  {
   int  byteIndx;
   int  nonZeroFreqCount = 0;
   long long  byteTotal;
@@ -131,29 +139,29 @@ int  printByteFrequencies( long  byteFreq[], int  onlyNonZeroFlag )  {
   int  dontCalcPercentage;
    
   zeroFreqCount = doByteFreqStats( byteFreq, &byteTotal, &indxOfMax, &indxOfMin );
-  /* printf( "Debug: Zero Freq count is %d\n", zeroFreqCount ); */
-  /* printf( "Debug: byte Total is %lld\n", byteTotal ); */
+  /* fprintf( ofp, "Debug: Zero Freq count is %d\n", zeroFreqCount ); */
+  /* fprintf( ofp, "Debug: byte Total is %lld\n", byteTotal ); */
   dontCalcPercentage = (( zeroFreqCount == 256 ) || ( byteTotal <= 0LL ));	/* Check all zero array or accumulation error */
   total = ( double ) byteTotal;
   percentMult = ( double ) 100.0 / total;	/* repeated multiply in loop is cheaper than divide */
-  /* printf( "Debug: dontCalcPercentage is %d\n", dontCalcPercentage ); */
-  /* printf( "Debug: total is %lg\n", total ); */
+  /* fprintf( ofp, "Debug: dontCalcPercentage is %d\n", dontCalcPercentage ); */
+  /* fprintf( ofp, "Debug: total is %lg\n", total ); */
 /* Only print info for bytes that don't have zero counts if the onlyNonZeroFlag is true */
   for( byteIndx = 0; byteIndx < 256; byteIndx++ )  {
     if( byteFreq[ byteIndx ] != 0L )  {
-      printf( "Frequency: " );
-      printFormattedLine( byteIndx, byteFreq[ byteIndx ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ byteIndx ] * percentMult );
+      fprintf( ofp, "Frequency: " );
+      printFormattedLine( ofp, byteIndx, byteFreq[ byteIndx ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ byteIndx ] * percentMult );
       nonZeroFreqCount += 1;
     }
     else if( ! onlyNonZeroFlag )  {
-      printf( "Frequency: " );
-      printFormattedLine( byteIndx, byteFreq[ byteIndx ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ byteIndx ] * percentMult );
+      fprintf( ofp, "Frequency: " );
+      printFormattedLine( ofp, byteIndx, byteFreq[ byteIndx ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ byteIndx ] * percentMult );
     }
   }
-  printf( "Highest:   " );
-  printFormattedLine( indxOfMax, byteFreq[ indxOfMax ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ indxOfMax ] * percentMult );
-  printf( "Lowest:    " );
-  printFormattedLine( indxOfMin, byteFreq[ indxOfMin ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ indxOfMin ] * percentMult );
+  fprintf( ofp, "Highest:   " );
+  printFormattedLine( ofp, indxOfMax, byteFreq[ indxOfMax ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ indxOfMax ] * percentMult );
+  fprintf( ofp, "Lowest:    " );
+  printFormattedLine( ofp, indxOfMin, byteFreq[ indxOfMin ], ( dontCalcPercentage ) ? ( double ) 0.0 : ( double ) byteFreq[ indxOfMin ] * percentMult );
   return( nonZeroFreqCount );
 }
 
@@ -174,7 +182,7 @@ int  longCompare( const void *  p1, const void *  p2 )  {
 }
 
 
-void  printCryptoGramFrequencies( long  byteFreq[] )  {
+void  printCryptoGramFrequencies( FILE * ofp, long  byteFreq[] )  {
   long  cryptoFreq[ 256 ];
   long  largestFreq;
   long long  charTotal;
@@ -194,29 +202,29 @@ void  printCryptoGramFrequencies( long  byteFreq[] )  {
     charTotal += (long long) *lPtr++;
   }
   if( charTotal == 0LL )
-    printf( "? There are no characters in the range of A to Z or a to z to print\n" );
+    fprintf( ofp, "? There are no characters in the range of A to Z or a to z to print\n" );
   else if( charTotal < 0LL )
-    printf( "?? %lld characters in the range of A to Z or a to z, which shouldn't occur\n",  charTotal );
+    fprintf( ofp, "?? %lld characters in the range of A to Z or a to z, which shouldn't occur\n",  charTotal );
   else  {
     total = ( double ) charTotal;
     percentMult = ( double ) 100.0 / total;
     /* Print 2 line horizontal list of non-zero A to Z frequencies */
-    printf( "Char: " );
+    fprintf( ofp, "Char: " );
     /* Print a line of A to Z Characters */
     for( indx = (int) 'A'; indx <= (int) 'Z'; indx++ )
-      printf( " %c ", ( char ) indx );	/* print A to Z chars */
-    printf( "\n%%Frq: " );
+      fprintf( ofp, " %c ", ( char ) indx );	/* print A to Z chars */
+    fprintf( ofp, "\n%%Frq: " );
     /* Print a line of % frequencies associated with the Character on the line above it */
     for( indx = (int) 'A'; indx <= (int) 'Z'; indx++ )
-      printf( "%2.0lf ", ( double ) cryptoFreq[ indx ] * percentMult );
-    printf( "\n" );
+      fprintf( ofp, "%2.0lf ", ( double ) cryptoFreq[ indx ] * percentMult );
+    fprintf( ofp, "\n" );
     /* Print 2 line horizontal list of frequencies sorted highest to lowest  */
     /* Where two or more frequencies are the same ensure associated chars are in alphabetic order  */
     if( largestFreq > ( LONG_MAX >> 5 ))  {
-      printf( "? Unable to sort frequency values due to size of largest frequency (%ld)\n", largestFreq );
+      fprintf( ofp, "? Unable to sort frequency values due to size of largest frequency (%ld)\n", largestFreq );
     }
     else  {
-      printf( "\n%%Frq: " );
+      fprintf( ofp, "\n%%Frq: " );
       /* Cryptograms are generally short sayings, so can have multiple freq values the same */
       /* and it probably isn't going to matter that we don't have the full long capacity any more */
       for( indx = 0, lPtr = cryptoFreq + ( long ) 'A'; indx < 26; indx++ )
@@ -224,12 +232,12 @@ void  printCryptoGramFrequencies( long  byteFreq[] )  {
       qsort( sortFreqAscii, 26, sizeof( long ), &longCompare );
       /* Print a line of % frequencies */
       for( indx = 0; indx < 26; indx++ )
-        printf( "%2.0lf ", ( double ) ( sortFreqAscii[ indx ] >> 5 ) * percentMult );	/* recover just freq part and print % freq */
-      printf( "\nChar: " );
+        fprintf( ofp, "%2.0lf ", ( double ) ( sortFreqAscii[ indx ] >> 5 ) * percentMult );	/* recover just freq part and print % freq */
+      fprintf( ofp, "\nChar: " );
       /* Print a line of Characters associated with the frequency on the line above it */
       for( indx = 0; indx < 26; indx++ )  
-        printf( " %c ", ( char ) (( 0x1f & (~ sortFreqAscii[ indx ])) | 0x40));	/* recover char part associated with freq and print it */
-      printf( "\n" );
+        fprintf( ofp, " %c ", ( char ) (( 0x1f & (~ sortFreqAscii[ indx ])) | 0x40));	/* recover char part associated with freq and print it */
+      fprintf( ofp, "\n" );
     }
   }
 }

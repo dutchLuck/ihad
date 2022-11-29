@@ -3,7 +3,7 @@
  *
  * Header for byteFreq.
  *
- * byteFreq.h last edited on Sat Nov 26 22:39:29 2022 
+ * byteFreq.h last edited on Tue Nov 29 22:28:48 2022 
  *
  * This is not production code! Consider it only slightly tested.
  *
@@ -20,6 +20,9 @@
 
 /*
  * $Log: byteFreq.h,v $
+ * Revision 0.3  2022/11/29 11:31:37  owen
+ * Changed routine prototypes to include file variable.
+ *
  * Revision 0.2  2022/11/26 11:43:18  owen
  * Added header info for extra info routines.
  *
@@ -34,8 +37,8 @@
  */
 
 
-void  print_byteFreq_SourceCodeControlIdentifier( void );
-void  print_byteFreq_SourceCompileDetails( void );
-int  printByteFrequencies( long  byteFreq[], int  onlyNonZeroFlag );
-void  printCryptoGramFrequencies( long  byteFreq[] );
+void  print_byteFreq_SourceCodeControlIdentifier( FILE * ofp  );
+void  print_byteFreq_SourceCompileDetails( FILE * ofp  );
+int  printByteFrequencies( FILE * ofp, long  byteFreq[], int  onlyNonZeroFlag );
+void  printCryptoGramFrequencies( FILE * ofp, long  byteFreq[] );
 
