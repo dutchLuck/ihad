@@ -158,18 +158,20 @@ The ihad command has a number of options which are outlined in the useage inform
 > ihad.exe -h
 
 Useage:
-ihad.exe [options] [inputFile1 [inputFile2 [.. inputFileN]]]
-  where options are '-A -b X -c C -d -D -f X -h -H -I -o outfileName -s -S C -v[X] -w X'; -
+ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
+  where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -
    -A .. Ascii output disable
    -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
-   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
+   -B X .. Limit file dumps to a maximum of X bytes
    -c C .. Set char C as non-ASCII indicator & overide -A option
+   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
    -f X .. Set hex field separator to X spaces (where 0 < X < 2)
    -h .. Print out this help message and exit
    -H .. Hexadecimal output disable
    -I .. Index output disable
+   -L X .. Limit file dumps to a maximum of X lines
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
    -S C .. Set char C as column separator
@@ -203,3 +205,8 @@ show just summary information about file "test.bin". Option "-v5" provides more 
 including a listing of frequency of all bytes. Option "-v4" also provides a listing
 of only non-zero frequencies. A cryptogram mode has been added with the "-C" option.
 The "-C" option is just a shortcut to specifying "-I -H -w32 -v6".
+The dump can be limited to a maximum number of lines or a maximum number of bytes.
+The "-L X" option limits the file dump to a maximum of X lines. In a similar
+fashion the option "-B X" limits the file dump to a maximum of X bytes. If both
+"-L" and "-B" options are used at the same time then the one resulting in the
+smallest number of bytes being dumped is chosen.
