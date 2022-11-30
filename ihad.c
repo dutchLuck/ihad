@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Wed Nov 30 00:15:11 2022 
+ * ihad.c last edited on Wed Nov 30 22:17:08 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -49,11 +49,19 @@
  * For useage help type the switch -h;
  * e.g.
  *  ./ihad -h
- * 
+ *
+ * Compile with; -
+ *  cc -Wall -c byteFreq.c
+ *  cc -Wall -c ihad.c
+ *  cc -o ihad ihad.o byteFreq.o
+ *
  */
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.25  2022/11/30 11:17:15  owen
+ * Added "-B X" option to limit bytes dumped to a maximum of X bytes.
+ *
  * Revision 0.24  2022/11/29 13:15:21  owen
  * Added -L X option to limit dump to a max of X lines.
  *
@@ -146,7 +154,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.24 2022/11/29 13:15:21 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.25 2022/11/30 11:17:15 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -157,15 +165,18 @@
 
 
 /* Command line Optional Switches: */
-/*  Ascii, beginOffset, charAlternate, Cryptogram, decimal, Debug, fieldSepWidth, */
-/*  help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
-const char  optionStr[] = "Ab:c:CdDf:hHIL:o:sS:v::w:";
+/*  Ascii, beginOffset, ByteCount, charAlternate, Cryptogram, decimal, Debug, */
+/*  fieldSepWidth, help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
+const char  optionStr[] = "Ab:B:c:CdDf:hHIL:o:sS:v::w:";
 
 /* Global Flags & Data */
 int  A_Flg;			/* Control Ascii column output */
 int  bFlg;			/* begin offset bytes from the start of the file */
 long  beginOffset;		/* or if < 0 then measure back from end of the file */
 char *  bStrng;
+int  B_Flg;			/* Limit bytes dumped */
+long  bytesToDump;		/* number of bytes to dump */
+char *  B_Strng;		/* max number of bytes to dump */
 int  cFlg;			/* use alternate char instead of full stops for non-ASCII */
 char *  cStrng;
 char defaultCharStrng[] = ".";
@@ -178,7 +189,7 @@ int  hFlg;			/* Control help info output */
 int  H_Flg;			/* Control Hexadecimal column output */
 int  I_Flg;			/* Control Index column output */
 int  L_Flg;			/* Limit lines dumped */
-long  bytesToDump;		/* number of bytes to dump */
+long  linesToDump;		/* number of lines to dump */
 char *  L_Strng;		/* max number of lines to dump */
 int  oFlg;			/* Control output file output */
 char *  oStrng;		/* output file name */
@@ -195,12 +206,16 @@ char *  wStrng;
 char *  exeName;		/* name of this executable */
 char *  exePath;		/* path of this executable */
 
+
 void  setGlobalFlagDefaults( void )  {
 /* Preset command line options */
   A_Flg = 0;		/* Default is Ascii column output */
-  bFlg = 0;		    /* Default to begin the dump at the beginning of the file */
+  bFlg = 0;		/* Default to begin the dump at the beginning of the file */
   beginOffset = 0L;
   bStrng = ( char * ) NULL;
+  B_Flg = 0;			/* Default to unlimited number of dump bytes */
+  bytesToDump = LONG_MAX;
+  B_Strng = ( char * ) NULL;
   cFlg = 0;			/* Default to output full-stops */
   cStrng = defaultCharStrng;
   C_Flg = 0;			/* Default to Cryptogram mode off */
@@ -212,6 +227,7 @@ void  setGlobalFlagDefaults( void )  {
   H_Flg = 0;			/* Default is Hexadecimal column output */
   I_Flg = 0;			/* Default is Index column output */
   L_Flg = 0;			/* Default to unlimited number of dump lines */
+  linesToDump = LONG_MAX;
   L_Strng = ( char * ) NULL;
   oFlg = 0;			/* Default to output to stdout */
   oStrng = ( char * ) NULL;
@@ -231,9 +247,10 @@ void  setGlobalFlagDefaults( void )  {
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
-  printf( "  where options are '-A -b X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -\n" );
+  printf( "  where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -\n" );
   printf( "   -A .. Ascii output disable\n" );
   printf( "   -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)\n" );
+  printf( "   -B X .. Limit file dumps to a maximum of X bytes\n" );
   printf( "   -c C .. Set char C as non-ASCII indicator & overide -A option\n" );
   printf( "   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
@@ -276,6 +293,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     switch( result )  {
       case 'A' :  A_Flg = 1; break;
       case 'b' :  bFlg = 1; bStrng = optarg; break;
+      case 'B' :  B_Flg = 1; B_Strng = optarg; break;
       case 'c' :  cFlg = 1; cStrng = optarg; break;
       case 'C' :  C_Flg = 1; break;
       case 'd' :  dFlg = 1; break;
@@ -469,30 +487,56 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     }
   }
 
+/* Postprocess -B (dump at most X bytes) switch option */
+  if( D_Flg )  printf( "Debug: Option '-B' is %s (%d)\n", B_Flg ? "True" : "False", B_Flg );
+  if( B_Flg )  {
+    bytesToDump = LONG_MAX;     /* set limit to a very large number */
+    if( B_Strng == ( char * ) NULL )  {
+      printf( "? String for option '-B' is uninitialised, using default value of %ld\n", bytesToDump );
+    }
+    else  {
+      if( D_Flg )  printf( "Debug: String for option '-B' is %s\n", B_Strng );
+   /* Convert offset specification to unsigned long */
+      bytesToDump = atol( B_Strng );
+      if( D_Flg )  printf( "Debug: The '%s' string for option '-B' was converted to %ld\n", B_Strng, bytesToDump );
+   /* Rough check on atol() output - did it reset bytesToDump to zero when option value likely wasn't zero */
+      if(( bytesToDump == 0L ) && ( *B_Strng != '0' ))  {
+        fprintf( stderr, "\n?? Unable to convert '%s' into a long integer for option '-B'\n", B_Strng );
+      }
+    }
+  }
+  else  {
+    if( D_Flg )  printf( "Debug: Option '-B' was not found in the command line options\n" );
+  }
+  if( D_Flg )  printf( "Debug: Limit bytes to Dump from the file to a max of %ld bytes\n", bytesToDump );
+
 /* Postprocess -L (dump at most X lines) switch option */
   if( D_Flg )  printf( "Debug: Option '-L' is %s (%d)\n", L_Flg ? "True" : "False", L_Flg );
   if( L_Flg )  {
-    bytesToDump = LONG_MAX;     /* set limit to a very large number */
+    linesToDump = LONG_MAX;     /* set limit to a very large number */
     if( L_Strng == ( char * ) NULL )  {
-      printf( "? String for option '-L' is uninitialised, using default value of %ld\n", bytesToDump );
+      printf( "? String for option '-L' is uninitialised, using default value of %ld\n", linesToDump );
     }
     else  {
       if( D_Flg )  printf( "Debug: String for option '-L' is %s\n", L_Strng );
    /* Convert offset specification to unsigned long */
-      bytesToDump = atol( L_Strng );
-      if( D_Flg )  printf( "Debug: The '%s' string for option '-L' was converted to %ld\n", L_Strng, bytesToDump );
+      linesToDump = atol( L_Strng );
+      if( D_Flg )  printf( "Debug: The '%s' string for option '-L' was converted to %ld\n", L_Strng, linesToDump );
    /* Rough check on atol() output - did it reset bytesToDump to zero when option value likely wasn't zero */
-      if(( bytesToDump == 0L ) && ( *L_Strng != '0' ))  {
+      if(( linesToDump == 0L ) && ( *L_Strng != '0' ))  {
         fprintf( stderr, "\n?? Unable to convert '%s' into a long integer for option '-L'\n", L_Strng );
       }
-      bytesToDump = byteDisplayWidth * bytesToDump;	/* Convert from max number of lines to max number of bytes */
+      if( bytesToDump > byteDisplayWidth * linesToDump )  {	/* Take smaller of max number of lines * width and max number of bytes */
+        bytesToDump = byteDisplayWidth * linesToDump;	/* Convert from max number of lines to max number of bytes */
+        B_Flg = 1;
+      }
     }
   }
   else  {
     if( D_Flg )  printf( "Debug: Option '-L' was not found in the command line options\n" );
   }
-  if( D_Flg )  printf( "Debug: Limit bytes to Dump from the file to a max of %ld bytes\n", bytesToDump );
- 
+  if( D_Flg )  printf( "Debug: Limit lines to Dump from the file to a max of %ld lines\n", linesToDump );
+  
 /* Report on -h switch option */
   if( D_Flg )  printf( "Debug: Option '-h' is %s (%d)\n", hFlg ? "True" : "False", hFlg );
   if( ! hFlg )  {
@@ -526,7 +570,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
   int  hexFldWdth;
   char  hexFldFrmt[ 11 ];
 
-/* set or reset flag according to the need to print summary information */
+/* Set or reset flag according to the need to print summary information */
   collectSummary = ( D_Flg || ( verbosityLevel > 1 ) || C_Flg );
   for( byte = 0; byte < 256; byte++ )  freqArray[ byte ] = 0L;
 /* Setup the format for printing the hex bytes */
@@ -553,7 +597,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
  /* Take any fseek() skip into account if there was one */
     byteAddr = startOffset;
  /* Read bytes from stdin or file until either end of file or bytes to dump reaches zero */
-    while((( byte = fgetc( fp )) != EOF ) && (( ! L_Flg ) || ( bytesToDump-- > 0L ))) {
+    while((( byte = fgetc( fp )) != EOF ) && (( ! B_Flg ) || ( bytesToDump-- > 0L ))) {
       byte &= BYTE_MASK;
       if( collectSummary )  {
         freqArray[ byte ]++;	/* Accumalate counts of all bytes */

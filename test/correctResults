@@ -169,9 +169,10 @@ f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
 
 Useage:
 ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
-  where options are '-A -b X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -
+  where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -
    -A .. Ascii output disable
    -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
+   -B X .. Limit file dumps to a maximum of X bytes
    -c C .. Set char C as non-ASCII indicator & overide -A option
    -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
    -d .. Decimal index output enable & default to 10 bytes per line
@@ -291,3 +292,14 @@ File: 'test256.dat' is 256 bytes
 00000040 404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
 00000060 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f `abcdefghijklmnopqrstuvwxyz{|}~.
 File: 'test256.dat' (96 bytes dumped)
++++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++++++++++++++
+00000048 303132333435363738393a3b3c3d3e3f40414243 0123456789:;<=>?@ABC
+00000068 4445464748494a4b4c4d4e4f5051525354555657 DEFGHIJKLMNOPQRSTUVW
+00000088 58595a5b5c5d5e5f606162636465666768696a6b XYZ[\]^_`abcdefghijk
+00000108 6c6d6e6f707172737475767778797a7b7c7d7e7f lmnopqrstuvwxyz{|}~.
++++++++++++ ihad -B 48 -L 2 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
++++++++++++ ihad -d -B 20 -L 4 test52.dat  +++++++++++++++
+00000000 6162636465666768696a abcdefghij
+00000010 6b6c6d6e6f7071727374 klmnopqrst
