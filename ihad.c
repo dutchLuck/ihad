@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Wed Nov 30 22:17:08 2022 
+ * ihad.c last edited on Fri Dec  2 00:33:13 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -59,6 +59,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.26  2022/12/01 13:33:22  owen
+ * Use common routine for -b -B and -L value acquisition.
+ *
  * Revision 0.25  2022/11/30 11:17:15  owen
  * Added "-B X" option to limit bytes dumped to a maximum of X bytes.
  *
@@ -154,7 +157,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.25 2022/11/30 11:17:15 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.26 2022/12/01 13:33:22 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -241,6 +244,28 @@ void  setGlobalFlagDefaults( void )  {
   wFlg = 0;			/* Default to DEFAULT_WIDTH bytes per line */
   byteDisplayWidth = DEFAULT_WIDTH;
   wStrng = ( char * ) NULL;
+}
+
+
+long  convertOptionStringToLong( long  defltValue, char *  strng, char *  flgName )  {
+  long  result;
+
+  result = defltValue;
+  if( strng == ( char * ) NULL )  {
+    printf( "? String for option '%s' is uninitialised, using default value of %ld\n", flgName, result );
+  }
+  else  {
+    if( D_Flg )  printf( "Debug: String for option '%s' is %s\n", flgName, strng );
+ /* Convert option string specified to signed long, if possible */
+    result = atol( strng );
+ /* Rough check on atol() output - is result zero when option string likely wasn't zero */
+    if(( result == 0L ) && ( *strng != '0' ))  {
+      fprintf( stderr, "\n?? Unable to convert '%s' into a long integer for option '%s'\n", strng, flgName );
+      result = defltValue;
+    }
+    if( D_Flg )  printf( "Debug: The conversion of '%s' string for option '%s' resulted in %ld\n", strng, flgName, result );
+  }
+  return( result );
 }
 
 
@@ -364,27 +389,15 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 
 /* Postprocess -b (begin at offset) switch option */
   if( D_Flg )  printf( "Debug: Option '-b' is %s (%d)\n", bFlg ? "True" : "False", bFlg );
-  if( bFlg )  {
-    beginOffset = LONG_MIN;     /* set offset to a very unlikely number */
-    if( bStrng == ( char * ) NULL )  {
-      beginOffset = 0L;
-      printf( "? String for option '-b' is uninitialised, using default value of %ld\n", beginOffset );
-    }
-    else  {
-      if( D_Flg )  printf( "Debug: String for option '-b' is %s\n", bStrng );
-   /* Convert offset specification to unsigned long */
-      beginOffset = atol( bStrng );
-      if( D_Flg )  printf( "Debug: The '%s' string for option '-b' was converted to %ld\n", bStrng, beginOffset );
-   /* Rough check on atol() output - did it reset beginOffset to zero when option value likely wasn't zero */
-      if(( beginOffset == 0L ) && ( *bStrng != '0' ))  {
-        fprintf( stderr, "\n?? Unable to convert '%s' into a long integer for option '-b'\n", bStrng );
-      }
-    }
-  }
+  if( bFlg )  beginOffset = convertOptionStringToLong( 0L, bStrng, "-b" );
   else  {
     if( D_Flg )  printf( "Debug: Option '-b' was not found in the command line options\n" );
+    beginOffset = 0L;	/* Ensure beginOffset is set to default */
   }
   if( D_Flg )  printf( "Debug: Begin at an offset in the file of %ld bytes\n", beginOffset );
+
+/* Postprocess -d (decimal index) switch option */
+  if( D_Flg )  printf( "Debug: Option '-d' is %s (%d)\n", dFlg ? "True" : "False", dFlg );
 
 /* Postprocess -w (width) switch option */
   if( D_Flg )  printf( "Debug: Option '-w' is %s (%d)\n", wFlg ? "True" : "False", wFlg );
@@ -489,51 +502,25 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 
 /* Postprocess -B (dump at most X bytes) switch option */
   if( D_Flg )  printf( "Debug: Option '-B' is %s (%d)\n", B_Flg ? "True" : "False", B_Flg );
-  if( B_Flg )  {
-    bytesToDump = LONG_MAX;     /* set limit to a very large number */
-    if( B_Strng == ( char * ) NULL )  {
-      printf( "? String for option '-B' is uninitialised, using default value of %ld\n", bytesToDump );
-    }
-    else  {
-      if( D_Flg )  printf( "Debug: String for option '-B' is %s\n", B_Strng );
-   /* Convert offset specification to unsigned long */
-      bytesToDump = atol( B_Strng );
-      if( D_Flg )  printf( "Debug: The '%s' string for option '-B' was converted to %ld\n", B_Strng, bytesToDump );
-   /* Rough check on atol() output - did it reset bytesToDump to zero when option value likely wasn't zero */
-      if(( bytesToDump == 0L ) && ( *B_Strng != '0' ))  {
-        fprintf( stderr, "\n?? Unable to convert '%s' into a long integer for option '-B'\n", B_Strng );
-      }
-    }
-  }
+  if( B_Flg )  bytesToDump = convertOptionStringToLong( LONG_MAX, B_Strng, "-B" );
   else  {
     if( D_Flg )  printf( "Debug: Option '-B' was not found in the command line options\n" );
+    bytesToDump = LONG_MAX;	/* Ensure bytesToDump is set to default */
   }
   if( D_Flg )  printf( "Debug: Limit bytes to Dump from the file to a max of %ld bytes\n", bytesToDump );
 
 /* Postprocess -L (dump at most X lines) switch option */
   if( D_Flg )  printf( "Debug: Option '-L' is %s (%d)\n", L_Flg ? "True" : "False", L_Flg );
   if( L_Flg )  {
-    linesToDump = LONG_MAX;     /* set limit to a very large number */
-    if( L_Strng == ( char * ) NULL )  {
-      printf( "? String for option '-L' is uninitialised, using default value of %ld\n", linesToDump );
-    }
-    else  {
-      if( D_Flg )  printf( "Debug: String for option '-L' is %s\n", L_Strng );
-   /* Convert offset specification to unsigned long */
-      linesToDump = atol( L_Strng );
-      if( D_Flg )  printf( "Debug: The '%s' string for option '-L' was converted to %ld\n", L_Strng, linesToDump );
-   /* Rough check on atol() output - did it reset bytesToDump to zero when option value likely wasn't zero */
-      if(( linesToDump == 0L ) && ( *L_Strng != '0' ))  {
-        fprintf( stderr, "\n?? Unable to convert '%s' into a long integer for option '-L'\n", L_Strng );
-      }
-      if( bytesToDump > byteDisplayWidth * linesToDump )  {	/* Take smaller of max number of lines * width and max number of bytes */
-        bytesToDump = byteDisplayWidth * linesToDump;	/* Convert from max number of lines to max number of bytes */
-        B_Flg = 1;
-      }
+    linesToDump = convertOptionStringToLong( LONG_MAX / byteDisplayWidth, L_Strng, "-L" );
+    if( bytesToDump > byteDisplayWidth * linesToDump )  {	/* Take smaller of max number of lines * width and max number of bytes */
+      bytesToDump = byteDisplayWidth * linesToDump;	/* Convert from max number of lines to max number of bytes */
+      B_Flg = 1;
     }
   }
   else  {
     if( D_Flg )  printf( "Debug: Option '-L' was not found in the command line options\n" );
+    linesToDump = LONG_MAX / byteDisplayWidth;	/* Ensure linesToDump is set to default */
   }
   if( D_Flg )  printf( "Debug: Limit lines to Dump from the file to a max of %ld lines\n", linesToDump );
   
@@ -581,7 +568,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
   bPtr = hexFldFrmt + ( 2 + hexFldWdth );	/* Temp use of bPtr to point to end of Hex format string */
   *bPtr = '\0';	/* Terminate Hex format string with the correct number of column separators (Defaults to space) */
 /* Get a suitably sized buffer to hold the output string */
-  outputStringSize = (( I_Flg ) ? 4 : 14 ) + (( hexFldWdth ) + (( A_Flg ) ? 0 : 1 )) * byteDisplayWidth;
+  outputStringSize = (( I_Flg ) ? 4 : 14 ) + ( hexFldWdth + (( A_Flg ) ? 0 : 1 )) * byteDisplayWidth;
   outputString = malloc( outputStringSize );
   if( outputString == NULL )  {
     fprintf( stderr, "?? malloc( %d ) failed\n", outputStringSize );
@@ -727,14 +714,12 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
       fileSize = ( long ) ftell( fp );
       /* Ensure file is reset back to starting at 0 */
       rewind( fp );
-      if( vFlg )
-        fprintf( ofp, "File: '%s' is %ld bytes\n", nameStrng, fileSize );
+      if( vFlg )  fprintf( ofp, "File: '%s' is %ld bytes\n", nameStrng, fileSize );
       if( fileSize == 0L )  {	/* Is there any bytes in the file to process? */
-        if( vFlg )
-          fprintf( ofp, "? There are no bytes to dump in '%s'\n", nameStrng );
+        if( vFlg )  fprintf( ofp, "? There are no bytes to dump in '%s'\n", nameStrng );
       }
       else if( fileSize < 0L )  {
-        fprintf( ofp, "?? There are less than zero (%ld)  bytes to dump in '%s'\n", fileSize, nameStrng );
+        fprintf( ofp, "?? There are less than zero (%ld) bytes to dump in '%s' - trying anyway\n", fileSize, nameStrng );
       }
       else  {	/* Begin file size greater than zero block, so process the file */
         if( D_Flg )
@@ -746,9 +731,8 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
             if(( fileSize > 0L ) && ( fileOffset > fileSize ))  fileOffset = fileSize;
          /* Set up the start of the dumping at the begin offset */
             result = fseek( fp, fileOffset, SEEK_SET );
-            if( D_Flg )  {
+            if( D_Flg )
               fprintf( ofp, "Debug: result of fseek() from start of file was %d\n", result );
-            }
           }
           else if( fileOffset < 0L )  {
          /* If fileSize is valid then make sure the seek offset isn't bigger than the file */
@@ -758,9 +742,8 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
             result = fseek( fp, fileOffset, SEEK_END );
          /* Adjust fileOffset to print correct Index */
             if( result == 0 )  fileOffset += fileSize;
-            if( D_Flg )  {
+            if( D_Flg )
               fprintf( ofp, "Debug: result of fseek() from end of file was %d\n", result );
-            }
           }
         }
       }	/* End of file size is greater than 0 block */
@@ -787,13 +770,11 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
   if( D_Flg )  {
     printf( "Debug: Executing: processNonSwitchCommandLineParameters()\n" );
     printf( "Debug: first index is %d and last index is %d\n", frstIndx, lstIndx );
-    for( indx = frstIndx; indx <= lstIndx; indx++ )  {
+    for( indx = frstIndx; indx <= lstIndx; indx++ )
       printf( "Debug: cmdLnStrngs[ %d ] string is '%s'\n", indx, cmdLnStrngs[ indx ] );
-    }
   }
-  if(( oFlg ) && ( oStrng == ( char * ) NULL ))  {
-      fprintf( stderr, "?? -o specified, but no output file name specified - aborting\n" );
-  }
+  if(( oFlg ) && ( oStrng == ( char * ) NULL ))
+    fprintf( stderr, "?? -o specified, but no output file name specified - aborting\n" );
   else  {
   /* Attempt to open the output file if required */
     result = ( oFlg ) ? (( ofp = fopen( oStrng, "w" )) != NULL ) : 1;
@@ -811,9 +792,8 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
         if( D_Flg )
           printf( "Debug: Largest file size that can be safely handled is %ld bytes\n", LONG_MAX );
      /* Process each file specified in the command line */
-        for( indx = frstIndx; indx <= lstIndx; indx++ )  {
+        for( indx = frstIndx; indx <= lstIndx; indx++ )
           result = processA_SingleCommandLineParameter( ofp, cmdLnStrngs[ indx ] );
-        }
       }
    /* Close output file specified in the command line */
       result = ( oFlg ) ? (fclose( ofp ) == 0) : 1;
