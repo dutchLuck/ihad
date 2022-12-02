@@ -286,6 +286,59 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 %Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
 File: 'ASD_Coin_Level2.encoded' (79 bytes dumped)
++++++++++++ ihad -L -100 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
++++++++++++ ihad -L -1 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
++++++++++++ ihad -L 0 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
++++++++++++ ihad -L 1 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
++++++++++++ ihad -L 2 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
++++++++++++ ihad -L 3 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
++++++++++++ ihad -L 4 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
++++++++++++ ihad -L +100 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
++++++++++++ ihad -B -50 test52.dat  +++++++++++++++
+00000000 61                               a
++++++++++++ ihad -B -1 test52.dat  +++++++++++++++
+00000000 61                               a
++++++++++++ ihad -B 0 test52.dat  +++++++++++++++
+00000000 61                               a
++++++++++++ ihad -B 1 test52.dat  +++++++++++++++
+00000000 61                               a
++++++++++++ ihad -B 2 test52.dat  +++++++++++++++
+00000000 6162                             ab
++++++++++++ ihad -B 32 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
++++++++++++ ihad -B 50 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758                             WX
++++++++++++ ihad -B +100 test52.dat  +++++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
++++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++++++++++++++
+00000048 303132333435363738393a3b3c3d3e3f40414243 0123456789:;<=>?@ABC
+00000068 4445464748494a4b4c4d4e4f5051525354555657 DEFGHIJKLMNOPQRSTUVW
+00000088 58595a5b5c5d5e5f606162636465666768696a6b XYZ[\]^_`abcdefghijk
+00000108 6c6d6e6f707172737475767778797a7b7c7d7e7f lmnopqrstuvwxyz{|}~.
 +++++++++++ ihad -v0 -b 32 -L 3 -w 32 test256.dat  +++++++++++++++
 File: 'test256.dat' is 256 bytes
 00000020 202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f .!"#$%&'()*+,-./0123456789:;<=>?

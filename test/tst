@@ -76,6 +76,40 @@ echo "+++++++++++ ihad -I -v4 test11.dat +++++++++++++++"
 ../ihad -I -v4 test11.dat
 echo "+++++++++++ ihad -C ASD_Coin_Level2.encoded +++++++++++++++"
 ../ihad -C ASD_Coin_Level2.encoded
+echo "+++++++++++ ihad -L -100 test52.dat  +++++++++++++++"
+../ihad -L -100 test52.dat
+echo "+++++++++++ ihad -L -1 test52.dat  +++++++++++++++"
+../ihad -L -1 test52.dat
+echo "+++++++++++ ihad -L 0 test52.dat  +++++++++++++++"
+../ihad -L 0 test52.dat
+echo "+++++++++++ ihad -L 1 test52.dat  +++++++++++++++"
+../ihad -L 1 test52.dat
+echo "+++++++++++ ihad -L 2 test52.dat  +++++++++++++++"
+../ihad -L 2 test52.dat
+echo "+++++++++++ ihad -L 3 test52.dat  +++++++++++++++"
+../ihad -L 3 test52.dat
+echo "+++++++++++ ihad -L 4 test52.dat  +++++++++++++++"
+../ihad -L 4 test52.dat
+echo "+++++++++++ ihad -L +100 test52.dat  +++++++++++++++"
+../ihad -L +100 test52.dat
+echo "+++++++++++ ihad -B -50 test52.dat  +++++++++++++++"
+../ihad -B -50 test52.dat
+echo "+++++++++++ ihad -B -1 test52.dat  +++++++++++++++"
+../ihad -B -1 test52.dat
+echo "+++++++++++ ihad -B 0 test52.dat  +++++++++++++++"
+../ihad -B 0 test52.dat
+echo "+++++++++++ ihad -B 1 test52.dat  +++++++++++++++"
+../ihad -B 1 test52.dat
+echo "+++++++++++ ihad -B 2 test52.dat  +++++++++++++++"
+../ihad -B 2 test52.dat
+echo "+++++++++++ ihad -B 32 test52.dat  +++++++++++++++"
+../ihad -B 32 test52.dat
+echo "+++++++++++ ihad -B 50 test52.dat  +++++++++++++++"
+../ihad -B 50 test52.dat
+echo "+++++++++++ ihad -B +100 test52.dat  +++++++++++++++"
+../ihad -B +100 test52.dat
+echo "+++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++++++++++++++"
+../ihad -b 48 -B 80 -w 20 -d test256.dat
 echo "+++++++++++ ihad -v0 -b 32 -L 3 -w 32 test256.dat  +++++++++++++++"
 ../ihad -v0 -b 32 -L 3 -w 32 test256.dat
 echo "+++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++++++++++++++"

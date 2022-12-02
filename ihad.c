@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Fri Dec  2 00:33:13 2022 
+ * ihad.c last edited on Fri Dec  2 23:57:25 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -59,6 +59,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.27  2022/12/02 12:57:35  owen
+ * Added limits to -L and -B options to prevent negetive values being accepted.
+ *
  * Revision 0.26  2022/12/01 13:33:22  owen
  * Use common routine for -b -B and -L value acquisition.
  *
@@ -157,7 +160,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.26 2022/12/01 13:33:22 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.27 2022/12/02 12:57:35 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -244,6 +247,20 @@ void  setGlobalFlagDefaults( void )  {
   wFlg = 0;			/* Default to DEFAULT_WIDTH bytes per line */
   byteDisplayWidth = DEFAULT_WIDTH;
   wStrng = ( char * ) NULL;
+}
+
+long  limitValueToEqualOrMoreNegettiveThan( long  value, long  boundary )  {
+  return(( value > boundary ) ? boundary : value );
+}
+
+
+long  limitValueToEqualOrMorePositiveThan( long  value, long  boundary )  {
+  return(( value < boundary ) ? boundary : value );
+}
+
+
+long  limitValueToEqualOrWithinRange( long  value, long  loBoundary, long  hiBoundary )  {
+  return(( value < loBoundary ) ? loBoundary : (( value > hiBoundary ) ? hiBoundary : value ));
 }
 
 
@@ -392,7 +409,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   if( bFlg )  beginOffset = convertOptionStringToLong( 0L, bStrng, "-b" );
   else  {
     if( D_Flg )  printf( "Debug: Option '-b' was not found in the command line options\n" );
-    beginOffset = 0L;	/* Ensure beginOffset is set to default */
+    beginOffset = 0L;	/* Ensure beginOffset is set to default of start of file */
   }
   if( D_Flg )  printf( "Debug: Begin at an offset in the file of %ld bytes\n", beginOffset );
 
@@ -507,12 +524,14 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     if( D_Flg )  printf( "Debug: Option '-B' was not found in the command line options\n" );
     bytesToDump = LONG_MAX;	/* Ensure bytesToDump is set to default */
   }
+  bytesToDump = limitValueToEqualOrMorePositiveThan( bytesToDump, 1L );
   if( D_Flg )  printf( "Debug: Limit bytes to Dump from the file to a max of %ld bytes\n", bytesToDump );
 
 /* Postprocess -L (dump at most X lines) switch option */
   if( D_Flg )  printf( "Debug: Option '-L' is %s (%d)\n", L_Flg ? "True" : "False", L_Flg );
   if( L_Flg )  {
     linesToDump = convertOptionStringToLong( LONG_MAX / byteDisplayWidth, L_Strng, "-L" );
+    linesToDump = limitValueToEqualOrWithinRange( linesToDump, 1L, LONG_MAX / byteDisplayWidth );
     if( bytesToDump > byteDisplayWidth * linesToDump )  {	/* Take smaller of max number of lines * width and max number of bytes */
       bytesToDump = byteDisplayWidth * linesToDump;	/* Convert from max number of lines to max number of bytes */
       B_Flg = 1;
@@ -522,6 +541,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     if( D_Flg )  printf( "Debug: Option '-L' was not found in the command line options\n" );
     linesToDump = LONG_MAX / byteDisplayWidth;	/* Ensure linesToDump is set to default */
   }
+  linesToDump = limitValueToEqualOrWithinRange( linesToDump, 1L, LONG_MAX / byteDisplayWidth );
   if( D_Flg )  printf( "Debug: Limit lines to Dump from the file to a max of %ld lines\n", linesToDump );
   
 /* Report on -h switch option */
