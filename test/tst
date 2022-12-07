@@ -1,121 +1,167 @@
-echo "+++++++++++ ihad Zero Length File check +++++++++++++++"
+echo "+++++++++++ ihad test00.dat  +++Zero Length File check++++++++++++"
 ../ihad test00.dat
-echo "+++++++++++ ihad 1 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad test01.dat  +++1 byte Length File check++++++++++++"
 ../ihad test01.dat
-echo "+++++++++++ ihad 15 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad test15.dat  +++15 byte Length File check++++++++++++"
 ../ihad test15.dat
-echo "+++++++++++ ihad 16 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad test16.dat  +++16 byte Length File check++++++++++++"
 ../ihad test16.dat
-echo "+++++++++++ ihad 17 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad test17.dat  +++17 byte Length File check++++++++++++"
 ../ihad test17.dat
-echo "+++++++++++ ihad 52 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad test52.dat  +++52 byte Length File check++++++++++++"
 ../ihad test52.dat
-echo "+++++++++++ ihad 256 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad test256.dat  +++256 byte Length File check++++++++++++"
 ../ihad test256.dat
-echo "+++++++++++ ihad -d Zero Length File check +++++++++++++++"
+echo "+++++++++++ ihad -d test00.dat  +++Zero Length File check in decimal mode++++++++++++"
 ../ihad -d test00.dat
-echo "+++++++++++ ihad -d 1 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -d test01.dat  +++1 byte Length File check in decimal mode++++++++++++"
 ../ihad -d test01.dat
-echo "+++++++++++ ihad -d 9 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -d test09.dat  +++9 byte Length File check in decimal mode++++++++++++"
 ../ihad -d test09.dat
-echo "+++++++++++ ihad -d 10 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -d test10.dat  +++10 byte Length File check in decimal mode++++++++++++"
 ../ihad -d test10.dat
-echo "+++++++++++ ihad -d 11 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -d test11.dat  +++11 byte Length File check in decimal mode++++++++++++"
 ../ihad -d test11.dat
-echo "+++++++++++ ihad -d 52 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -d test52.dat  +++52 byte Length File check in decimal mode++++++++++++"
 ../ihad -d test52.dat
-echo "+++++++++++ ihad -d 256 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -d test256.dat  +++256 byte Length File check in decimal mode++++++++++++"
 ../ihad -d test256.dat
-echo "+++++++++++ ihad -w1 Zero Length File check +++++++++++++++"
+echo "+++++++++++ ihad -w1 test00.dat +++Test narrow output on zero length file++++++++++++"
 ../ihad -w1 test00.dat
-echo "+++++++++++ ihad -w1 1 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -w1 test01.dat +++Test narrow output on 1 byte length file++++++++++++"
 ../ihad -w1 test01.dat
-echo "+++++++++++ ihad -w2 9 byte Length File check +++++++++++++++"
-../ihad -w2 test09.dat
-echo "+++++++++++ ihad -w2 10 byte Length File check +++++++++++++++"
-../ihad -w2 test10.dat
-echo "+++++++++++ ihad -w3 11 byte Length File check +++++++++++++++"
-../ihad -w3 test11.dat
-echo "+++++++++++ ihad -w24 52 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -w2 test15.dat +++Test narrow output++++++++++++"
+../ihad -w2 test15.dat
+echo "+++++++++++ ihad -w3 test16.dat +++Test narrow output++++++++++++"
+../ihad -w3 test16.dat
+echo "+++++++++++ ihad -w4 test17.dat +++Test narrow output++++++++++++"
+../ihad -w4 test17.dat
+echo "+++++++++++ ihad -w24 test52.dat +++Test wide output++++++++++++"
 ../ihad -w24 test52.dat
-echo "+++++++++++ ihad -w32 256 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -w32 test256.dat +++Test widest output++++++++++++"
 ../ihad -w32 test256.dat
-echo "+++++++++++ ihad -I -A 256 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -I -A test256.dat +++Test Hex only output++++++++++++"
 ../ihad -I -A test256.dat
-echo "+++++++++++ ihad -I 52 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -I test52.dat  +++Test output sans Index++++++++++++"
 ../ihad -I test52.dat
-echo "+++++++++++ ihad -A 52 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -H test52.dat  +++Test output sans Hexadecimal++++++++++++"
+../ihad -H test52.dat
+echo "+++++++++++ ihad -A test52.dat  +++Test output sans Ascii++++++++++++"
 ../ihad -A test52.dat
-echo "+++++++++++ ihad -f1 52 byte Length File check +++++++++++++++"
-../ihad -f1 test52.dat
-echo "+++++++++++ ihad -w7 -f2 52 byte Length File check +++++++++++++++"
-../ihad -w7 -f2 test52.dat
-echo "+++++++++++ ihad -s 256 byte Length File check +++++++++++++++"
+echo "+++++++++++ ihad -f 0 test52.dat  +++Test explicit hex byte Field width 0 option++++++++++++"
+../ihad -f 0 test52.dat
+echo "+++++++++++ ihad -f 1 test52.dat  +++Test hex byte Field width 1 option++++++++++++"
+../ihad -f 1 test52.dat
+echo "+++++++++++ ihad -d -f2 test52.dat  +++Test decimal mode with hex byte Field width of 2++++++++++++"
+../ihad -d -f2 test52.dat
+echo "+++++++++++ ihad -s test256.dat  +++Test show space characters++++++++++++"
 ../ihad -s test256.dat
-echo "+++++++++++ ihad -h                            +++++++++++++++"
+echo "+++++++++++ ihad -h              +++Test help option++++++++++++"
 ../ihad -h
-echo "+++++++++++ ihad -o test.tmp test11.dat test52.dat  +++++++++++++"
+echo "+++++++++++ ihad -o test.tmp test11.dat test52.dat  +++Test output to a file with 2 input files++++++++++"
 ../ihad -o test.tmp test11.dat test52.dat
 cat test.tmp
 rm test.tmp
-echo "+++++++++++ cat test52.dat | ihad              +++++++++++++++"
+echo "+++++++++++ cat test52.dat | ihad      +++Test input provided via a pipe into stdin++++++++++++"
 cat test52.dat | ../ihad 
-echo "+++++++++++ ihad -c_ test256.dat                +++++++++++++++"
+echo "+++++++++++ ihad -c_ test256.dat       +++Test non-Ascii indicator being underscore++++++++++++"
 ../ihad -c_ test256.dat 
-echo "+++++++++++ ihad -S, test52.dat                +++++++++++++++"
+echo "+++++++++++ ihad -S, test52.dat        +++Test column Separator being a comma++++++++++++"
 ../ihad -S, test52.dat 
-echo "+++++++++++ ihad -b 26 test52.dat              +++++++++++++++"
+echo "+++++++++++ ihad -S : test52.dat       +++Test column Separator being a colon++++++++++++"
+../ihad -S : test52.dat 
+echo "+++++++++++ ihad -S \| -s test256.dat  +++Test column Separator being a vertical bar++++++++++++"
+../ihad -S \| -s test256.dat 
+echo "+++++++++++ ihad -b 26 test52.dat      +++Test start dump at 26 bytes in++++++++++++"
 ../ihad -b 26 test52.dat 
-echo "+++++++++++ ihad -b -32 test52.dat            +++++++++++++++"
+echo "+++++++++++ ihad -b -32 test52.dat     +++Test start dump at 32 bytes from end of file++++++++++++"
 ../ihad -b -32 test52.dat 
-echo "+++++++++++ ihad -b -16 -v0 test256.dat test52.dat  +++++++++++++++"
-../ihad -b -16 -v0 test256.dat test52.dat 
-echo "+++++++++++ ihad -I -H -A -v3 test256.dat +++++++++++++++"
+echo "+++++++++++ ihad -d -b -10 -v0 test256.dat test52.dat  +++Test dump of last 10 bytes of two files++++++++++++"
+../ihad -d -b -10 -v0 test256.dat test52.dat 
+echo "+++++++++++ ihad -I -H -A -v3 test256.dat +++Test summary only output++++++++++++"
 ../ihad -I -H -A -v3 test256.dat
-echo "+++++++++++ ihad -I -v4 test11.dat +++++++++++++++"
-../ihad -I -v4 test11.dat
+echo "+++++++++++ ihad -v4 test11.dat +++Test expanded summary mode output ++++++++++++"
+../ihad -v4 test11.dat
+echo "+++++++++++ ihad -v5 test11.dat +++Test expanded summary mode output ++++++++++++"
+../ihad -v5 test11.dat
 echo "+++++++++++ ihad -C ASD_Coin_Level2.encoded +++++++++++++++"
 ../ihad -C ASD_Coin_Level2.encoded
-echo "+++++++++++ ihad -L -100 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -v-100 test11.dat  +++Test Verbosity option negetive value limiting++++++++++++"
+../ihad -v-100 test11.dat
+echo "+++++++++++ ihad -v-1 test11.dat  +++Test Verbosity option small negetive value limiting++++++++++++"
+../ihad -v-1 test11.dat
+echo "+++++++++++ ihad -v0 test52.dat  +++Test valid Verbosity option value++++++++++++"
+../ihad -v0 test52.dat
+echo "+++++++++++ ihad -v3 test52.dat  +++Test valid Verbosity option value++++++++++++"
+../ihad -v3 test52.dat
+echo "+++++++++++ ihad -v6 test52.dat  +++Test valid Verbosity option value++++++++++++"
+../ihad -v6 test52.dat
+echo "+++++++++++ ihad -v7 test52.dat  +++Test Verbosity option small positive value limiting++++++++++++"
+../ihad -v7 test52.dat
+echo "+++++++++++ ihad -v10 test52.dat  +++Test Verbosity option positive value limiting++++++++++++"
+../ihad -v10 test52.dat
+echo "+++++++++++ ihad -v+100 test52.dat  +++Test Verbosity option large positive value limiting++++++++++++"
+../ihad -v+100 test52.dat
+echo "+++++++++++ ihad -w -100 test11.dat  +++Test Width option negetive value limiting++++++++++++"
+../ihad -w -100 test11.dat
+echo "+++++++++++ ihad -w -1 test11.dat  +++Test Width option small negetive value limiting++++++++++++"
+../ihad -w -1 test11.dat
+echo "+++++++++++ ihad -w 0 test11.dat  +++Test Width option zero value limiting++++++++++++"
+../ihad -w 0 test11.dat
+echo "+++++++++++ ihad -w 1 -L 4 test52.dat  +++Test valid small Width option value++++++++++++"
+../ihad -w 1 -L 4 test52.dat
+echo "+++++++++++ ihad -w 2 -L 4 test52.dat  +++Test valid small Width option value++++++++++++"
+../ihad -w 2 -L 4 test52.dat
+echo "+++++++++++ ihad -d test52.dat  +++Test implicit Width option value set by decimal option++++++++++++"
+../ihad -d test52.dat
+echo "+++++++++++ ihad -w +16 test52.dat  +++Test default Width option value++++++++++++"
+../ihad -w +16 test52.dat
+echo "+++++++++++ ihad -w 32 test52.dat  +++Test valid Width option value++++++++++++"
+../ihad -w 32 test52.dat
+echo "+++++++++++ ihad -w 100 test52.dat  +++Test Width option large positive value limiting++++++++++++"
+../ihad -w 100 test52.dat
+echo "+++++++++++ ihad -L -100 test52.dat  +++Test Lines option negetive value limiting++++++++++++"
 ../ihad -L -100 test52.dat
-echo "+++++++++++ ihad -L -1 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -L -1 test52.dat  +++Test Lines option small negetive value limiting++++++++++++"
 ../ihad -L -1 test52.dat
-echo "+++++++++++ ihad -L 0 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -L 0 test52.dat  +++Test Lines option zero value limiting++++++++++++"
 ../ihad -L 0 test52.dat
-echo "+++++++++++ ihad -L 1 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -L 1 test52.dat  +++Test valid small Lines option value++++++++++++"
 ../ihad -L 1 test52.dat
-echo "+++++++++++ ihad -L 2 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -L 2 test52.dat  +++Test valid Lines option value++++++++++++"
 ../ihad -L 2 test52.dat
-echo "+++++++++++ ihad -L 3 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -L 3 test52.dat  +++Test valid Lines option value++++++++++++"
 ../ihad -L 3 test52.dat
-echo "+++++++++++ ihad -L 4 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -L 4 test52.dat  +++Test large Lines option value++++++++++++"
 ../ihad -L 4 test52.dat
-echo "+++++++++++ ihad -L +100 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -L +100 test52.dat  +++Test much too large Lines option value++++++++++++"
 ../ihad -L +100 test52.dat
-echo "+++++++++++ ihad -B -50 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -B -50 test52.dat  +++Test Bytes option negetive value limiting++++++++++++"
 ../ihad -B -50 test52.dat
-echo "+++++++++++ ihad -B -1 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -B -1 test52.dat  +++Test Bytes option small negetive value limiting++++++++++++"
 ../ihad -B -1 test52.dat
-echo "+++++++++++ ihad -B 0 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -B 0 test52.dat  +++Test Bytes option zero value limiting++++++++++++"
 ../ihad -B 0 test52.dat
-echo "+++++++++++ ihad -B 1 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -B 1 test52.dat  +++Test valid small Bytes option value++++++++++++"
 ../ihad -B 1 test52.dat
-echo "+++++++++++ ihad -B 2 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -B 2 test52.dat  +++Test valid small Bytes option value++++++++++++"
 ../ihad -B 2 test52.dat
-echo "+++++++++++ ihad -B 32 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -B 32 test52.dat  +++Test valid Bytes option value++++++++++++"
 ../ihad -B 32 test52.dat
-echo "+++++++++++ ihad -B 50 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -B 50 test52.dat  +++Test valid Bytes option value++++++++++++"
 ../ihad -B 50 test52.dat
-echo "+++++++++++ ihad -B +100 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -B +100 test52.dat  +++Test too large Bytes option value++++++++++++"
 ../ihad -B +100 test52.dat
-echo "+++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++++++++++++++"
+echo "+++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++Test combination of -b -B -w -d options++++++++++++"
 ../ihad -b 48 -B 80 -w 20 -d test256.dat
-echo "+++++++++++ ihad -v0 -b 32 -L 3 -w 32 test256.dat  +++++++++++++++"
-../ihad -v0 -b 32 -L 3 -w 32 test256.dat
-echo "+++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++++++++++++++"
-../ihad -b 48 -B 80 -w 20 -d test256.dat
-echo "+++++++++++ ihad -B 48 -L 2 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -b 48 -L 4 -w 20 -d test256.dat  +++Test combination of -b -L -w -d options++++++++++++"
+../ihad -b 48 -L 4 -w 20 -d test256.dat
+echo "+++++++++++ ihad -v0 -b32 -B96 -w32 test256.dat  +++Test combination of -v -b -B -w options++++++++++++"
+../ihad -v0 -b32 -B96 -w32 test256.dat
+echo "+++++++++++ ihad -v0 -b32 -L3 -w32 test256.dat  +++Test combination of -v -b -L -w options++++++++++++"
+../ihad -v0 -b32 -L3 -w32 test256.dat
+echo "+++++++++++ ihad -B 48 -L 2 test52.dat  +++Test Lines over-rides Bytes option value to limit output++++++++++++"
 ../ihad -B 48 -L 2 test52.dat
-echo "+++++++++++ ihad -d -B 20 -L 4 test52.dat  +++++++++++++++"
+echo "+++++++++++ ihad -d -B 20 -L 4 test52.dat  +++Test Bytes over-rides Lines option value to limit output++++++++++++"
 ../ihad -d -B 20 -L 4 test52.dat
 

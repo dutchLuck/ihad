@@ -1,19 +1,19 @@
-+++++++++++ ihad Zero Length File check +++++++++++++++
-+++++++++++ ihad 1 byte Length File check +++++++++++++++
++++++++++++ ihad test00.dat  +++Zero Length File check++++++++++++
++++++++++++ ihad test01.dat  +++1 byte Length File check++++++++++++
 00000000 55                               U
-+++++++++++ ihad 15 byte Length File check +++++++++++++++
++++++++++++ ihad test15.dat  +++15 byte Length File check++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f   abcdefghijklmno
-+++++++++++ ihad 16 byte Length File check +++++++++++++++
++++++++++++ ihad test16.dat  +++16 byte Length File check++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-+++++++++++ ihad 17 byte Length File check +++++++++++++++
++++++++++++ ihad test17.dat  +++17 byte Length File check++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 71                               q
-+++++++++++ ihad 52 byte Length File check +++++++++++++++
++++++++++++ ihad test52.dat  +++52 byte Length File check++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-+++++++++++ ihad 256 byte Length File check +++++++++++++++
++++++++++++ ihad test256.dat  +++256 byte Length File check++++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
 00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
@@ -30,24 +30,24 @@
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
-+++++++++++ ihad -d Zero Length File check +++++++++++++++
-+++++++++++ ihad -d 1 byte Length File check +++++++++++++++
++++++++++++ ihad -d test00.dat  +++Zero Length File check in decimal mode++++++++++++
++++++++++++ ihad -d test01.dat  +++1 byte Length File check in decimal mode++++++++++++
 00000000 55                   U
-+++++++++++ ihad -d 9 byte Length File check +++++++++++++++
++++++++++++ ihad -d test09.dat  +++9 byte Length File check in decimal mode++++++++++++
 00000000 616263646566676869   abcdefghi
-+++++++++++ ihad -d 10 byte Length File check +++++++++++++++
++++++++++++ ihad -d test10.dat  +++10 byte Length File check in decimal mode++++++++++++
 00000000 6162636465666768696a abcdefghij
-+++++++++++ ihad -d 11 byte Length File check +++++++++++++++
++++++++++++ ihad -d test11.dat  +++11 byte Length File check in decimal mode++++++++++++
 00000000 6162636465666768696a abcdefghij
 00000010 6b                   k
-+++++++++++ ihad -d 52 byte Length File check +++++++++++++++
++++++++++++ ihad -d test52.dat  +++52 byte Length File check in decimal mode++++++++++++
 00000000 6162636465666768696a abcdefghij
 00000010 6b6c6d6e6f7071727374 klmnopqrst
 00000020 75767778797a41424344 uvwxyzABCD
 00000030 45464748494a4b4c4d4e EFGHIJKLMN
 00000040 4f505152535455565758 OPQRSTUVWX
 00000050 595a                 YZ
-+++++++++++ ihad -d 256 byte Length File check +++++++++++++++
++++++++++++ ihad -d test256.dat  +++256 byte Length File check in decimal mode++++++++++++
 00000000 00010203040506070809 ..........
 00000010 0a0b0c0d0e0f10111213 ..........
 00000020 1415161718191a1b1c1d ..........
@@ -74,31 +74,36 @@
 00000230 e6e7e8e9eaebecedeeef ..........
 00000240 f0f1f2f3f4f5f6f7f8f9 ..........
 00000250 fafbfcfdfeff         ......
-+++++++++++ ihad -w1 Zero Length File check +++++++++++++++
-+++++++++++ ihad -w1 1 byte Length File check +++++++++++++++
++++++++++++ ihad -w1 test00.dat +++Test narrow output on zero length file++++++++++++
++++++++++++ ihad -w1 test01.dat +++Test narrow output on 1 byte length file++++++++++++
 00000000 55 U
-+++++++++++ ihad -w2 9 byte Length File check +++++++++++++++
-00000000 6162 ab
-00000002 6364 cd
-00000004 6566 ef
-00000006 6768 gh
-00000008 69   i
-+++++++++++ ihad -w2 10 byte Length File check +++++++++++++++
++++++++++++ ihad -w2 test15.dat +++Test narrow output++++++++++++
 00000000 6162 ab
 00000002 6364 cd
 00000004 6566 ef
 00000006 6768 gh
 00000008 696a ij
-+++++++++++ ihad -w3 11 byte Length File check +++++++++++++++
+0000000a 6b6c kl
+0000000c 6d6e mn
+0000000e 6f   o
++++++++++++ ihad -w3 test16.dat +++Test narrow output++++++++++++
 00000000 616263 abc
 00000003 646566 def
 00000006 676869 ghi
-00000009 6a6b   jk
-+++++++++++ ihad -w24 52 byte Length File check +++++++++++++++
+00000009 6a6b6c jkl
+0000000c 6d6e6f mno
+0000000f 70     p
++++++++++++ ihad -w4 test17.dat +++Test narrow output++++++++++++
+00000000 61626364 abcd
+00000004 65666768 efgh
+00000008 696a6b6c ijkl
+0000000c 6d6e6f70 mnop
+00000010 71       q
++++++++++++ ihad -w24 test52.dat +++Test wide output++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f707172737475767778 abcdefghijklmnopqrstuvwx
 00000018 797a4142434445464748494a4b4c4d4e4f50515253545556 yzABCDEFGHIJKLMNOPQRSTUV
 00000030 5758595a                                         WXYZ
-+++++++++++ ihad -w32 256 byte Length File check +++++++++++++++
++++++++++++ ihad -w32 test256.dat +++Test widest output++++++++++++
 00000000 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f ................................
 00000020 202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f .!"#$%&'()*+,-./0123456789:;<=>?
 00000040 404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
@@ -107,7 +112,7 @@
 000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf ................................
 000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................................
-+++++++++++ ihad -I -A 256 byte Length File check +++++++++++++++
++++++++++++ ihad -I -A test256.dat +++Test Hex only output++++++++++++
 000102030405060708090a0b0c0d0e0f
 101112131415161718191a1b1c1d1e1f
 202122232425262728292a2b2c2d2e2f
@@ -124,31 +129,39 @@ c0c1c2c3c4c5c6c7c8c9cacbcccdcecf
 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
 e0e1e2e3e4e5e6e7e8e9eaebecedeeef
 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
-+++++++++++ ihad -I 52 byte Length File check +++++++++++++++
++++++++++++ ihad -I test52.dat  +++Test output sans Index++++++++++++
 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 5758595a                         WXYZ
-+++++++++++ ihad -A 52 byte Length File check +++++++++++++++
++++++++++++ ihad -H test52.dat  +++Test output sans Hexadecimal++++++++++++
+00000000 abcdefghijklmnop
+00000010 qrstuvwxyzABCDEF
+00000020 GHIJKLMNOPQRSTUV
+00000030 WXYZ
++++++++++++ ihad -A test52.dat  +++Test output sans Ascii++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70
 00000010 7172737475767778797a414243444546
 00000020 4748494a4b4c4d4e4f50515253545556
 00000030 5758595a
-+++++++++++ ihad -f1 52 byte Length File check +++++++++++++++
++++++++++++ ihad -f 0 test52.dat  +++Test explicit hex byte Field width 0 option++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
++++++++++++ ihad -f 1 test52.dat  +++Test hex byte Field width 1 option++++++++++++
 00000000  61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f 70  abcdefghijklmnop
 00000010  71 72 73 74 75 76 77 78 79 7a 41 42 43 44 45 46  qrstuvwxyzABCDEF
 00000020  47 48 49 4a 4b 4c 4d 4e 4f 50 51 52 53 54 55 56  GHIJKLMNOPQRSTUV
 00000030  57 58 59 5a                                      WXYZ
-+++++++++++ ihad -w7 -f2 52 byte Length File check +++++++++++++++
-00000000  61  62  63  64  65  66  67   abcdefg
-00000007  68  69  6a  6b  6c  6d  6e   hijklmn
-0000000e  6f  70  71  72  73  74  75   opqrstu
-00000015  76  77  78  79  7a  41  42   vwxyzAB
-0000001c  43  44  45  46  47  48  49   CDEFGHI
-00000023  4a  4b  4c  4d  4e  4f  50   JKLMNOP
-0000002a  51  52  53  54  55  56  57   QRSTUVW
-00000031  58  59  5a                   XYZ
-+++++++++++ ihad -s 256 byte Length File check +++++++++++++++
++++++++++++ ihad -d -f2 test52.dat  +++Test decimal mode with hex byte Field width of 2++++++++++++
+00000000  61  62  63  64  65  66  67  68  69  6a   abcdefghij
+00000010  6b  6c  6d  6e  6f  70  71  72  73  74   klmnopqrst
+00000020  75  76  77  78  79  7a  41  42  43  44   uvwxyzABCD
+00000030  45  46  47  48  49  4a  4b  4c  4d  4e   EFGHIJKLMN
+00000040  4f  50  51  52  53  54  55  56  57  58   OPQRSTUVWX
+00000050  59  5a                                   YZ
++++++++++++ ihad -s test256.dat  +++Test show space characters++++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
 00000020 202122232425262728292a2b2c2d2e2f  !"#$%&'()*+,-./
@@ -165,7 +178,7 @@ f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
-+++++++++++ ihad -h                            +++++++++++++++
++++++++++++ ihad -h              +++Test help option++++++++++++
 
 Useage:
 ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
@@ -198,18 +211,18 @@ xxd -g 0
 hexdump -C
 od -A x -t x1z -v
 
-+++++++++++ ihad -o test.tmp test11.dat test52.dat  +++++++++++++
++++++++++++ ihad -o test.tmp test11.dat test52.dat  +++Test output to a file with 2 input files++++++++++
 00000000 6162636465666768696a6b           abcdefghijk
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-+++++++++++ cat test52.dat | ihad              +++++++++++++++
++++++++++++ cat test52.dat | ihad      +++Test input provided via a pipe into stdin++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-+++++++++++ ihad -c_ test256.dat                +++++++++++++++
++++++++++++ ihad -c_ test256.dat       +++Test non-Ascii indicator being underscore++++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ________________
 00000010 101112131415161718191a1b1c1d1e1f ________________
 00000020 202122232425262728292a2b2c2d2e2f _!"#$%&'()*+,-./
@@ -226,35 +239,57 @@ od -A x -t x1z -v
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ________________
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ________________
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ________________
-+++++++++++ ihad -S, test52.dat                +++++++++++++++
++++++++++++ ihad -S, test52.dat        +++Test column Separator being a comma++++++++++++
 00000000,6162636465666768696a6b6c6d6e6f70,abcdefghijklmnop
 00000010,7172737475767778797a414243444546,qrstuvwxyzABCDEF
 00000020,4748494a4b4c4d4e4f50515253545556,GHIJKLMNOPQRSTUV
 00000030,5758595a,,,,,,,,,,,,,,,,,,,,,,,,,WXYZ
-+++++++++++ ihad -b 26 test52.dat              +++++++++++++++
++++++++++++ ihad -S : test52.dat       +++Test column Separator being a colon++++++++++++
+00000000:6162636465666768696a6b6c6d6e6f70:abcdefghijklmnop
+00000010:7172737475767778797a414243444546:qrstuvwxyzABCDEF
+00000020:4748494a4b4c4d4e4f50515253545556:GHIJKLMNOPQRSTUV
+00000030:5758595a:::::::::::::::::::::::::WXYZ
++++++++++++ ihad -S \| -s test256.dat  +++Test column Separator being a vertical bar++++++++++++
+00000000|000102030405060708090a0b0c0d0e0f|................
+00000010|101112131415161718191a1b1c1d1e1f|................
+00000020|202122232425262728292a2b2c2d2e2f| !"#$%&'()*+,-./
+00000030|303132333435363738393a3b3c3d3e3f|0123456789:;<=>?
+00000040|404142434445464748494a4b4c4d4e4f|@ABCDEFGHIJKLMNO
+00000050|505152535455565758595a5b5c5d5e5f|PQRSTUVWXYZ[\]^_
+00000060|606162636465666768696a6b6c6d6e6f|`abcdefghijklmno
+00000070|707172737475767778797a7b7c7d7e7f|pqrstuvwxyz{|}~.
+00000080|808182838485868788898a8b8c8d8e8f|................
+00000090|909192939495969798999a9b9c9d9e9f|................
+000000a0|a0a1a2a3a4a5a6a7a8a9aaabacadaeaf|................
+000000b0|b0b1b2b3b4b5b6b7b8b9babbbcbdbebf|................
+000000c0|c0c1c2c3c4c5c6c7c8c9cacbcccdcecf|................
+000000d0|d0d1d2d3d4d5d6d7d8d9dadbdcdddedf|................
+000000e0|e0e1e2e3e4e5e6e7e8e9eaebecedeeef|................
+000000f0|f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff|................
++++++++++++ ihad -b 26 test52.dat      +++Test start dump at 26 bytes in++++++++++++
 0000001a 4142434445464748494a4b4c4d4e4f50 ABCDEFGHIJKLMNOP
 0000002a 5152535455565758595a             QRSTUVWXYZ
-+++++++++++ ihad -b -32 test52.dat            +++++++++++++++
++++++++++++ ihad -b -32 test52.dat     +++Test start dump at 32 bytes from end of file++++++++++++
 00000014 75767778797a4142434445464748494a uvwxyzABCDEFGHIJ
 00000024 4b4c4d4e4f505152535455565758595a KLMNOPQRSTUVWXYZ
-+++++++++++ ihad -b -16 -v0 test256.dat test52.dat  +++++++++++++++
++++++++++++ ihad -d -b -10 -v0 test256.dat test52.dat  +++Test dump of last 10 bytes of two files++++++++++++
 File: 'test256.dat' is 256 bytes
-000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
-File: 'test256.dat' (16 bytes dumped)
+00000246 f6f7f8f9fafbfcfdfeff ..........
+File: 'test256.dat' (10 bytes processed)
 File: 'test52.dat' is 52 bytes
-00000024 4b4c4d4e4f505152535455565758595a KLMNOPQRSTUVWXYZ
-File: 'test52.dat' (16 bytes dumped)
-+++++++++++ ihad -I -H -A -v3 test256.dat +++++++++++++++
+00000042 5152535455565758595a QRSTUVWXYZ
+File: 'test52.dat' (10 bytes processed)
++++++++++++ ihad -I -H -A -v3 test256.dat +++Test summary only output++++++++++++
 File: 'test256.dat' is 256 bytes
 Summary: ASCII: 128 chars in total of which 95 are printable (includes spaces)
 Summary: ASCII: 52 alphabet ( 26 upper case and 26 lower case ) chars
 Summary: ASCII: 10 digit, 32 punctuation, 1 space and 33 control chars
 Summary: ASCII: 1 space (SP) and 1 horizontal tab (HT) chars
 Summary: ASCII: 1 carriage return (CR), 1 line feed (LF) and 1 full stop chars
-File: 'test256.dat' (256 bytes dumped)
-+++++++++++ ihad -I -v4 test11.dat +++++++++++++++
+File: 'test256.dat' (256 bytes processed)
++++++++++++ ihad -v4 test11.dat +++Test expanded summary mode output ++++++++++++
 File: 'test11.dat' is 11 bytes
-6162636465666768696a6b           abcdefghijk
+00000000 6162636465666768696a6b           abcdefghijk
 Summary: ASCII: 11 chars in total of which 11 are printable (includes spaces)
 Summary: ASCII: 11 alphabet ( 0 upper case and 11 lower case ) chars
 Summary: ASCII: 0 digit, 0 punctuation, 0 space and 0 control chars
@@ -271,7 +306,272 @@ Frequency: 6a 106 152   j   9.1% 1
 Frequency: 6b 107 153   k   9.1% 1
 Highest:   61  97 141   a   9.1% 1
 Lowest:    00   0 000 NUL   0.0% 0
-File: 'test11.dat' (11 bytes dumped)
+File: 'test11.dat' (11 bytes processed)
++++++++++++ ihad -v5 test11.dat +++Test expanded summary mode output ++++++++++++
+File: 'test11.dat' is 11 bytes
+00000000 6162636465666768696a6b           abcdefghijk
+Summary: ASCII: 11 chars in total of which 11 are printable (includes spaces)
+Summary: ASCII: 11 alphabet ( 0 upper case and 11 lower case ) chars
+Summary: ASCII: 0 digit, 0 punctuation, 0 space and 0 control chars
+Frequency: 00   0 000 NUL   0.0% 0
+Frequency: 01   1 001 SOH   0.0% 0
+Frequency: 02   2 002 STX   0.0% 0
+Frequency: 03   3 003 ETX   0.0% 0
+Frequency: 04   4 004 EOT   0.0% 0
+Frequency: 05   5 005 ENQ   0.0% 0
+Frequency: 06   6 006 ACK   0.0% 0
+Frequency: 07   7 007 BEL   0.0% 0
+Frequency: 08   8 010  BS   0.0% 0
+Frequency: 09   9 011  HT   0.0% 0
+Frequency: 0a  10 012  LF   0.0% 0
+Frequency: 0b  11 013  VT   0.0% 0
+Frequency: 0c  12 014  FF   0.0% 0
+Frequency: 0d  13 015  CR   0.0% 0
+Frequency: 0e  14 016  SO   0.0% 0
+Frequency: 0f  15 017  SI   0.0% 0
+Frequency: 10  16 020 DLE   0.0% 0
+Frequency: 11  17 021 DC1   0.0% 0
+Frequency: 12  18 022 DC2   0.0% 0
+Frequency: 13  19 023 DC3   0.0% 0
+Frequency: 14  20 024 DC4   0.0% 0
+Frequency: 15  21 025 NAK   0.0% 0
+Frequency: 16  22 026 SYN   0.0% 0
+Frequency: 17  23 027 ETB   0.0% 0
+Frequency: 18  24 030 CAN   0.0% 0
+Frequency: 19  25 031  EM   0.0% 0
+Frequency: 1a  26 032 SUB   0.0% 0
+Frequency: 1b  27 033 ESC   0.0% 0
+Frequency: 1c  28 034  FS   0.0% 0
+Frequency: 1d  29 035  GS   0.0% 0
+Frequency: 1e  30 036  RS   0.0% 0
+Frequency: 1f  31 037  US   0.0% 0
+Frequency: 20  32 040  SP   0.0% 0
+Frequency: 21  33 041   !   0.0% 0
+Frequency: 22  34 042   "   0.0% 0
+Frequency: 23  35 043   #   0.0% 0
+Frequency: 24  36 044   $   0.0% 0
+Frequency: 25  37 045   %   0.0% 0
+Frequency: 26  38 046   &   0.0% 0
+Frequency: 27  39 047   '   0.0% 0
+Frequency: 28  40 050   (   0.0% 0
+Frequency: 29  41 051   )   0.0% 0
+Frequency: 2a  42 052   *   0.0% 0
+Frequency: 2b  43 053   +   0.0% 0
+Frequency: 2c  44 054   ,   0.0% 0
+Frequency: 2d  45 055   -   0.0% 0
+Frequency: 2e  46 056   .   0.0% 0
+Frequency: 2f  47 057   /   0.0% 0
+Frequency: 30  48 060   0   0.0% 0
+Frequency: 31  49 061   1   0.0% 0
+Frequency: 32  50 062   2   0.0% 0
+Frequency: 33  51 063   3   0.0% 0
+Frequency: 34  52 064   4   0.0% 0
+Frequency: 35  53 065   5   0.0% 0
+Frequency: 36  54 066   6   0.0% 0
+Frequency: 37  55 067   7   0.0% 0
+Frequency: 38  56 070   8   0.0% 0
+Frequency: 39  57 071   9   0.0% 0
+Frequency: 3a  58 072   :   0.0% 0
+Frequency: 3b  59 073   ;   0.0% 0
+Frequency: 3c  60 074   <   0.0% 0
+Frequency: 3d  61 075   =   0.0% 0
+Frequency: 3e  62 076   >   0.0% 0
+Frequency: 3f  63 077   ?   0.0% 0
+Frequency: 40  64 100   @   0.0% 0
+Frequency: 41  65 101   A   0.0% 0
+Frequency: 42  66 102   B   0.0% 0
+Frequency: 43  67 103   C   0.0% 0
+Frequency: 44  68 104   D   0.0% 0
+Frequency: 45  69 105   E   0.0% 0
+Frequency: 46  70 106   F   0.0% 0
+Frequency: 47  71 107   G   0.0% 0
+Frequency: 48  72 110   H   0.0% 0
+Frequency: 49  73 111   I   0.0% 0
+Frequency: 4a  74 112   J   0.0% 0
+Frequency: 4b  75 113   K   0.0% 0
+Frequency: 4c  76 114   L   0.0% 0
+Frequency: 4d  77 115   M   0.0% 0
+Frequency: 4e  78 116   N   0.0% 0
+Frequency: 4f  79 117   O   0.0% 0
+Frequency: 50  80 120   P   0.0% 0
+Frequency: 51  81 121   Q   0.0% 0
+Frequency: 52  82 122   R   0.0% 0
+Frequency: 53  83 123   S   0.0% 0
+Frequency: 54  84 124   T   0.0% 0
+Frequency: 55  85 125   U   0.0% 0
+Frequency: 56  86 126   V   0.0% 0
+Frequency: 57  87 127   W   0.0% 0
+Frequency: 58  88 130   X   0.0% 0
+Frequency: 59  89 131   Y   0.0% 0
+Frequency: 5a  90 132   Z   0.0% 0
+Frequency: 5b  91 133   [   0.0% 0
+Frequency: 5c  92 134   \   0.0% 0
+Frequency: 5d  93 135   ]   0.0% 0
+Frequency: 5e  94 136   ^   0.0% 0
+Frequency: 5f  95 137   _   0.0% 0
+Frequency: 60  96 140   `   0.0% 0
+Frequency: 61  97 141   a   9.1% 1
+Frequency: 62  98 142   b   9.1% 1
+Frequency: 63  99 143   c   9.1% 1
+Frequency: 64 100 144   d   9.1% 1
+Frequency: 65 101 145   e   9.1% 1
+Frequency: 66 102 146   f   9.1% 1
+Frequency: 67 103 147   g   9.1% 1
+Frequency: 68 104 150   h   9.1% 1
+Frequency: 69 105 151   i   9.1% 1
+Frequency: 6a 106 152   j   9.1% 1
+Frequency: 6b 107 153   k   9.1% 1
+Frequency: 6c 108 154   l   0.0% 0
+Frequency: 6d 109 155   m   0.0% 0
+Frequency: 6e 110 156   n   0.0% 0
+Frequency: 6f 111 157   o   0.0% 0
+Frequency: 70 112 160   p   0.0% 0
+Frequency: 71 113 161   q   0.0% 0
+Frequency: 72 114 162   r   0.0% 0
+Frequency: 73 115 163   s   0.0% 0
+Frequency: 74 116 164   t   0.0% 0
+Frequency: 75 117 165   u   0.0% 0
+Frequency: 76 118 166   v   0.0% 0
+Frequency: 77 119 167   w   0.0% 0
+Frequency: 78 120 170   x   0.0% 0
+Frequency: 79 121 171   y   0.0% 0
+Frequency: 7a 122 172   z   0.0% 0
+Frequency: 7b 123 173   {   0.0% 0
+Frequency: 7c 124 174   |   0.0% 0
+Frequency: 7d 125 175   }   0.0% 0
+Frequency: 7e 126 176   ~   0.0% 0
+Frequency: 7f 127 177 DEL   0.0% 0
+Frequency: 80 128 200       0.0% 0
+Frequency: 81 129 201       0.0% 0
+Frequency: 82 130 202       0.0% 0
+Frequency: 83 131 203       0.0% 0
+Frequency: 84 132 204       0.0% 0
+Frequency: 85 133 205       0.0% 0
+Frequency: 86 134 206       0.0% 0
+Frequency: 87 135 207       0.0% 0
+Frequency: 88 136 210       0.0% 0
+Frequency: 89 137 211       0.0% 0
+Frequency: 8a 138 212       0.0% 0
+Frequency: 8b 139 213       0.0% 0
+Frequency: 8c 140 214       0.0% 0
+Frequency: 8d 141 215       0.0% 0
+Frequency: 8e 142 216       0.0% 0
+Frequency: 8f 143 217       0.0% 0
+Frequency: 90 144 220       0.0% 0
+Frequency: 91 145 221       0.0% 0
+Frequency: 92 146 222       0.0% 0
+Frequency: 93 147 223       0.0% 0
+Frequency: 94 148 224       0.0% 0
+Frequency: 95 149 225       0.0% 0
+Frequency: 96 150 226       0.0% 0
+Frequency: 97 151 227       0.0% 0
+Frequency: 98 152 230       0.0% 0
+Frequency: 99 153 231       0.0% 0
+Frequency: 9a 154 232       0.0% 0
+Frequency: 9b 155 233       0.0% 0
+Frequency: 9c 156 234       0.0% 0
+Frequency: 9d 157 235       0.0% 0
+Frequency: 9e 158 236       0.0% 0
+Frequency: 9f 159 237       0.0% 0
+Frequency: a0 160 240       0.0% 0
+Frequency: a1 161 241       0.0% 0
+Frequency: a2 162 242       0.0% 0
+Frequency: a3 163 243       0.0% 0
+Frequency: a4 164 244       0.0% 0
+Frequency: a5 165 245       0.0% 0
+Frequency: a6 166 246       0.0% 0
+Frequency: a7 167 247       0.0% 0
+Frequency: a8 168 250       0.0% 0
+Frequency: a9 169 251       0.0% 0
+Frequency: aa 170 252       0.0% 0
+Frequency: ab 171 253       0.0% 0
+Frequency: ac 172 254       0.0% 0
+Frequency: ad 173 255       0.0% 0
+Frequency: ae 174 256       0.0% 0
+Frequency: af 175 257       0.0% 0
+Frequency: b0 176 260       0.0% 0
+Frequency: b1 177 261       0.0% 0
+Frequency: b2 178 262       0.0% 0
+Frequency: b3 179 263       0.0% 0
+Frequency: b4 180 264       0.0% 0
+Frequency: b5 181 265       0.0% 0
+Frequency: b6 182 266       0.0% 0
+Frequency: b7 183 267       0.0% 0
+Frequency: b8 184 270       0.0% 0
+Frequency: b9 185 271       0.0% 0
+Frequency: ba 186 272       0.0% 0
+Frequency: bb 187 273       0.0% 0
+Frequency: bc 188 274       0.0% 0
+Frequency: bd 189 275       0.0% 0
+Frequency: be 190 276       0.0% 0
+Frequency: bf 191 277       0.0% 0
+Frequency: c0 192 300       0.0% 0
+Frequency: c1 193 301       0.0% 0
+Frequency: c2 194 302       0.0% 0
+Frequency: c3 195 303       0.0% 0
+Frequency: c4 196 304       0.0% 0
+Frequency: c5 197 305       0.0% 0
+Frequency: c6 198 306       0.0% 0
+Frequency: c7 199 307       0.0% 0
+Frequency: c8 200 310       0.0% 0
+Frequency: c9 201 311       0.0% 0
+Frequency: ca 202 312       0.0% 0
+Frequency: cb 203 313       0.0% 0
+Frequency: cc 204 314       0.0% 0
+Frequency: cd 205 315       0.0% 0
+Frequency: ce 206 316       0.0% 0
+Frequency: cf 207 317       0.0% 0
+Frequency: d0 208 320       0.0% 0
+Frequency: d1 209 321       0.0% 0
+Frequency: d2 210 322       0.0% 0
+Frequency: d3 211 323       0.0% 0
+Frequency: d4 212 324       0.0% 0
+Frequency: d5 213 325       0.0% 0
+Frequency: d6 214 326       0.0% 0
+Frequency: d7 215 327       0.0% 0
+Frequency: d8 216 330       0.0% 0
+Frequency: d9 217 331       0.0% 0
+Frequency: da 218 332       0.0% 0
+Frequency: db 219 333       0.0% 0
+Frequency: dc 220 334       0.0% 0
+Frequency: dd 221 335       0.0% 0
+Frequency: de 222 336       0.0% 0
+Frequency: df 223 337       0.0% 0
+Frequency: e0 224 340       0.0% 0
+Frequency: e1 225 341       0.0% 0
+Frequency: e2 226 342       0.0% 0
+Frequency: e3 227 343       0.0% 0
+Frequency: e4 228 344       0.0% 0
+Frequency: e5 229 345       0.0% 0
+Frequency: e6 230 346       0.0% 0
+Frequency: e7 231 347       0.0% 0
+Frequency: e8 232 350       0.0% 0
+Frequency: e9 233 351       0.0% 0
+Frequency: ea 234 352       0.0% 0
+Frequency: eb 235 353       0.0% 0
+Frequency: ec 236 354       0.0% 0
+Frequency: ed 237 355       0.0% 0
+Frequency: ee 238 356       0.0% 0
+Frequency: ef 239 357       0.0% 0
+Frequency: f0 240 360       0.0% 0
+Frequency: f1 241 361       0.0% 0
+Frequency: f2 242 362       0.0% 0
+Frequency: f3 243 363       0.0% 0
+Frequency: f4 244 364       0.0% 0
+Frequency: f5 245 365       0.0% 0
+Frequency: f6 246 366       0.0% 0
+Frequency: f7 247 367       0.0% 0
+Frequency: f8 248 370       0.0% 0
+Frequency: f9 249 371       0.0% 0
+Frequency: fa 250 372       0.0% 0
+Frequency: fb 251 373       0.0% 0
+Frequency: fc 252 374       0.0% 0
+Frequency: fd 253 375       0.0% 0
+Frequency: fe 254 376       0.0% 0
+Frequency: ff 255 377       0.0% 0
+Highest:   61  97 141   a   9.1% 1
+Lowest:    00   0 000 NUL   0.0% 0
+File: 'test11.dat' (11 bytes processed)
 +++++++++++ ihad -C ASD_Coin_Level2.encoded +++++++++++++++
 File: 'ASD_Coin_Level2.encoded' is 79 bytes
 .MWNVGRXFOLFHRMVCVXFGRLM..URMWXO
@@ -285,74 +585,231 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 
 %Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
-File: 'ASD_Coin_Level2.encoded' (79 bytes dumped)
-+++++++++++ ihad -L -100 test52.dat  +++++++++++++++
-00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-+++++++++++ ihad -L -1 test52.dat  +++++++++++++++
-00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-+++++++++++ ihad -L 0 test52.dat  +++++++++++++++
-00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-+++++++++++ ihad -L 1 test52.dat  +++++++++++++++
-00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-+++++++++++ ihad -L 2 test52.dat  +++++++++++++++
-00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
-+++++++++++ ihad -L 3 test52.dat  +++++++++++++++
-00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
-00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
-+++++++++++ ihad -L 4 test52.dat  +++++++++++++++
+File: 'ASD_Coin_Level2.encoded' (79 bytes processed)
++++++++++++ ihad -v-100 test11.dat  +++Test Verbosity option negetive value limiting++++++++++++
+File: 'test11.dat' is 11 bytes
+00000000 6162636465666768696a6b           abcdefghijk
+File: 'test11.dat' (11 bytes processed)
++++++++++++ ihad -v-1 test11.dat  +++Test Verbosity option small negetive value limiting++++++++++++
+File: 'test11.dat' is 11 bytes
+00000000 6162636465666768696a6b           abcdefghijk
+File: 'test11.dat' (11 bytes processed)
++++++++++++ ihad -v0 test52.dat  +++Test valid Verbosity option value++++++++++++
+File: 'test52.dat' is 52 bytes
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-+++++++++++ ihad -L +100 test52.dat  +++++++++++++++
+File: 'test52.dat' (52 bytes processed)
++++++++++++ ihad -v3 test52.dat  +++Test valid Verbosity option value++++++++++++
+File: 'test52.dat' is 52 bytes
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-+++++++++++ ihad -B -50 test52.dat  +++++++++++++++
+Summary: ASCII: 52 chars in total of which 52 are printable (includes spaces)
+Summary: ASCII: 52 alphabet ( 26 upper case and 26 lower case ) chars
+Summary: ASCII: 0 digit, 0 punctuation, 0 space and 0 control chars
+Summary: ASCII: 0 space (SP) and 0 horizontal tab (HT) chars
+Summary: ASCII: 0 carriage return (CR), 0 line feed (LF) and 0 full stop chars
+File: 'test52.dat' (52 bytes processed)
++++++++++++ ihad -v6 test52.dat  +++Test valid Verbosity option value++++++++++++
+File: 'test52.dat' is 52 bytes
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
+Summary: ASCII: 52 chars in total of which 52 are printable (includes spaces)
+Summary: ASCII: 52 alphabet ( 26 upper case and 26 lower case ) chars
+Summary: ASCII: 0 digit, 0 punctuation, 0 space and 0 control chars
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+%Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
+
+%Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+File: 'test52.dat' (52 bytes processed)
++++++++++++ ihad -v7 test52.dat  +++Test Verbosity option small positive value limiting++++++++++++
+File: 'test52.dat' is 52 bytes
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
+Summary: ASCII: 52 chars in total of which 52 are printable (includes spaces)
+Summary: ASCII: 52 alphabet ( 26 upper case and 26 lower case ) chars
+Summary: ASCII: 0 digit, 0 punctuation, 0 space and 0 control chars
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+%Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
+
+%Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+File: 'test52.dat' (52 bytes processed)
++++++++++++ ihad -v10 test52.dat  +++Test Verbosity option positive value limiting++++++++++++
+File: 'test52.dat' is 52 bytes
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
+Summary: ASCII: 52 chars in total of which 52 are printable (includes spaces)
+Summary: ASCII: 52 alphabet ( 26 upper case and 26 lower case ) chars
+Summary: ASCII: 0 digit, 0 punctuation, 0 space and 0 control chars
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+%Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
+
+%Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+File: 'test52.dat' (52 bytes processed)
++++++++++++ ihad -v+100 test52.dat  +++Test Verbosity option large positive value limiting++++++++++++
+File: 'test52.dat' is 52 bytes
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
+Summary: ASCII: 52 chars in total of which 52 are printable (includes spaces)
+Summary: ASCII: 52 alphabet ( 26 upper case and 26 lower case ) chars
+Summary: ASCII: 0 digit, 0 punctuation, 0 space and 0 control chars
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+%Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
+
+%Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+File: 'test52.dat' (52 bytes processed)
++++++++++++ ihad -w -100 test11.dat  +++Test Width option negetive value limiting++++++++++++
+00000000 61 a
+00000001 62 b
+00000002 63 c
+00000003 64 d
+00000004 65 e
+00000005 66 f
+00000006 67 g
+00000007 68 h
+00000008 69 i
+00000009 6a j
+0000000a 6b k
++++++++++++ ihad -w -1 test11.dat  +++Test Width option small negetive value limiting++++++++++++
+00000000 61 a
+00000001 62 b
+00000002 63 c
+00000003 64 d
+00000004 65 e
+00000005 66 f
+00000006 67 g
+00000007 68 h
+00000008 69 i
+00000009 6a j
+0000000a 6b k
++++++++++++ ihad -w 0 test11.dat  +++Test Width option zero value limiting++++++++++++
+00000000 61 a
+00000001 62 b
+00000002 63 c
+00000003 64 d
+00000004 65 e
+00000005 66 f
+00000006 67 g
+00000007 68 h
+00000008 69 i
+00000009 6a j
+0000000a 6b k
++++++++++++ ihad -w 1 -L 4 test52.dat  +++Test valid small Width option value++++++++++++
+00000000 61 a
+00000001 62 b
+00000002 63 c
+00000003 64 d
++++++++++++ ihad -w 2 -L 4 test52.dat  +++Test valid small Width option value++++++++++++
+00000000 6162 ab
+00000002 6364 cd
+00000004 6566 ef
+00000006 6768 gh
++++++++++++ ihad -d test52.dat  +++Test implicit Width option value set by decimal option++++++++++++
+00000000 6162636465666768696a abcdefghij
+00000010 6b6c6d6e6f7071727374 klmnopqrst
+00000020 75767778797a41424344 uvwxyzABCD
+00000030 45464748494a4b4c4d4e EFGHIJKLMN
+00000040 4f505152535455565758 OPQRSTUVWX
+00000050 595a                 YZ
++++++++++++ ihad -w +16 test52.dat  +++Test default Width option value++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
++++++++++++ ihad -w 32 test52.dat  +++Test valid Width option value++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f707172737475767778797a414243444546 abcdefghijklmnopqrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f505152535455565758595a                         GHIJKLMNOPQRSTUVWXYZ
++++++++++++ ihad -w 100 test52.dat  +++Test Width option large positive value limiting++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f707172737475767778797a414243444546 abcdefghijklmnopqrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f505152535455565758595a                         GHIJKLMNOPQRSTUVWXYZ
++++++++++++ ihad -L -100 test52.dat  +++Test Lines option negetive value limiting++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
++++++++++++ ihad -L -1 test52.dat  +++Test Lines option small negetive value limiting++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
++++++++++++ ihad -L 0 test52.dat  +++Test Lines option zero value limiting++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
++++++++++++ ihad -L 1 test52.dat  +++Test valid small Lines option value++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
++++++++++++ ihad -L 2 test52.dat  +++Test valid Lines option value++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
++++++++++++ ihad -L 3 test52.dat  +++Test valid Lines option value++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
++++++++++++ ihad -L 4 test52.dat  +++Test large Lines option value++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
++++++++++++ ihad -L +100 test52.dat  +++Test much too large Lines option value++++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
++++++++++++ ihad -B -50 test52.dat  +++Test Bytes option negetive value limiting++++++++++++
 00000000 61                               a
-+++++++++++ ihad -B -1 test52.dat  +++++++++++++++
++++++++++++ ihad -B -1 test52.dat  +++Test Bytes option small negetive value limiting++++++++++++
 00000000 61                               a
-+++++++++++ ihad -B 0 test52.dat  +++++++++++++++
++++++++++++ ihad -B 0 test52.dat  +++Test Bytes option zero value limiting++++++++++++
 00000000 61                               a
-+++++++++++ ihad -B 1 test52.dat  +++++++++++++++
++++++++++++ ihad -B 1 test52.dat  +++Test valid small Bytes option value++++++++++++
 00000000 61                               a
-+++++++++++ ihad -B 2 test52.dat  +++++++++++++++
++++++++++++ ihad -B 2 test52.dat  +++Test valid small Bytes option value++++++++++++
 00000000 6162                             ab
-+++++++++++ ihad -B 32 test52.dat  +++++++++++++++
++++++++++++ ihad -B 32 test52.dat  +++Test valid Bytes option value++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
-+++++++++++ ihad -B 50 test52.dat  +++++++++++++++
++++++++++++ ihad -B 50 test52.dat  +++Test valid Bytes option value++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758                             WX
-+++++++++++ ihad -B +100 test52.dat  +++++++++++++++
++++++++++++ ihad -B +100 test52.dat  +++Test too large Bytes option value++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-+++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++++++++++++++
++++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++Test combination of -b -B -w -d options++++++++++++
 00000048 303132333435363738393a3b3c3d3e3f40414243 0123456789:;<=>?@ABC
 00000068 4445464748494a4b4c4d4e4f5051525354555657 DEFGHIJKLMNOPQRSTUVW
 00000088 58595a5b5c5d5e5f606162636465666768696a6b XYZ[\]^_`abcdefghijk
 00000108 6c6d6e6f707172737475767778797a7b7c7d7e7f lmnopqrstuvwxyz{|}~.
-+++++++++++ ihad -v0 -b 32 -L 3 -w 32 test256.dat  +++++++++++++++
++++++++++++ ihad -b 48 -L 4 -w 20 -d test256.dat  +++Test combination of -b -L -w -d options++++++++++++
+00000048 303132333435363738393a3b3c3d3e3f40414243 0123456789:;<=>?@ABC
+00000068 4445464748494a4b4c4d4e4f5051525354555657 DEFGHIJKLMNOPQRSTUVW
+00000088 58595a5b5c5d5e5f606162636465666768696a6b XYZ[\]^_`abcdefghijk
+00000108 6c6d6e6f707172737475767778797a7b7c7d7e7f lmnopqrstuvwxyz{|}~.
++++++++++++ ihad -v0 -b32 -B96 -w32 test256.dat  +++Test combination of -v -b -B -w options++++++++++++
 File: 'test256.dat' is 256 bytes
 00000020 202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f .!"#$%&'()*+,-./0123456789:;<=>?
 00000040 404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
 00000060 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f `abcdefghijklmnopqrstuvwxyz{|}~.
-File: 'test256.dat' (96 bytes dumped)
-+++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++++++++++++++
-00000048 303132333435363738393a3b3c3d3e3f40414243 0123456789:;<=>?@ABC
-00000068 4445464748494a4b4c4d4e4f5051525354555657 DEFGHIJKLMNOPQRSTUVW
-00000088 58595a5b5c5d5e5f606162636465666768696a6b XYZ[\]^_`abcdefghijk
-00000108 6c6d6e6f707172737475767778797a7b7c7d7e7f lmnopqrstuvwxyz{|}~.
-+++++++++++ ihad -B 48 -L 2 test52.dat  +++++++++++++++
+File: 'test256.dat' (96 bytes processed)
++++++++++++ ihad -v0 -b32 -L3 -w32 test256.dat  +++Test combination of -v -b -L -w options++++++++++++
+File: 'test256.dat' is 256 bytes
+00000020 202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f .!"#$%&'()*+,-./0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f `abcdefghijklmnopqrstuvwxyz{|}~.
+File: 'test256.dat' (96 bytes processed)
++++++++++++ ihad -B 48 -L 2 test52.dat  +++Test Lines over-rides Bytes option value to limit output++++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
-+++++++++++ ihad -d -B 20 -L 4 test52.dat  +++++++++++++++
++++++++++++ ihad -d -B 20 -L 4 test52.dat  +++Test Bytes over-rides Lines option value to limit output++++++++++++
 00000000 6162636465666768696a abcdefghij
 00000010 6b6c6d6e6f7071727374 klmnopqrst

@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Tue Dec  6 23:37:40 2022 
+ * ihad.c last edited on Thu Dec  8 00:01:01 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -59,6 +59,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.29  2022/12/07 13:01:10  owen
+ * Replaced verbose message about bytes dumped to bytes processed.
+ *
  * Revision 0.28  2022/12/06 12:37:49  owen
  * Reworked option -v, -f and -w processing to use subroutines.
  *
@@ -163,7 +166,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.28 2022/12/06 12:37:49 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.29 2022/12/07 13:01:10 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -779,7 +782,7 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
       perror( "processA_SingleCommandLineParameter()" );
     }
     if( D_Flg || vFlg )
-      fprintf( ofp, "File: '%s' (%ld bytes dumped)\n", nameStrng, byteCnt );
+      fprintf( ofp, "File: '%s' (%ld bytes processed)\n", nameStrng, byteCnt );
   }	/* End of file opened ok block */
   return( result );
 }
