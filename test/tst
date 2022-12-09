@@ -66,12 +66,18 @@ echo "+++++++++++ cat test52.dat | ihad      +++Test input provided via a pipe i
 cat test52.dat | ../ihad 
 echo "+++++++++++ ihad -c_ test256.dat       +++Test non-Ascii indicator being underscore++++++++++++"
 ../ihad -c_ test256.dat 
+echo "+++++++++++ ihad -c '*' test256.dat    +++Test non-Ascii indicator being asterisk++++++++++++"
+../ihad -c '*' test256.dat 
+echo "+++++++++++ ihad -c 0137 test256.dat    +++Test non-Ascii indicator being octal++++++++++++"
+../ihad -c 0137 test256.dat 
 echo "+++++++++++ ihad -S, test52.dat        +++Test column Separator being a comma++++++++++++"
 ../ihad -S, test52.dat 
 echo "+++++++++++ ihad -S : test52.dat       +++Test column Separator being a colon++++++++++++"
 ../ihad -S : test52.dat 
 echo "+++++++++++ ihad -S \| -s test256.dat  +++Test column Separator being a vertical bar++++++++++++"
 ../ihad -S \| -s test256.dat 
+echo "+++++++++++ ihad -S \| -s -f1 test256.dat  +++Test column Separator being a vertical bar++++++++++++"
+../ihad -S \| -s -f1 test256.dat 
 echo "+++++++++++ ihad -b 26 test52.dat      +++Test start dump at 26 bytes in++++++++++++"
 ../ihad -b 26 test52.dat 
 echo "+++++++++++ ihad -b -32 test52.dat     +++Test start dump at 32 bytes from end of file++++++++++++"

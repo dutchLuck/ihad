@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Thu Dec  8 00:01:01 2022 
+ * ihad.c last edited on Sat Dec 10 00:26:18 2022 
  *
  * This is not production code! Consider it only slightly tested.
  * Better alternatives are; -
@@ -59,6 +59,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.30  2022/12/09 13:26:27  owen
+ * Reworked -c C and -S C option processing.
+ *
  * Revision 0.29  2022/12/07 13:01:10  owen
  * Replaced verbose message about bytes dumped to bytes processed.
  *
@@ -166,7 +169,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.29 2022/12/07 13:01:10 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.30 2022/12/09 13:26:27 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
@@ -191,8 +194,8 @@ int  B_Flg;			/* Limit bytes dumped */
 long  bytesToDump;		/* number of bytes to dump */
 char *  B_Strng;		/* max number of bytes to dump */
 int  cFlg;			/* use alternate char instead of full stops for non-ASCII */
-char *  cStrng;
-char defaultCharStrng[] = ".";
+char *  cStrng;		/* pointer to -c value if there is a value */
+char cCharStrng[] = ".";	/* use period if no alternate is specified in the options */
 int  C_Flg;			/* Force Cryptogram info output */
 int  dFlg;			/* use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg;			/* Control Debug info output */
@@ -207,11 +210,11 @@ char *  L_Strng;		/* max number of lines to dump */
 int  oFlg;			/* Control output file output */
 char *  oStrng;		/* output file name */
 FILE * ofp;			/* output file pointer */
-int  sFlg;			/* Control output of space in ascii column */
+int  sFlg;			/* Control whether space is considered printable in ascii column */
 char  lowestPrintableAsciiChar;
-int  S_Flg;			/* Control Char used between columns */
-char *  S_Strng;
-char defaultColumnChar[] = " ";
+int  S_Flg;			/* Separator option: Allow alternate Char use between columns */
+char *  S_Strng;		/* pointer to -S (Separator) value if there is a value */
+char S_ColumnChar[] = " ";	/* use space char if no alternate is specified in the options */
 int  vFlg, verbosityLevel;	/* Control verbosity level */
 char *  vStrng;
 int  wFlg, byteDisplayWidth;	/* Control number of bytes dealt with per line */
@@ -229,8 +232,8 @@ void  setGlobalFlagDefaults( void )  {
   B_Flg = 0;			/* Default to unlimited number of dump bytes */
   bytesToDump = LONG_MAX;
   B_Strng = ( char * ) NULL;
-  cFlg = 0;			/* Default to output full-stops */
-  cStrng = defaultCharStrng;
+  cFlg = 0;			/* Non Printable ASCII char substitute is a period (i.e. full-stop) */
+  cStrng = ( char * ) NULL;
   C_Flg = 0;			/* Default to Cryptogram mode off */
   dFlg = 0;			/* Default to output hex index rather than decimal index */
   D_Flg = 0;			/* Default to Debug off */
@@ -247,8 +250,8 @@ void  setGlobalFlagDefaults( void )  {
   ofp = stdout;		/* Output file pointer defaults to stdout */
   sFlg = 0;			/* Default to replacing space with a '.' in ascii column */
   lowestPrintableAsciiChar = '!';	/* '!' is next to space */
-  S_Flg = 0;			/* Default to using space as the column separator */
-  S_Strng = defaultColumnChar;
+  S_Flg = 0;			/* Default to using space char as the column separator */
+  S_Strng = ( char * ) NULL;
   vFlg = verbosityLevel = 0;	/* Default to no verbose output */
   vStrng = ( char * ) NULL;
   wFlg = 0;			/* Default to DEFAULT_WIDTH bytes per line */
@@ -334,21 +337,21 @@ void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
   printf( "  where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -\n" );
-  printf( "   -A .. Ascii output disable\n" );
+  printf( "   -A .. Disable output of ASCII column (bytes in ASCII form normally in 3rd column)\n" );
   printf( "   -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)\n" );
   printf( "   -B X .. Limit file dumps to a maximum of X bytes\n" );
-  printf( "   -c C .. Set char C as non-ASCII indicator & overide -A option\n" );
+  printf( "   -c C .. Use char C instead of '.' as substitute for a non-printable or non-ASCII char (also overides -A)\n" );
   printf( "   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
   printf( "   -f X .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
   printf( "   -h .. Print out this help message and exit\n" );
-  printf( "   -H .. Hexadecimal output disable\n" );
-  printf( "   -I .. Index output disable\n" );
+  printf( "   -H .. Disable output of Hex column (bytes in Hexadecimal form normally in 2nd column)\n" );
+  printf( "   -I .. Disable output of Index column (Index number of first byte in a line, normally in 1st column)\n" );
   printf( "   -L X .. Limit file dumps to a maximum of X lines\n" );
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. Classify space char as printable in Ascii output\n" );
-  printf( "   -S C .. Set char C as column separator\n" );
+  printf( "   -S C .. Use char C instead of default space (SP) char as column separator char\n" );
   printf( "   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 6)\n" );
   printf( "   -w X .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
   printf( "  where; -\n" );
@@ -445,11 +448,11 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     if( cStrng == ( char * ) NULL )  {
       printf( "?? Character string for option '-c alternateChar' is uninitialised\n" );
       cFlg = 0;
-      cStrng  = defaultCharStrng;
-      fprintf( stderr, "Defaulting to writing non-ASCII as '.'\n" );
+      fprintf( stderr, "Defaulting to writing non-ASCII or non-printable-ASCII as '%c'\n", *cCharStrng );
     }
     else  {
-      if( D_Flg )  printf( "Debug: Alternate Char string part of option '-c' is '%s'\n", cStrng );
+      *cCharStrng = *cStrng;	/* Copy first char of option value and over-write default space char */
+      if( D_Flg )  printf( "Debug: Alternate Char part of option '-c' is '%c' (1st char of '%s')\n", *cCharStrng, cStrng );
       if( A_Flg )  {
         A_Flg = 0;
         printf( "Warning: -A option reset as a valid -c option overides it\n" );
@@ -502,11 +505,11 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     if( S_Strng == ( char * ) NULL )  {
       printf( "?? Character string for option '-S char' is uninitialised\n" );
       S_Flg = 0;
-      S_Strng  = defaultColumnChar;
-      fprintf( stderr, "Defaulting to space as column separator\n" );
+      fprintf( stderr, "Defaulting to '%c' as column separator\n", *S_ColumnChar );
     }
     else  {
-      if( D_Flg )  printf( "Debug: Column separator Char string part of option '-S' is '%s'\n", S_Strng );
+      *S_ColumnChar = *S_Strng;	/* copy 1st char of -S value to over-write the column separator */
+      if( D_Flg )  printf( "Debug: Column separator is '%c' (1st part of option '-S' is '%s')\n", *S_ColumnChar, S_Strng );
     }
   }
   else  {
@@ -590,7 +593,8 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
   hexFldWdth = HEX_BYTE_FIELD_WIDTH + fieldSeparatorWidth;
   if( hexFldWdth > ( sizeof( hexFldFrmt ) - 7))  hexFldWdth = ( sizeof( hexFldFrmt ) - 7);
   else if( hexFldWdth < 2 )  hexFldWdth = 2;
-  sprintf( hexFldFrmt, "%c02x%c%c%c%c%c", '%', *S_Strng, *S_Strng, *S_Strng, *S_Strng, *S_Strng );	/* Set up a string of the form "%02x  " */
+  sprintf( hexFldFrmt, "%c02x%c%c%c%c%c",
+    '%', *S_ColumnChar, *S_ColumnChar, *S_ColumnChar, *S_ColumnChar, *S_ColumnChar );	/* Set up a string of the form "%02x  " */
   bPtr = hexFldFrmt + ( 2 + hexFldWdth );	/* Temp use of bPtr to point to end of Hex format string */
   *bPtr = '\0';	/* Terminate Hex format string with the correct number of column separators (Defaults to space) */
 /* Get a suitably sized buffer to hold the output string */
@@ -631,11 +635,11 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
    /* Initialize new line if required */
       if(( byteCnt++ % byteDisplayWidth ) == 0 )  {
      /* Make the line buffer all column separator characters (defaults to space characters) */
-        bPtr = ( char * ) memset( outputString, *S_Strng, outputStringSize );
+        bPtr = ( char * ) memset( outputString, *S_ColumnChar, outputStringSize );
      /* Put the Index in the line buffer, if not disabled */
         if( ! I_Flg )  {
-          sprintf( bPtr, ( dFlg ) ? "%08lu%c" : "%08lx%c", byteAddr, *S_Strng );
-	      if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), "%s", S_Strng );
+          sprintf( bPtr, ( dFlg ) ? "%08lu%c" : "%08lx%c", byteAddr, *S_ColumnChar );
+	      if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), "%c", *S_ColumnChar );
           bPtr += strlen( outputString );
         }
         aPtr = bPtr + (( H_Flg ) ? 0 : ( hexFldWdth * byteDisplayWidth + 1 ));
@@ -650,14 +654,14 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
       if( ! A_Flg )  {
         if(( byte >= lowestPrintableAsciiChar ) && ( byte <= 0x7e ))	/* Test for printable Ascii */
           sprintf( aPtr, "%c", byte );		/* Print byte as ascii character */
-        else  *aPtr =  *cStrng;		/* Print a full stop or alternate char instead of non-printable ascii */
+        else  *aPtr =  *cCharStrng;	/* Print a full stop or alternate char instead of non-printable ascii */
         aPtr += 1;
       }
    /* Output current line if required */
       if(( byteCnt % byteDisplayWidth ) == 0 )  {
         if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
         else  {
-          if( ! H_Flg )  *bPtr = *S_Strng;	/* Don't use byte pointer if Hexadecimal is not being output */
+          if( ! H_Flg )  *bPtr = *S_ColumnChar;	/* Don't use byte pointer if Hexadecimal is not being output */
           sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
         }
         if( ! ( I_Flg && H_Flg && A_Flg ))  {	/* Don't print lines of column separators if all 3 columns are off */
@@ -673,7 +677,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
     if( strlen( outputString ) > 0 )  {
       if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
       else  {
-        if( ! H_Flg )  *bPtr = *S_Strng;	/* Don't use byte pointer if Hexadecimal is not being output */
+        if( ! H_Flg )  *bPtr = *S_ColumnChar;	/* Don't use byte pointer if Hexadecimal is not being output */
         sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
       }
       if( ! ( I_Flg && H_Flg && A_Flg ))  {	/* Don't print last line of column separators if all 3 columns are off */

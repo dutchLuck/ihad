@@ -183,21 +183,21 @@ f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
 Useage:
 ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
   where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -
-   -A .. Ascii output disable
+   -A .. Disable output of ASCII column (bytes in ASCII form normally in 3rd column)
    -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
    -B X .. Limit file dumps to a maximum of X bytes
-   -c C .. Set char C as non-ASCII indicator & overide -A option
+   -c C .. Use char C instead of '.' as substitute for a non-printable or non-ASCII char (also overides -A)
    -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
    -f X .. Set hex field separator to X spaces (where 0 < X < 2)
    -h .. Print out this help message and exit
-   -H .. Hexadecimal output disable
-   -I .. Index output disable
+   -H .. Disable output of Hex column (bytes in Hexadecimal form normally in 2nd column)
+   -I .. Disable output of Index column (Index number of first byte in a line, normally in 1st column)
    -L X .. Limit file dumps to a maximum of X lines
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
-   -S C .. Set char C as column separator
+   -S C .. Use char C instead of default space (SP) char as column separator char
    -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 6)
    -w X .. Set bytes per line to X (where 0 < X <= 32)
 
@@ -239,6 +239,40 @@ od -A x -t x1z -v
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ________________
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ________________
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ________________
++++++++++++ ihad -c '*' test256.dat    +++Test non-Ascii indicator being asterisk++++++++++++
+00000000 000102030405060708090a0b0c0d0e0f ****************
+00000010 101112131415161718191a1b1c1d1e1f ****************
+00000020 202122232425262728292a2b2c2d2e2f *!"#$%&'()*+,-./
+00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
+00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
+00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~*
+00000080 808182838485868788898a8b8c8d8e8f ****************
+00000090 909192939495969798999a9b9c9d9e9f ****************
+000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ****************
+000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ****************
+000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ****************
+000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ****************
+000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ****************
+000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ****************
++++++++++++ ihad -c 0137 test256.dat    +++Test non-Ascii indicator being octal++++++++++++
+00000000 000102030405060708090a0b0c0d0e0f 0000000000000000
+00000010 101112131415161718191a1b1c1d1e1f 0000000000000000
+00000020 202122232425262728292a2b2c2d2e2f 0!"#$%&'()*+,-./
+00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
+00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
+00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~0
+00000080 808182838485868788898a8b8c8d8e8f 0000000000000000
+00000090 909192939495969798999a9b9c9d9e9f 0000000000000000
+000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf 0000000000000000
+000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf 0000000000000000
+000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf 0000000000000000
+000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 0000000000000000
+000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef 0000000000000000
+000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff 0000000000000000
 +++++++++++ ihad -S, test52.dat        +++Test column Separator being a comma++++++++++++
 00000000,6162636465666768696a6b6c6d6e6f70,abcdefghijklmnop
 00000010,7172737475767778797a414243444546,qrstuvwxyzABCDEF
@@ -266,6 +300,23 @@ od -A x -t x1z -v
 000000d0|d0d1d2d3d4d5d6d7d8d9dadbdcdddedf|................
 000000e0|e0e1e2e3e4e5e6e7e8e9eaebecedeeef|................
 000000f0|f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff|................
++++++++++++ ihad -S \| -s -f1 test256.dat  +++Test column Separator being a vertical bar++++++++++++
+00000000||00|01|02|03|04|05|06|07|08|09|0a|0b|0c|0d|0e|0f||................
+00000010||10|11|12|13|14|15|16|17|18|19|1a|1b|1c|1d|1e|1f||................
+00000020||20|21|22|23|24|25|26|27|28|29|2a|2b|2c|2d|2e|2f|| !"#$%&'()*+,-./
+00000030||30|31|32|33|34|35|36|37|38|39|3a|3b|3c|3d|3e|3f||0123456789:;<=>?
+00000040||40|41|42|43|44|45|46|47|48|49|4a|4b|4c|4d|4e|4f||@ABCDEFGHIJKLMNO
+00000050||50|51|52|53|54|55|56|57|58|59|5a|5b|5c|5d|5e|5f||PQRSTUVWXYZ[\]^_
+00000060||60|61|62|63|64|65|66|67|68|69|6a|6b|6c|6d|6e|6f||`abcdefghijklmno
+00000070||70|71|72|73|74|75|76|77|78|79|7a|7b|7c|7d|7e|7f||pqrstuvwxyz{|}~.
+00000080||80|81|82|83|84|85|86|87|88|89|8a|8b|8c|8d|8e|8f||................
+00000090||90|91|92|93|94|95|96|97|98|99|9a|9b|9c|9d|9e|9f||................
+000000a0||a0|a1|a2|a3|a4|a5|a6|a7|a8|a9|aa|ab|ac|ad|ae|af||................
+000000b0||b0|b1|b2|b3|b4|b5|b6|b7|b8|b9|ba|bb|bc|bd|be|bf||................
+000000c0||c0|c1|c2|c3|c4|c5|c6|c7|c8|c9|ca|cb|cc|cd|ce|cf||................
+000000d0||d0|d1|d2|d3|d4|d5|d6|d7|d8|d9|da|db|dc|dd|de|df||................
+000000e0||e0|e1|e2|e3|e4|e5|e6|e7|e8|e9|ea|eb|ec|ed|ee|ef||................
+000000f0||f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff||................
 +++++++++++ ihad -b 26 test52.dat      +++Test start dump at 26 bytes in++++++++++++
 0000001a 4142434445464748494a4b4c4d4e4f50 ABCDEFGHIJKLMNOP
 0000002a 5152535455565758595a             QRSTUVWXYZ
