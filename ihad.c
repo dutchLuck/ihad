@@ -3,17 +3,15 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Sat Dec 10 00:26:18 2022 
+ * ihad.c last edited on Sun Dec 11 23:18:43 2022 
  *
- * This is not production code! Consider it only slightly tested.
- * Better alternatives are; -
- *
+ * Industry standard alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
  * OR  xxd -g 0 yourFile
  * OR  od -A x -t x1z -v yourFile
  * OR  format-hex on Microsoft Windows in powershell i.e.  format-hex yourFile
  *
- * In addition, PLEASE do not look at the source code as an example
+ * In addition, Please do not look at the source code as an example
  * of how to code! or how not to code!
  *
  * ihad was written for my own education.
@@ -59,6 +57,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.31  2022/12/11 12:18:54  owen
+ * Options -c and -S have more ways to specify the character to use.
+ *
  * Revision 0.30  2022/12/09 13:26:27  owen
  * Reworked -c C and -S C option processing.
  *
@@ -169,14 +170,24 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.30 2022/12/09 13:26:27 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.31 2022/12/11 12:18:54 owen Exp owen $"
 
+#ifndef FALSE
+#define  FALSE 0
+#endif
+#ifndef TRUE
+#define  TRUE (! FALSE)
+#endif
 #define  BYTE_MASK 0xff
 #define  WORD_MASK 0xffff
-#define  DEFAULT_WIDTH 16
-#define  DEFAULT_DECIMAL_WIDTH 10
-#define  MAX_WIDTH 32
-#define  MIN_WIDTH 1
+#define  MIN_VERBOSITY_LEVEL 0
+#define  MAX_VERBOSITY_LEVEL 6
+#define  MIN_HEX_FIELD_SEPARATOR_WIDTH 0
+#define  MAX_HEX_FIELD_SEPARATOR_WIDTH 2
+#define  DEFAULT_BYTES_PER_LINE 16
+#define  DEFAULT_DECIMAL_BYTES_PER_LINE 10
+#define  MAX_BYTES_PER_LINE 32
+#define  MIN_BYTES_PER_LINE 1
 #define  HEX_BYTE_FIELD_WIDTH 2		/* Default is 2 which is no spaces */
 
 
@@ -185,79 +196,84 @@
 /*  fieldSepWidth, help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
 const char  optionStr[] = "Ab:B:c:CdDf:hHIL:o:sS:v::w:";
 
-/* Global Flags & Data */
-int  A_Flg;			/* Control Ascii column output */
-int  bFlg;			/* begin offset bytes from the start of the file */
-long  beginOffset;		/* or if < 0 then measure back from end of the file */
+/* Global Flags & default data */
+int  A_Flg = FALSE;		/* ASCII option: Control Ascii column output */
+int  bFlg = FALSE;		/* begin option: begin offset bytes from the start of the file */
+long  beginOffset;		/*  or if < 0 then measure back from end of the file */
 char *  bStrng;
-int  B_Flg;			/* Limit bytes dumped */
-long  bytesToDump;		/* number of bytes to dump */
-char *  B_Strng;		/* max number of bytes to dump */
-int  cFlg;			/* use alternate char instead of full stops for non-ASCII */
-char *  cStrng;		/* pointer to -c value if there is a value */
-char cCharStrng[] = ".";	/* use period if no alternate is specified in the options */
-int  C_Flg;			/* Force Cryptogram info output */
-int  dFlg;			/* use decimal index and a default hex width of 10 bytes per line */
-int  D_Flg;			/* Control Debug info output */
-int  fFlg, fieldSeparatorWidth;	/* Control hex field separation width */
+int  B_Flg = FALSE;		/* Bytes option: Limit bytes dumped */
+long  bytesToDump;		/*  number of bytes to dump */
+char *  B_Strng;		/*  pointer to -B value (max number of bytes to dump) */
+int  cFlg = FALSE;		/* char option: use alternate char instead of full stops for non-ASCII or non-printable ASCII */
+char *  cStrng;		/*  pointer to -c value if there is a value */
+char cCharStrng[] = ".";	/*  use period if no alternate is specified in the options */
+int  C_Flg = FALSE;		/* Cryptogram option: force Cryptogram info output */
+int  dFlg = FALSE;		/* decimal option: use decimal index and a default hex width of 10 bytes per line */
+int  D_Flg = FALSE;		/* Debug option: Control Debug info output */
+int  fFlg = FALSE;		/* field option: Control hex field separation width */
+int  fieldSeparatorWidth;	/*  hex field separation width */
 char *  fStrng;
-int  hFlg;			/* Control help info output */
-int  H_Flg;			/* Control Hexadecimal column output */
-int  I_Flg;			/* Control Index column output */
-int  L_Flg;			/* Limit lines dumped */
-long  linesToDump;		/* number of lines to dump */
-char *  L_Strng;		/* max number of lines to dump */
-int  oFlg;			/* Control output file output */
-char *  oStrng;		/* output file name */
-FILE * ofp;			/* output file pointer */
-int  sFlg;			/* Control whether space is considered printable in ascii column */
+int  hFlg = FALSE;		/* help option: Control help info output */
+int  H_Flg = FALSE;		/* Hex option: Control Hexadecimal column output */
+int  I_Flg = FALSE;		/* Index option: Control Index column output */
+int  L_Flg = FALSE;		/* Limit option: Limit lines dumped */
+long  linesToDump;		/*  number of lines to dump */
+char *  L_Strng;		/*  pointer to -L value (max number of lines to dump) */
+int  oFlg = FALSE;		/* output option: Control output file output */
+char *  oStrng;		/*  pointer to -o string (output file name) */
+FILE * ofp;			/*  output file pointer */
+int  sFlg = FALSE;		/* space option: Control whether space is considered printable in ascii column */
 char  lowestPrintableAsciiChar;
-int  S_Flg;			/* Separator option: Allow alternate Char use between columns */
-char *  S_Strng;		/* pointer to -S (Separator) value if there is a value */
-char S_ColumnChar[] = " ";	/* use space char if no alternate is specified in the options */
-int  vFlg, verbosityLevel;	/* Control verbosity level */
-char *  vStrng;
-int  wFlg, byteDisplayWidth;	/* Control number of bytes dealt with per line */
-char *  wStrng;
+int  S_Flg = FALSE;		/* Separator option: Allow alternate Char use between columns */
+char *  S_Strng;		/*  pointer to -S (Separator) value if there is a value */
+char S_ColumnChar[] = " ";	/*  use space char if no alternate is specified in the options */
+int  vFlg = FALSE;		/* verbosity option: Control verbosity level */
+int  verbosityLevel;		/*  Control verbosity level */
+char *  vStrng;		/*  pointer to -v value string, if there is one */
+int  wFlg = FALSE;		/* width option:  Control number of bytes dealt with per line */
+int  byteDisplayWidth;		/*  Control number of bytes dealt with per line */
+char *  wStrng;		/*  pointer to -w value string */
 char *  exeName;		/* name of this executable */
 char *  exePath;		/* path of this executable */
 
 
 void  setGlobalFlagDefaults( void )  {
 /* Preset command line options */
-  A_Flg = 0;		/* Default is Ascii column output */
-  bFlg = 0;		/* Default to begin the dump at the beginning of the file */
+  A_Flg = FALSE;		/* Default is Ascii column output */
+  bFlg = FALSE;		/* Default to begin the dump at the beginning of the file */
   beginOffset = 0L;
   bStrng = ( char * ) NULL;
-  B_Flg = 0;			/* Default to unlimited number of dump bytes */
+  B_Flg = FALSE;		/* Default to unlimited number of dump bytes */
   bytesToDump = LONG_MAX;
   B_Strng = ( char * ) NULL;
-  cFlg = 0;			/* Non Printable ASCII char substitute is a period (i.e. full-stop) */
+  cFlg = FALSE;		/* Non Printable ASCII char substitute is a period (i.e. full-stop) */
   cStrng = ( char * ) NULL;
-  C_Flg = 0;			/* Default to Cryptogram mode off */
-  dFlg = 0;			/* Default to output hex index rather than decimal index */
-  D_Flg = 0;			/* Default to Debug off */
-  fFlg = fieldSeparatorWidth = 0;	/* Default to no spaces between hex bytes */
+  C_Flg = FALSE;		/* Default to Cryptogram mode off */
+  dFlg = FALSE;		/* Default to output hex index rather than decimal index */
+  D_Flg = FALSE;		/* Default to Debug off */
+  fFlg = FALSE;
+  fieldSeparatorWidth = MIN_HEX_FIELD_SEPARATOR_WIDTH;	/* Default to no spaces between hex bytes */
   fStrng = ( char * ) NULL;
-  hFlg = 0;			/* Default to no help text output */
-  H_Flg = 0;			/* Default is Hexadecimal column output */
-  I_Flg = 0;			/* Default is Index column output */
-  L_Flg = 0;			/* Default to unlimited number of dump lines */
+  hFlg = FALSE;		/* Default to no help text output */
+  H_Flg = FALSE;		/* Default is Hexadecimal column output */
+  I_Flg = FALSE;		/* Default is Index column output */
+  L_Flg = FALSE;		/* Default to unlimited number of dump lines */
   linesToDump = LONG_MAX;
   L_Strng = ( char * ) NULL;
-  oFlg = 0;			/* Default to output to stdout */
+  oFlg = FALSE;		/* Default to output to stdout */
   oStrng = ( char * ) NULL;
   ofp = stdout;		/* Output file pointer defaults to stdout */
-  sFlg = 0;			/* Default to replacing space with a '.' in ascii column */
+  sFlg = FALSE;		/* Default to replacing space with a '.' in ascii column */
   lowestPrintableAsciiChar = '!';	/* '!' is next to space */
-  S_Flg = 0;			/* Default to using space char as the column separator */
+  S_Flg = FALSE;		/* Default to using space char as the column separator */
   S_Strng = ( char * ) NULL;
   vFlg = verbosityLevel = 0;	/* Default to no verbose output */
   vStrng = ( char * ) NULL;
-  wFlg = 0;			/* Default to DEFAULT_WIDTH bytes per line */
-  byteDisplayWidth = DEFAULT_WIDTH;
+  wFlg = FALSE;		/* Default to DEFAULT_BYTES_PER_LINE bytes per line */
+  byteDisplayWidth = DEFAULT_BYTES_PER_LINE;
   wStrng = ( char * ) NULL;
 }
+
 
 long  limitLongValueToEqualOrMoreNegettiveThan( long  value, long  boundary )  {
   return(( value > boundary ) ? boundary : value );
@@ -278,9 +294,10 @@ long  convertOptionStringToLong( long  defltValue, char *  strng, char *  flgNam
   long  result;
 
   result = defltValue;
-  if( strng == ( char * ) NULL )  {
-    printf( "? String for option '%s' is uninitialised, using default value of %ld\n", flgName, result );
-  }
+  if( strng == ( char * ) NULL )
+    printf( "? Parameter value for option '%s' is uninitialised, using default value of %ld\n", flgName, result );
+  else if( *strng == '\0' )	/* Assume "" used as option value so return default */
+    printf( "? Parameter value for option '%s' contains no information, using default value of %ld\n", flgName, result );
   else  {
     if( D_Flg )  printf( "Debug: String for option '%s' is %s\n", flgName, strng );
  /* Convert option string specified to signed long, if possible */
@@ -315,9 +332,10 @@ int  convertOptionStringToInteger( int  defltValue, char *  strng, char *  flgNa
   int  result;
 
   result = defltValue;
-  if( strng == ( char * ) NULL )  {
-    printf( "? String for option '%s' is uninitialised, using default value of %d\n", flgName, result );
-  }
+  if( strng == ( char * ) NULL )
+    printf( "? Parameter value for option '%s' is uninitialised, using default value of %d\n", flgName, result );
+  else if( *strng == '\0' )	/* Assume "" used as option value so return default */
+    printf( "? Parameter value for option '%s' contains no information, using default value of %d\n", flgName, result );
   else  {
     if( D_Flg )  printf( "Debug: String for option '%s' is %s\n", flgName, strng );
  /* Convert option string specified to signed integer, if possible */
@@ -333,6 +351,75 @@ int  convertOptionStringToInteger( int  defltValue, char *  strng, char *  flgNa
 }
 
 
+unsigned char  convertOptionStringToByteChar( int *  flgPtr, char *  defltValue, char *  strng, char *  flgName )  {
+  unsigned char  result;
+  int  strngLength;
+
+  result = ( unsigned char ) *defltValue;
+  strngLength = strlen( strng );
+  if( strng == ( char * ) NULL )  {
+    printf( "? Parameter value for option '%s' is uninitialised, using default value of %c\n", flgName, result );
+    *flgPtr = FALSE;
+  }
+  else  {
+    if( D_Flg )  printf( "Debug: String for option '%s' is %s\n", flgName, strng );
+    if( strngLength == 0 )  {	/* Assume "" used so return default */
+      printf( "? Parameter value for option '%s' contains no information, using default value of '%c'\n", flgName, ( char ) result );
+      *flgPtr = FALSE;
+    }
+    else if( strngLength == 1 )  {	/* Assume this single byte is the character to use */
+      result = ( unsigned char ) *strng;
+    }
+    else if( *strng == '\\' )  {	/* Look for a single backslash char as indicator of tr utility style input */
+      if( strngLength == 2 )  {	/* Assume \t style char specifier like the translate utility */
+        switch( strng[ 1 ] )  {
+          case '\\' : result = ( unsigned char ) 0x5c; break;	/* backslash - used as the escape indicator */
+          case '0'  : result = ( unsigned char ) 0x00; break;	/* Single digit representation of NUL */
+          case '1'  : result = ( unsigned char ) 0x01; break;	/* Single digit representation of SOH */
+          case '2'  : result = ( unsigned char ) 0x02; break;	/* Single digit representation of STX */
+          case '3'  : result = ( unsigned char ) 0x03; break;	/* Single digit representation of ETX */
+          case '4'  : result = ( unsigned char ) 0x04; break;	/* Single digit representation of EOT */
+          case '5'  : result = ( unsigned char ) 0x05; break;	/* Single digit representation of ENQ */
+          case '6'  : result = ( unsigned char ) 0x06; break;	/* Single digit representation of ACK */
+          case '7'  : result = ( unsigned char ) 0x07; break;	/* Single digit representation of BEL */
+          case 'a'  : result = ( unsigned char ) 0x07; break;	/* BEL */
+          case 'b'  : result = ( unsigned char ) 0x08; break;	/* BS */
+          case 'f'  : result = ( unsigned char ) 0x0c; break;	/* FF */
+          case 'n'  : result = ( unsigned char ) 0x0a; break;	/* LF */
+          case 'r'  : result = ( unsigned char ) 0x0d; break;	/* CR */
+          case 't'  : result = ( unsigned char ) 0x09; break;	/* HT */
+          case 'v'  : result = ( unsigned char ) 0x0b; break;	/* VT */
+        }
+      }
+      else if( strngLength > 2 )  {	/* Assume \NNN octal style char specifier like the translate utility */
+        result = ( unsigned char ) 0;
+        if(( strng[ 1 ] >= '0' ) && ( strng[ 1 ] <= '7' ))  {	/* Accept any octal digit */
+          result = ( strng[ 1 ] - '0' );
+        }
+        if(( strng[ 2 ] >= '0' ) && ( strng[ 2 ] <= '7' ))  {	/* Accept any octal digit */
+          result = ( result << 3 ) + ( strng[ 2 ] - '0' );
+        }
+        if(( strngLength > 3 ) && (( strng[ 3 ] >= '0' ) && ( strng[ 3 ] <= '7' )))  {	/* Accept any octal digit */
+          result = ( result << 3 ) + ( strng[ 3 ] - '0' );
+        }
+      }
+    }
+    else  {
+   /* Convert option string specified to (signed) integer, if possible */
+      result = ( unsigned char ) ( atoi( strng ) & BYTE_MASK );
+   /* Rough check on atoi() output - is result zero when option string likely wasn't zero */
+      if(( result == 0 ) && ( *strng != '0' ))  {
+        fprintf( stderr, "\n?? Unable to convert '%s' into a byte value for option '%s'\n", strng, flgName );
+        result = ( unsigned char ) *defltValue;
+        *flgPtr = FALSE;
+      }
+    }
+    if( D_Flg )  printf( "Debug: The conversion of '%s' string for option '%s' resulted in 0x%02x\n", strng, flgName, result );
+  }
+  return( result & BYTE_MASK );
+}
+
+
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
@@ -344,7 +431,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
-  printf( "   -f X .. Set hex field separator to X spaces (where 0 < X < 2)\n" );
+  printf( "   -f X .. Set hex field separator to X spaces (where %d <= X <= %d)\n", MIN_HEX_FIELD_SEPARATOR_WIDTH, MAX_HEX_FIELD_SEPARATOR_WIDTH );
   printf( "   -h .. Print out this help message and exit\n" );
   printf( "   -H .. Disable output of Hex column (bytes in Hexadecimal form normally in 2nd column)\n" );
   printf( "   -I .. Disable output of Index column (Index number of first byte in a line, normally in 1st column)\n" );
@@ -352,8 +439,8 @@ void  printOutHelpMessage( char * programName )  {
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. Classify space char as printable in Ascii output\n" );
   printf( "   -S C .. Use char C instead of default space (SP) char as column separator char\n" );
-  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 6)\n" );
-  printf( "   -w X .. Set bytes per line to X (where 0 < X <= %d)\n\n", MAX_WIDTH );
+  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where %d <= X <= %d)\n", MIN_VERBOSITY_LEVEL, MAX_VERBOSITY_LEVEL );
+  printf( "   -w X .. Set bytes per line to X (where %d < X <= %d)\n\n", MIN_BYTES_PER_LINE - 1, MAX_BYTES_PER_LINE );
   printf( "  where; -\n" );
   printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
   printf( "    of file(s) to dump in hex & ascii\n" );
@@ -380,23 +467,23 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 /* Process switch options from the command line */
   while(( result = getopt( argc, argv, optionStr )) != -1 )  {
     switch( result )  {
-      case 'A' :  A_Flg = 1; break;
-      case 'b' :  bFlg = 1; bStrng = optarg; break;
-      case 'B' :  B_Flg = 1; B_Strng = optarg; break;
-      case 'c' :  cFlg = 1; cStrng = optarg; break;
-      case 'C' :  C_Flg = 1; break;
-      case 'd' :  dFlg = 1; break;
-      case 'D' :  D_Flg = 1; break;
-      case 'f' :  fFlg = 1; fStrng = optarg; break;
-      case 'h' :  hFlg = 1; break;
-      case 'H' :  H_Flg = 1; break;
-      case 'I' :  I_Flg = 1; break;
-      case 'L' :  L_Flg = 1; L_Strng = optarg; break;
-      case 'o' :  oFlg = 1; oStrng = optarg; break;
-      case 's' :  sFlg = 1; lowestPrintableAsciiChar = ' '; break;
-      case 'S' :  S_Flg = 1; S_Strng = optarg; break;
-      case 'v' :  vFlg = 1; vStrng = optarg; break;
-      case 'w' :  wFlg = 1; wStrng = optarg; break;
+      case 'A' :  A_Flg = TRUE; break;
+      case 'b' :  bFlg = TRUE; bStrng = optarg; break;
+      case 'B' :  B_Flg = TRUE; B_Strng = optarg; break;
+      case 'c' :  cFlg = TRUE; cStrng = optarg; break;
+      case 'C' :  C_Flg = TRUE; break;
+      case 'd' :  dFlg = TRUE; break;
+      case 'D' :  D_Flg = TRUE; break;
+      case 'f' :  fFlg = TRUE; fStrng = optarg; break;
+      case 'h' :  hFlg = TRUE; break;
+      case 'H' :  H_Flg = TRUE; break;
+      case 'I' :  I_Flg = TRUE; break;
+      case 'L' :  L_Flg = TRUE; L_Strng = optarg; break;
+      case 'o' :  oFlg = TRUE; oStrng = optarg; break;
+      case 's' :  sFlg = TRUE; lowestPrintableAsciiChar = ' '; break;
+      case 'S' :  S_Flg = TRUE; S_Strng = optarg; break;
+      case 'v' :  vFlg = TRUE; vStrng = optarg; break;
+      case 'w' :  wFlg = TRUE; wStrng = optarg; break;
       default :
         fprintf( stderr, "\n?? command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
         printf( " for help on command line options run '%s -h'\n", exeName );
@@ -408,7 +495,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   if( D_Flg )  printf( "Debug: Option '-D' is %s (%d)\n", D_Flg ? "True" : "False", D_Flg );
   if( D_Flg )  {
     if( ! vFlg )  {
-      vFlg = 1;     /* -v processing still to come will set level to 0 if not specified */
+      vFlg = TRUE;     /* -v processing still to come will set level to 0 if not specified */
       printf( "Warning: verbose option '-v' set True by -D option\n" );
     }
   }
@@ -420,7 +507,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     if( D_Flg )  printf( "Debug: Option '-v' was not found in the command line options\n" );
   }
 /* Ensure the verbosity level is in the expected range */
-  verbosityLevel = limitIntegerValueToEqualOrWithinRange( verbosityLevel, 0, 6 );
+  verbosityLevel = limitIntegerValueToEqualOrWithinRange( verbosityLevel, MIN_VERBOSITY_LEVEL, MAX_VERBOSITY_LEVEL );
   if( D_Flg )  printf( "Debug: verbosity level is %d\n", verbosityLevel );
   
 /* Postprocess -b (begin at offset) switch option */
@@ -444,23 +531,13 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 
 /* Postprocess -c switch option */
   if( D_Flg )  printf( "Debug: Option '-c' is %s (%d)\n", cFlg ? "True" : "False", cFlg );
-  if( cFlg )  {
-    if( cStrng == ( char * ) NULL )  {
-      printf( "?? Character string for option '-c alternateChar' is uninitialised\n" );
-      cFlg = 0;
-      fprintf( stderr, "Defaulting to writing non-ASCII or non-printable-ASCII as '%c'\n", *cCharStrng );
-    }
-    else  {
-      *cCharStrng = *cStrng;	/* Copy first char of option value and over-write default space char */
-      if( D_Flg )  printf( "Debug: Alternate Char part of option '-c' is '%c' (1st char of '%s')\n", *cCharStrng, cStrng );
-      if( A_Flg )  {
-        A_Flg = 0;
-        printf( "Warning: -A option reset as a valid -c option overides it\n" );
-      }
-    }
-  }
+  if( cFlg )  *cCharStrng = ( char ) convertOptionStringToByteChar( &cFlg, cCharStrng, cStrng, "-c" );
   else  {
     if( D_Flg )  printf( "Debug: Option '-c alternateChar' was not found in the command line options\n" );
+  }
+  if( cFlg && A_Flg )  {
+    A_Flg = FALSE;
+    printf( "Warning: -A option reset as a valid -c option overides it\n" );
   }
   
 /* Postprocess -d (decimal index) switch option */
@@ -468,12 +545,12 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 
 /* Postprocess -f (fieldSeparatorWidth) switch option */
   if( D_Flg )  printf( "Debug: Option '-f' is %s (%d)\n", fFlg ? "True" : "False", fFlg );
-  if( fFlg )  fieldSeparatorWidth = convertOptionStringToInteger( 1, fStrng, "-f" );
+  if( fFlg )  fieldSeparatorWidth = convertOptionStringToInteger( MIN_HEX_FIELD_SEPARATOR_WIDTH, fStrng, "-f" );
   else  {
     if( D_Flg )  printf( "Debug: Option '-f' was not found in the command line options\n" );
   }
 /* Ensure the field separator width is in the expected range */
-  fieldSeparatorWidth = limitIntegerValueToEqualOrWithinRange( fieldSeparatorWidth, 0, 2 );
+  fieldSeparatorWidth = limitIntegerValueToEqualOrWithinRange( fieldSeparatorWidth, MIN_HEX_FIELD_SEPARATOR_WIDTH, MAX_HEX_FIELD_SEPARATOR_WIDTH );
   if( D_Flg )  printf( "Debug: field separator width is %d\n", fieldSeparatorWidth );
 
 /* Report on -h switch option */
@@ -487,7 +564,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   if( oFlg )  {
     if( oStrng == ( char * ) NULL )  {
       printf( "?? File name string for option '-o outfileName' is uninitialised\n" );
-      oFlg = 0;
+      oFlg = FALSE;
       ofp = stdout;
       fprintf( stderr, "Defaulting to writing output to stdout\n" );
     }
@@ -501,43 +578,36 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 
 /* Postprocess -S switch option */
   if( D_Flg )  printf( "Debug: Option '-S' is %s (%d)\n", S_Flg ? "True" : "False", S_Flg );
-  if( S_Flg )  {
-    if( S_Strng == ( char * ) NULL )  {
-      printf( "?? Character string for option '-S char' is uninitialised\n" );
-      S_Flg = 0;
-      fprintf( stderr, "Defaulting to '%c' as column separator\n", *S_ColumnChar );
-    }
-    else  {
-      *S_ColumnChar = *S_Strng;	/* copy 1st char of -S value to over-write the column separator */
-      if( D_Flg )  printf( "Debug: Column separator is '%c' (1st part of option '-S' is '%s')\n", *S_ColumnChar, S_Strng );
-    }
-  }
+  if( S_Flg )  *S_ColumnChar = ( char ) convertOptionStringToByteChar( &S_Flg, S_ColumnChar, S_Strng, "-S" );
   else  {
     if( D_Flg )  printf( "Debug: Option '-S char' was not found in the command line options\n" );
   }
+  if( S_Flg && D_Flg )
+    printf( "Debug: Column separator is '%c' (1st part of option '-S' is '%s')\n", *S_ColumnChar, S_Strng );
+
 
 /* Postprocess -w (width) switch option */
   if( D_Flg )  printf( "Debug: Option '-w' is %s (%d)\n", wFlg ? "True" : "False", wFlg );
-  if( wFlg )  byteDisplayWidth = convertOptionStringToInteger( DEFAULT_WIDTH, wStrng, "-w" );
+  if( wFlg )  byteDisplayWidth = convertOptionStringToInteger( DEFAULT_BYTES_PER_LINE, wStrng, "-w" );
   else  {
     if( D_Flg )  printf( "Debug: Option '-w' was not found in the command line options\n" );
-    byteDisplayWidth = (( dFlg ) ? DEFAULT_DECIMAL_WIDTH : DEFAULT_WIDTH );
+    byteDisplayWidth = (( dFlg ) ? DEFAULT_DECIMAL_BYTES_PER_LINE : DEFAULT_BYTES_PER_LINE );
   }
-/* Ensure the display width is not negetive, not zero and not bigger than MAX_WIDTH */
-  byteDisplayWidth = limitIntegerValueToEqualOrWithinRange( byteDisplayWidth, MIN_WIDTH, MAX_WIDTH );
+/* Ensure the display width is not negetive, not zero and not bigger than MAX_BYTES_PER_LINE */
+  byteDisplayWidth = limitIntegerValueToEqualOrWithinRange( byteDisplayWidth, MIN_BYTES_PER_LINE, MAX_BYTES_PER_LINE );
   if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
 
 /* Postprocess -C (cryptogram mode) switch option - must be after -w processing */
   if( D_Flg )  printf( "Debug: Option '-C' is %s (%d)\n", C_Flg ? "True" : "False", C_Flg );
   if( C_Flg )  {
-    I_Flg = 1;		/* don't print index */
-    H_Flg = 1;		/* don't print hex */
+    I_Flg = TRUE;	/* don't print index */
+    H_Flg = TRUE;	/* don't print hex */
     if( ! wFlg )  {	/* if user hasn't set the width then make it the max width */
-      wFlg = 1;
-      byteDisplayWidth = MAX_WIDTH;
+      wFlg = TRUE;
+      byteDisplayWidth = MAX_BYTES_PER_LINE;
     }
     if( ! vFlg )  {	/* if user hasn't set the verbosity then make it 6 */
-      vFlg = 1;
+      vFlg = TRUE;
       verbosityLevel = 6;
     }
   }
@@ -549,7 +619,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     linesToDump = limitLongValueToEqualOrWithinRange( linesToDump, 1L, LONG_MAX / byteDisplayWidth );
     if( bytesToDump > byteDisplayWidth * linesToDump )  {	/* Take smaller of max number of lines * width and max number of bytes */
       bytesToDump = byteDisplayWidth * linesToDump;	/* Convert from max number of lines to max number of bytes */
-      B_Flg = 1;
+      B_Flg = TRUE;
     }
   }
   else  {
@@ -580,8 +650,8 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
   long  freqArray[ 256 ];	/* track frequency of bytes */
   unsigned long  byteAddr = 0L;	/* Index of first byte in each output line */
   char *  outputString;	/* pointer to character string to print to stdout or a file */
-  int  outputStringSize;	/* must be big enough for MAX_WIDTH bytes per line */
-  char *  bPtr;     /* byte pointer */	/* output line space > 8+2+3*MAX_WIDTH+1+MAX_WIDTH+1 */
+  int  outputStringSize;	/* must be big enough for MAX_BYTES_PER_LINE bytes per line */
+  char *  bPtr;     /* byte pointer */	/* output line space > 8+2+3*MAX_BYTES_PER_LINE+1+MAX_BYTES_PER_LINE+1 */
   char *  aPtr;     /* ascii pointer */
   int  hexFldWdth;
   char  hexFldFrmt[ 11 ];

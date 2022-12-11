@@ -1,173 +1,194 @@
-echo "+++++++++++ ihad test00.dat  +++Zero Length File check++++++++++++"
+#! /bin/sh
+#
+# T S T
+#
+#
+TEN_PLUSS=++++++++++
+#
+echo "$TEN_PLUSS ihad test00.dat  +++Zero Length File check$TEN_PLUSS+"
 ../ihad test00.dat
-echo "+++++++++++ ihad test01.dat  +++1 byte Length File check++++++++++++"
+echo "$TEN_PLUSS ihad test01.dat  +++1 byte Length File check$TEN_PLUSS+"
 ../ihad test01.dat
-echo "+++++++++++ ihad test15.dat  +++15 byte Length File check++++++++++++"
+echo "$TEN_PLUSS ihad test15.dat  +++15 byte Length File check$TEN_PLUSS+"
 ../ihad test15.dat
-echo "+++++++++++ ihad test16.dat  +++16 byte Length File check++++++++++++"
+echo "$TEN_PLUSS ihad test16.dat  +++16 byte Length File check$TEN_PLUSS+"
 ../ihad test16.dat
-echo "+++++++++++ ihad test17.dat  +++17 byte Length File check++++++++++++"
+echo "$TEN_PLUSS ihad test17.dat  +++17 byte Length File check$TEN_PLUSS+"
 ../ihad test17.dat
-echo "+++++++++++ ihad test52.dat  +++52 byte Length File check++++++++++++"
+echo "$TEN_PLUSS ihad test52.dat  +++52 byte Length File check$TEN_PLUSS+"
 ../ihad test52.dat
-echo "+++++++++++ ihad test256.dat  +++256 byte Length File check++++++++++++"
+echo "$TEN_PLUSS ihad test256.dat  +++256 byte Length File check$TEN_PLUSS+"
 ../ihad test256.dat
-echo "+++++++++++ ihad -d test00.dat  +++Zero Length File check in decimal mode++++++++++++"
+echo "$TEN_PLUSS ihad -d test00.dat  +++Zero Length File check in decimal mode$TEN_PLUSS+"
 ../ihad -d test00.dat
-echo "+++++++++++ ihad -d test01.dat  +++1 byte Length File check in decimal mode++++++++++++"
+echo "$TEN_PLUSS ihad -d test01.dat  +++1 byte Length File check in decimal mode$TEN_PLUSS+"
 ../ihad -d test01.dat
-echo "+++++++++++ ihad -d test09.dat  +++9 byte Length File check in decimal mode++++++++++++"
+echo "$TEN_PLUSS ihad -d test09.dat  +++9 byte Length File check in decimal mode$TEN_PLUSS+"
 ../ihad -d test09.dat
-echo "+++++++++++ ihad -d test10.dat  +++10 byte Length File check in decimal mode++++++++++++"
+echo "$TEN_PLUSS ihad -d test10.dat  +++10 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test10.dat
-echo "+++++++++++ ihad -d test11.dat  +++11 byte Length File check in decimal mode++++++++++++"
+echo "$TEN_PLUSS ihad -d test11.dat  +++11 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test11.dat
-echo "+++++++++++ ihad -d test52.dat  +++52 byte Length File check in decimal mode++++++++++++"
+echo "$TEN_PLUSS ihad -d test52.dat  +++52 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test52.dat
-echo "+++++++++++ ihad -d test256.dat  +++256 byte Length File check in decimal mode++++++++++++"
+echo "$TEN_PLUSS ihad -d test256.dat  +++256 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test256.dat
-echo "+++++++++++ ihad -w1 test00.dat +++Test narrow output on zero length file++++++++++++"
+echo "$TEN_PLUSS ihad -w1 test00.dat +++Test narrow output on zero length file${TEN_PLUSS}"
 ../ihad -w1 test00.dat
-echo "+++++++++++ ihad -w1 test01.dat +++Test narrow output on 1 byte length file++++++++++++"
+echo "$TEN_PLUSS ihad -w1 test01.dat +++Test narrow output on 1 byte length file${TEN_PLUSS}"
 ../ihad -w1 test01.dat
-echo "+++++++++++ ihad -w2 test15.dat +++Test narrow output++++++++++++"
+echo "$TEN_PLUSS ihad -w2 test15.dat +++Test narrow output${TEN_PLUSS}"
 ../ihad -w2 test15.dat
-echo "+++++++++++ ihad -w3 test16.dat +++Test narrow output++++++++++++"
+echo "$TEN_PLUSS ihad -w3 test16.dat +++Test narrow output${TEN_PLUSS}"
 ../ihad -w3 test16.dat
-echo "+++++++++++ ihad -w4 test17.dat +++Test narrow output++++++++++++"
+echo "$TEN_PLUSS ihad -w4 test17.dat +++Test narrow output${TEN_PLUSS}"
 ../ihad -w4 test17.dat
-echo "+++++++++++ ihad -w24 test52.dat +++Test wide output++++++++++++"
+echo "$TEN_PLUSS ihad -w24 test52.dat +++Test wide output${TEN_PLUSS}"
 ../ihad -w24 test52.dat
-echo "+++++++++++ ihad -w32 test256.dat +++Test widest output++++++++++++"
+echo "$TEN_PLUSS ihad -w32 test256.dat +++Test widest output${TEN_PLUSS}"
 ../ihad -w32 test256.dat
-echo "+++++++++++ ihad -I -A test256.dat +++Test Hex only output++++++++++++"
+echo "$TEN_PLUSS ihad -I -A test256.dat +++Test Hex only output${TEN_PLUSS}"
 ../ihad -I -A test256.dat
-echo "+++++++++++ ihad -I test52.dat  +++Test output sans Index++++++++++++"
+echo "$TEN_PLUSS ihad -I test52.dat  +++Test output sans Index${TEN_PLUSS}"
 ../ihad -I test52.dat
-echo "+++++++++++ ihad -H test52.dat  +++Test output sans Hexadecimal++++++++++++"
+echo "$TEN_PLUSS ihad -H test52.dat  +++Test output sans Hexadecimal${TEN_PLUSS}"
 ../ihad -H test52.dat
-echo "+++++++++++ ihad -A test52.dat  +++Test output sans Ascii++++++++++++"
+echo "$TEN_PLUSS ihad -A test52.dat  +++Test output sans Ascii${TEN_PLUSS}"
 ../ihad -A test52.dat
-echo "+++++++++++ ihad -f 0 test52.dat  +++Test explicit hex byte Field width 0 option++++++++++++"
+echo "$TEN_PLUSS ihad -f 0 test52.dat  +++Test explicit hex byte Field width 0 option${TEN_PLUSS}"
 ../ihad -f 0 test52.dat
-echo "+++++++++++ ihad -f 1 test52.dat  +++Test hex byte Field width 1 option++++++++++++"
+echo "$TEN_PLUSS ihad -f 1 test52.dat  +++Test hex byte Field width 1 option${TEN_PLUSS}"
 ../ihad -f 1 test52.dat
-echo "+++++++++++ ihad -d -f2 test52.dat  +++Test decimal mode with hex byte Field width of 2++++++++++++"
+echo "$TEN_PLUSS ihad -d -f2 test52.dat  +++Test decimal mode with hex byte Field width of 2${TEN_PLUSS}"
 ../ihad -d -f2 test52.dat
-echo "+++++++++++ ihad -s test256.dat  +++Test show space characters++++++++++++"
+echo "$TEN_PLUSS ihad -f \"\" test52.dat  +++Test hex byte Field width value set to zero length string${TEN_PLUSS}"
+../ihad -f "" test52.dat
+echo "$TEN_PLUSS ihad -s test256.dat  +++Test show space characters${TEN_PLUSS}"
 ../ihad -s test256.dat
-echo "+++++++++++ ihad -h              +++Test help option++++++++++++"
+echo "$TEN_PLUSS ihad -h              +++Test help option${TEN_PLUSS}"
 ../ihad -h
-echo "+++++++++++ ihad -o test.tmp test11.dat test52.dat  +++Test output to a file with 2 input files++++++++++"
+echo "$TEN_PLUSS ihad -o test.tmp test11.dat test52.dat  +++Test output to a file with 2 input files++++++++++"
 ../ihad -o test.tmp test11.dat test52.dat
 cat test.tmp
 rm test.tmp
-echo "+++++++++++ cat test52.dat | ihad      +++Test input provided via a pipe into stdin++++++++++++"
+echo "$TEN_PLUSS cat test52.dat | ihad    +++Test input provided via a pipe into stdin${TEN_PLUSS}"
 cat test52.dat | ../ihad 
-echo "+++++++++++ ihad -c_ test256.dat       +++Test non-Ascii indicator being underscore++++++++++++"
+echo "$TEN_PLUSS ihad -c_ test256.dat    +++Test non-Ascii indicator being underscore${TEN_PLUSS}"
 ../ihad -c_ test256.dat 
-echo "+++++++++++ ihad -c '*' test256.dat    +++Test non-Ascii indicator being asterisk++++++++++++"
-../ihad -c '*' test256.dat 
-echo "+++++++++++ ihad -c 0137 test256.dat    +++Test non-Ascii indicator being octal++++++++++++"
-../ihad -c 0137 test256.dat 
-echo "+++++++++++ ihad -S, test52.dat        +++Test column Separator being a comma++++++++++++"
+echo "$TEN_PLUSS ihad -c '\\052' test256.dat    +++Test non-Ascii indicator being asterisk${TEN_PLUSS}"
+../ihad -c '\052' test256.dat 
+echo "$TEN_PLUSS ihad -c \\137 test256.dat    +++Test non-Ascii indicator being octal for '_'${TEN_PLUSS}"
+../ihad -c '\137' test256.dat 
+echo "$TEN_PLUSS ihad -c 94 test256.dat    +++Test non-Ascii indicator being decimal for '^'${TEN_PLUSS}"
+../ihad -c 94 test256.dat 
+echo "$TEN_PLUSS ihad -c \"\" test256.dat   +++Test non-Ascii indicator value string being zero length${TEN_PLUSS}"
+../ihad -c "" test256.dat 
+echo "$TEN_PLUSS ihad -S \"\" test52.dat   +++Test column Separator value string being zero length${TEN_PLUSS}"
+../ihad -S "" test52.dat 
+echo "$TEN_PLUSS ihad -S, test52.dat   +++Test column Separator being a comma${TEN_PLUSS}"
 ../ihad -S, test52.dat 
-echo "+++++++++++ ihad -S : test52.dat       +++Test column Separator being a colon++++++++++++"
+echo "$TEN_PLUSS ihad -S : test52.dat    +++Test column Separator being a colon${TEN_PLUSS}"
 ../ihad -S : test52.dat 
-echo "+++++++++++ ihad -S \| -s test256.dat  +++Test column Separator being a vertical bar++++++++++++"
+echo "$TEN_PLUSS ihad -S \| -s test256.dat   +++Test column Separator being a vertical bar${TEN_PLUSS}"
 ../ihad -S \| -s test256.dat 
-echo "+++++++++++ ihad -S \| -s -f1 test256.dat  +++Test column Separator being a vertical bar++++++++++++"
+echo "$TEN_PLUSS ihad -S \| -s -f1 test256.dat   +++Test column Separator being a vertical bar${TEN_PLUSS}"
 ../ihad -S \| -s -f1 test256.dat 
-echo "+++++++++++ ihad -b 26 test52.dat      +++Test start dump at 26 bytes in++++++++++++"
+echo "$TEN_PLUSS ihad -b 26 test52.dat    +++Test start dump at 26 bytes in${TEN_PLUSS}"
 ../ihad -b 26 test52.dat 
-echo "+++++++++++ ihad -b -32 test52.dat     +++Test start dump at 32 bytes from end of file++++++++++++"
+echo "$TEN_PLUSS ihad -b -32 test52.dat    +++Test start dump at 32 bytes from end of file${TEN_PLUSS}"
 ../ihad -b -32 test52.dat 
-echo "+++++++++++ ihad -d -b -10 -v0 test256.dat test52.dat  +++Test dump of last 10 bytes of two files++++++++++++"
+echo "$TEN_PLUSS ihad -d -b -10 -v0 test256.dat test52.dat  +++Test dump of last 10 bytes of two files${TEN_PLUSS}"
 ../ihad -d -b -10 -v0 test256.dat test52.dat 
-echo "+++++++++++ ihad -I -H -A -v3 test256.dat +++Test summary only output++++++++++++"
+echo "$TEN_PLUSS ihad -I -H -A -v3 test256.dat   +++Test summary only output${TEN_PLUSS}"
 ../ihad -I -H -A -v3 test256.dat
-echo "+++++++++++ ihad -v4 test11.dat +++Test expanded summary mode output ++++++++++++"
+echo "$TEN_PLUSS ihad -v4 test11.dat   +++Test expanded summary mode output ${TEN_PLUSS}"
 ../ihad -v4 test11.dat
-echo "+++++++++++ ihad -v5 test11.dat +++Test expanded summary mode output ++++++++++++"
+echo "$TEN_PLUSS ihad -v5 test11.dat   +++Test expanded summary mode output ${TEN_PLUSS}"
 ../ihad -v5 test11.dat
-echo "+++++++++++ ihad -C ASD_Coin_Level2.encoded +++++++++++++++"
+echo "$TEN_PLUSS ihad -C ASD_Coin_Level2.encoded   +++Test Cryptogram mode${TEN_PLUSS}"
 ../ihad -C ASD_Coin_Level2.encoded
-echo "+++++++++++ ihad -v-100 test11.dat  +++Test Verbosity option negetive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -v-100 test11.dat  +++Test Verbosity option negetive value limiting${TEN_PLUSS}"
 ../ihad -v-100 test11.dat
-echo "+++++++++++ ihad -v-1 test11.dat  +++Test Verbosity option small negetive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -v-1 test11.dat  +++Test Verbosity option small negetive value limiting${TEN_PLUSS}"
 ../ihad -v-1 test11.dat
-echo "+++++++++++ ihad -v0 test52.dat  +++Test valid Verbosity option value++++++++++++"
+echo "$TEN_PLUSS ihad -v0 test52.dat  +++Test valid Verbosity option value${TEN_PLUSS}"
 ../ihad -v0 test52.dat
-echo "+++++++++++ ihad -v3 test52.dat  +++Test valid Verbosity option value++++++++++++"
+echo "$TEN_PLUSS ihad -v3 test52.dat  +++Test valid Verbosity option value${TEN_PLUSS}"
 ../ihad -v3 test52.dat
-echo "+++++++++++ ihad -v6 test52.dat  +++Test valid Verbosity option value++++++++++++"
+echo "$TEN_PLUSS ihad -v6 test52.dat  +++Test valid Verbosity option value${TEN_PLUSS}"
 ../ihad -v6 test52.dat
-echo "+++++++++++ ihad -v7 test52.dat  +++Test Verbosity option small positive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -v7 test52.dat  +++Test Verbosity option small positive value limiting${TEN_PLUSS}"
 ../ihad -v7 test52.dat
-echo "+++++++++++ ihad -v10 test52.dat  +++Test Verbosity option positive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -v10 test52.dat  +++Test Verbosity option positive value limiting${TEN_PLUSS}"
 ../ihad -v10 test52.dat
-echo "+++++++++++ ihad -v+100 test52.dat  +++Test Verbosity option large positive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -v+100 test52.dat  +++Test Verbosity option large positive value limiting${TEN_PLUSS}"
 ../ihad -v+100 test52.dat
-echo "+++++++++++ ihad -w -100 test11.dat  +++Test Width option negetive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -w \"\" test11.dat  +++Test Width option zero length value string${TEN_PLUSS}"
+../ihad -w "" test11.dat
+echo "$TEN_PLUSS ihad -w -100 test11.dat  +++Test Width option negetive value limiting${TEN_PLUSS}"
 ../ihad -w -100 test11.dat
-echo "+++++++++++ ihad -w -1 test11.dat  +++Test Width option small negetive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -w -1 test11.dat  +++Test Width option small negetive value limiting${TEN_PLUSS}"
 ../ihad -w -1 test11.dat
-echo "+++++++++++ ihad -w 0 test11.dat  +++Test Width option zero value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -w 0 test11.dat  +++Test Width option zero value limiting${TEN_PLUSS}"
 ../ihad -w 0 test11.dat
-echo "+++++++++++ ihad -w 1 -L 4 test52.dat  +++Test valid small Width option value++++++++++++"
+echo "$TEN_PLUSS ihad -w 1 -L 4 test52.dat  +++Test valid small Width option value${TEN_PLUSS}"
 ../ihad -w 1 -L 4 test52.dat
-echo "+++++++++++ ihad -w 2 -L 4 test52.dat  +++Test valid small Width option value++++++++++++"
+echo "$TEN_PLUSS ihad -w 2 -L 4 test52.dat  +++Test valid small Width option value${TEN_PLUSS}"
 ../ihad -w 2 -L 4 test52.dat
-echo "+++++++++++ ihad -d test52.dat  +++Test implicit Width option value set by decimal option++++++++++++"
+echo "$TEN_PLUSS ihad -d test52.dat  +++Test implicit Width option value set by decimal option${TEN_PLUSS}"
 ../ihad -d test52.dat
-echo "+++++++++++ ihad -w +16 test52.dat  +++Test default Width option value++++++++++++"
+echo "$TEN_PLUSS ihad -w +16 test52.dat  +++Test default Width option value${TEN_PLUSS}"
 ../ihad -w +16 test52.dat
-echo "+++++++++++ ihad -w 32 test52.dat  +++Test valid Width option value++++++++++++"
+echo "$TEN_PLUSS ihad -w 32 test52.dat  +++Test valid Width option value${TEN_PLUSS}"
 ../ihad -w 32 test52.dat
-echo "+++++++++++ ihad -w 100 test52.dat  +++Test Width option large positive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -w 100 test52.dat  +++Test Width option large positive value limiting${TEN_PLUSS}"
 ../ihad -w 100 test52.dat
-echo "+++++++++++ ihad -L -100 test52.dat  +++Test Lines option negetive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -L \"\" test52.dat  +++Test Lines option zero length value string${TEN_PLUSS}"
+../ihad -L "" test52.dat
+echo "$TEN_PLUSS ihad -L -100 test52.dat  +++Test Lines option negetive value limiting${TEN_PLUSS}"
 ../ihad -L -100 test52.dat
-echo "+++++++++++ ihad -L -1 test52.dat  +++Test Lines option small negetive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -L -1 test52.dat  +++Test Lines option small negetive value limiting${TEN_PLUSS}"
 ../ihad -L -1 test52.dat
-echo "+++++++++++ ihad -L 0 test52.dat  +++Test Lines option zero value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -L 0 test52.dat  +++Test Lines option zero value limiting${TEN_PLUSS}"
 ../ihad -L 0 test52.dat
-echo "+++++++++++ ihad -L 1 test52.dat  +++Test valid small Lines option value++++++++++++"
+echo "$TEN_PLUSS ihad -L 1 test52.dat  +++Test valid small Lines option value${TEN_PLUSS}"
 ../ihad -L 1 test52.dat
-echo "+++++++++++ ihad -L 2 test52.dat  +++Test valid Lines option value++++++++++++"
+echo "$TEN_PLUSS ihad -L 2 test52.dat  +++Test valid Lines option value${TEN_PLUSS}"
 ../ihad -L 2 test52.dat
-echo "+++++++++++ ihad -L 3 test52.dat  +++Test valid Lines option value++++++++++++"
+echo "$TEN_PLUSS ihad -L 3 test52.dat  +++Test valid Lines option value${TEN_PLUSS}"
 ../ihad -L 3 test52.dat
-echo "+++++++++++ ihad -L 4 test52.dat  +++Test large Lines option value++++++++++++"
+echo "$TEN_PLUSS ihad -L 4 test52.dat  +++Test large Lines option value${TEN_PLUSS}"
 ../ihad -L 4 test52.dat
-echo "+++++++++++ ihad -L +100 test52.dat  +++Test much too large Lines option value++++++++++++"
+echo "$TEN_PLUSS ihad -L +100 test52.dat  +++Test much too large Lines option value${TEN_PLUSS}"
 ../ihad -L +100 test52.dat
-echo "+++++++++++ ihad -B -50 test52.dat  +++Test Bytes option negetive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -B \"\" test52.dat  +++Test Bytes option zero length value string${TEN_PLUSS}"
+../ihad -B "" test52.dat
+echo "$TEN_PLUSS ihad -B -50 test52.dat  +++Test Bytes option negetive value limiting${TEN_PLUSS}"
 ../ihad -B -50 test52.dat
-echo "+++++++++++ ihad -B -1 test52.dat  +++Test Bytes option small negetive value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -B -1 test52.dat  +++Test Bytes option small negetive value limiting${TEN_PLUSS}"
 ../ihad -B -1 test52.dat
-echo "+++++++++++ ihad -B 0 test52.dat  +++Test Bytes option zero value limiting++++++++++++"
+echo "$TEN_PLUSS ihad -B 0 test52.dat  +++Test Bytes option zero value limiting${TEN_PLUSS}"
 ../ihad -B 0 test52.dat
-echo "+++++++++++ ihad -B 1 test52.dat  +++Test valid small Bytes option value++++++++++++"
+echo "$TEN_PLUSS ihad -B 1 test52.dat  +++Test valid small Bytes option value${TEN_PLUSS}"
 ../ihad -B 1 test52.dat
-echo "+++++++++++ ihad -B 2 test52.dat  +++Test valid small Bytes option value++++++++++++"
+echo "$TEN_PLUSS ihad -B 2 test52.dat  +++Test valid small Bytes option value${TEN_PLUSS}"
 ../ihad -B 2 test52.dat
-echo "+++++++++++ ihad -B 32 test52.dat  +++Test valid Bytes option value++++++++++++"
+echo "$TEN_PLUSS ihad -B 32 test52.dat  +++Test valid Bytes option value${TEN_PLUSS}"
 ../ihad -B 32 test52.dat
-echo "+++++++++++ ihad -B 50 test52.dat  +++Test valid Bytes option value++++++++++++"
+echo "$TEN_PLUSS ihad -B 50 test52.dat  +++Test valid Bytes option value${TEN_PLUSS}"
 ../ihad -B 50 test52.dat
-echo "+++++++++++ ihad -B +100 test52.dat  +++Test too large Bytes option value++++++++++++"
+echo "$TEN_PLUSS ihad -B +100 test52.dat  +++Test too large Bytes option value${TEN_PLUSS}"
 ../ihad -B +100 test52.dat
-echo "+++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++Test combination of -b -B -w -d options++++++++++++"
+echo "$TEN_PLUSS ihad -b 48 -B 80 -w 20 -d test256.dat  +++Test combination of -b -B -w -d options${TEN_PLUSS}"
 ../ihad -b 48 -B 80 -w 20 -d test256.dat
-echo "+++++++++++ ihad -b 48 -L 4 -w 20 -d test256.dat  +++Test combination of -b -L -w -d options++++++++++++"
+echo "$TEN_PLUSS ihad -b 48 -L 4 -w 20 -d test256.dat  +++Test combination of -b -L -w -d options${TEN_PLUSS}"
 ../ihad -b 48 -L 4 -w 20 -d test256.dat
-echo "+++++++++++ ihad -v0 -b32 -B96 -w32 test256.dat  +++Test combination of -v -b -B -w options++++++++++++"
+echo "$TEN_PLUSS ihad -v0 -b32 -B96 -w32 test256.dat  +++Test combination of -v -b -B -w options${TEN_PLUSS}"
 ../ihad -v0 -b32 -B96 -w32 test256.dat
-echo "+++++++++++ ihad -v0 -b32 -L3 -w32 test256.dat  +++Test combination of -v -b -L -w options++++++++++++"
+echo "$TEN_PLUSS ihad -v0 -b32 -L3 -w32 test256.dat  +++Test combination of -v -b -L -w options${TEN_PLUSS}"
 ../ihad -v0 -b32 -L3 -w32 test256.dat
-echo "+++++++++++ ihad -B 48 -L 2 test52.dat  +++Test Lines over-rides Bytes option value to limit output++++++++++++"
+echo "$TEN_PLUSS ihad -B 48 -L 2 test52.dat  +++Test Lines over-rides Bytes option value to limit output${TEN_PLUSS}"
 ../ihad -B 48 -L 2 test52.dat
-echo "+++++++++++ ihad -d -B 20 -L 4 test52.dat  +++Test Bytes over-rides Lines option value to limit output++++++++++++"
+echo "$TEN_PLUSS ihad -d -B 20 -L 4 test52.dat  +++Test Bytes over-rides Lines option value to limit output${TEN_PLUSS}"
 ../ihad -d -B 20 -L 4 test52.dat
 

@@ -3,11 +3,7 @@
  *
  * Header for byteFreq.
  *
- * byteFreq.h last edited on Tue Nov 29 22:28:48 2022 
- *
- * This is not production code! Consider it only slightly tested.
- *
- * byteFreq was written for my own education.
+ * byteFreq.h last edited on Sun Dec 11 23:15:31 2022 
  *
  * This code is released under the MIT license
  *
@@ -20,6 +16,9 @@
 
 /*
  * $Log: byteFreq.h,v $
+ * Revision 0.4  2022/12/11 12:15:42  owen
+ * Adjusted some comments at the top of the file.
+ *
  * Revision 0.3  2022/11/29 11:31:37  owen
  * Changed routine prototypes to include file variable.
  *

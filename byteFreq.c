@@ -3,9 +3,7 @@
  *
  * Support code for Index Hex Ascii Dump (ihad.c)
  *
- * byteFreq.c last edited on Tue Nov 29 22:28:46 2022 
- *
- * This is not production code! Consider it only slightly tested.
+ * byteFreq.c last edited on Sun Dec 11 23:16:44 2022 
  *
  * byteFreq was written for my own education.
  *
@@ -20,6 +18,9 @@
 
 /*
  * $Log: byteFreq.c,v $
+ * Revision 0.9  2022/12/11 12:16:56  owen
+ * Output an explicit 0x on hex values and a \ on octal values.
+ *
  * Revision 0.8  2022/11/29 11:29:02  owen
  * Output to a file, rather than just stdout, if required.
  *
@@ -53,7 +54,7 @@
 #include <limits.h>	/* LONG_MIN LONG_MAX */
 #include <stdlib.h>	/* qsort() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.8 2022/11/29 11:29:02 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.9 2022/12/11 12:16:56 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 
@@ -123,7 +124,7 @@ int  doByteFreqStats( long *  byteFreq, long long *  totalCount, int *  indxOfMa
  */
  
 void  printFormattedLine( FILE *  ofp, int  indx, long  freq, double  percentageFreq )  {
-  fprintf( ofp, "%02x %3d %03o %3s ", indx, indx, indx, humanReadableASCII[ indx ] );
+  fprintf( ofp, "0x%02x %3d \\%03o %3s ", indx, indx, indx, humanReadableASCII[ indx ] );
   fprintf( ofp, "%5.1lf%% %ld\n", percentageFreq, freq );
 }
 
