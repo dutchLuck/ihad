@@ -1,12 +1,13 @@
 # ihad
-ihad is named as such because it provides "index" "hex" "ascii" "dump" of a file.
-"ihad" is a command line program that by default dumps file data in a format of
-multiple lines of three columns separated by a space character.
-The first column is an index number representing an offset from the start of the
-file to the leftmost data byte in the second and third columns,
-the second column is hexadecimal representation
-of the bytes of data in the file and
-the third column is shows any ASCII characters in the bytes of data in the file.
+This utility program is named "ihad" because it provides "index" "hex" "ascii" "dump"
+of bytes (8 bit data) sent to it's input or obtained from one or more files.
+By default "ihad" dumps stdin input or file data in a format of multiple
+lines of three columns separated by a space character to stdout output.
+The first column is an index number representing an offset from the start
+of the input/file to the leftmost data byte in the second and third columns.
+The second column is a hexadecimal representation of the value of each byte in
+the stream of input data and the third column shows any ASCII characters in
+those same bytes of data.
 An example of the default output of ihad is; -
 
 ```
@@ -33,8 +34,9 @@ $ ./ihad tmp.dat
 $
 ```
 
-ihad is not production code! Consider it only slightly tested.
-It is probably better to use one of the many industry standard dump utilities.
+ihad is released under the MIT license and may be used at your own risk.
+However, unless it provides some specific capability you need then it
+is probably better to use one of the many industry standard dump utilities.
 For example on OSX or linux you could try one of the following: hexdump, xxd or od.
 For comparison sake these utilities with the same input file produce; -
 
@@ -112,7 +114,8 @@ $ xxd -g 0 tmp.dat
 $
 ```
 
-OR if you have Microsoft Windows powershell and are ok with unicode text output, instead of strictly ASCII output; -
+OR if you have Microsoft Windows powershell and are ok with unicode text output,
+instead of strictly ASCII output; -
 
 ```
 > format-hex C:\test\tmp.dat
@@ -144,15 +147,17 @@ OR if you have Microsoft Windows powershell and are ok with unicode text output,
 >
 ```
 
-With so many well established utilites to dump a file, why bother to create another?
+With so many well established utilites to dump a file or stdin, why bother to create another?
 Well... the output of ihad is somewhat cleaner than the output from the utility programs mentioned above.
-The default output of ihad has just a single space between each of the three columns of output,
-except that there may be multiple padding spaces in the last line if it is short on bytes.
-For example "hexdump -C" puts in extra space characters and book-ends the
-Ascii column with the "|" character and "od -A x -t x1z" also puts in extra space characters
+The default output of ihad has just a single space between each of the three columns of output.
+(The one exception to this philosophy is that there may be multiple padding spaces in the last line
+of the dump if it is short of the full compliment of bytes.)
+In contrast "hexdump -C" puts in extra space characters and book-ends the
+Ascii column with the "|" character, "od -A x -t x1z" puts in extra space characters
 and puts ">" "<" bookends around the Ascii column and "xxd -g 0" puts a colon on the end of the index number.
 
-The ihad command has a number of options which are outlined in the useage information.
+The ihad command has a number of options which are outlined in the useage information. Start the utility
+with the "-h" (help) option to see all the other options that are available; -
 
 ```
 > ihad.exe -h
@@ -160,21 +165,21 @@ The ihad command has a number of options which are outlined in the useage inform
 Useage:
 ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
   where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -
-   -A .. Ascii output disable
+   -A .. Disable output of ASCII column (bytes in ASCII form normally in 3rd column)
    -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
    -B X .. Limit file dumps to a maximum of X bytes
-   -c C .. Set char C as non-ASCII indicator & overide -A option
+   -c C .. Use char C instead of '.' as substitute for a non-printable or non-ASCII char (also overides -A)
    -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
    -f X .. Set hex field separator to X spaces (where 0 < X < 2)
    -h .. Print out this help message and exit
-   -H .. Hexadecimal output disable
-   -I .. Index output disable
+   -H .. Disable output of Hex column (bytes in Hexadecimal form normally in 2nd column)
+   -I .. Disable output of Index column (Index number of first byte in a line, normally in 1st column)
    -L X .. Limit file dumps to a maximum of X lines
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
-   -S C .. Set char C as column separator
+   -S C .. Use char C instead of default space (SP) char as column separator char
    -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 6)
    -w X .. Set bytes per line to X (where 0 < X <= 32)
 
@@ -189,24 +194,87 @@ hexdump -C
 od -A x -t x1z -v
 ```
 
-If the full stop at end of ASCII sentences is important then the -c C option enables the choice of a different
-indicator of non-ASCII bytes, for example underscore could be specified with "-c _".
-If a different column separator is desirable,
-instead of the space character then it may be specified with the -S C option.
-For example a pseudo comma separated variable (CSV) output may be simulated with "-S ,".
+If the displaying the period character (i.e. full stop) at end of ASCII sentences is
+important then the -c C option enables the choice of a different indicator of non-ASCII
+or non-printable ASCII bytes. For example underscore could be specified with "-c_"
+and produces the following style dump; -
+```
+$ ./ihad -c_ demo.bin
+00000000 000102030405060708090a0b0c0d0e0f ________________
+00000010 101112131415161718191a1b1c1d1e1f ________________
+00000020 202122232425262728292a2b2c2d2e2f _!"#$%&'()*+,-./
+```
+
+If a different column separator is desirable, instead of the space character, then
+it may be specified with the -S C option. For example a pseudo comma separated variable (CSV)
+output may be simulated with "-S,". This option dump will have the following style; -
+```
+$ ./ihad -S, demo.bin
+00000000,000102030405060708090a0b0c0d0e0f,................
+00000010,101112131415161718191a1b1c1d1e1f,................
+00000020,202122232425262728292a2b2c2d2e2f,.!"#$%&'()*+,-./
+```
 Note however, that the last line in this case will have too many commas,
 if it is shorter than the normal line length.
-The dump can begin at an offset into a file, using the -b X option.
-If the X value is greater than zero then the offset is applied from the start of the file.
-If the X value is negetive then the offset is applied back from the end of the file.
-Summary information about the characters in files can be obtained by using "-v2" and
-above vebosity levels. For example  "ihad -I -H -A -v2 test.bin" could be used to
-show just summary information about file "test.bin". Option "-v5" provides more details
-including a listing of frequency of all bytes. Option "-v4" also provides a listing
-of only non-zero frequencies. A cryptogram mode has been added with the "-C" option.
-The "-C" option is just a shortcut to specifying "-I -H -w32 -v6".
+
+The dump can begin at an offset into a file, using the -b X option, where the offset X is
+a decimal number smaller than the size of the file. If the X value is greater than zero then
+the offset is applied from the start of the file. If the X value is negetive then the offset
+is applied back from the end of the file.
+For example; -
+```
+$ ./ihad -b 16 demo.bin
+00000010 101112131415161718191a1b1c1d1e1f ................
+00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
+$ ./ihad -b -16 demo.bin
+00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
+```
+
 The dump can be limited to a maximum number of lines or a maximum number of bytes.
 The "-L X" option limits the file dump to a maximum of X lines. In a similar
 fashion the option "-B X" limits the file dump to a maximum of X bytes. If both
 "-L" and "-B" options are used at the same time then the one resulting in the
-smallest number of bytes being dumped is chosen.
+smallest number of bytes being dumped is chosen. Examples of -L or -B use are; -
+```
+$ ./ihad -L 1 demo.bin 
+00000000 000102030405060708090a0b0c0d0e0f ................
+$ ./ihad -B 16 demo.bin 
+00000000 000102030405060708090a0b0c0d0e0f ................
+```
+
+Summary information about the characters in files can be obtained by using "-v3" and
+above vebosity levels. For example  "ihad -I -H -A -v3 demo.bin" could be used to
+show just summary information about file "demo.bin"; -
+```
+$ ./ihad -I -H -A -v3 demo.bin
+File: 'demo.bin' is 48 bytes
+Summary: ASCII: 48 chars in total of which 16 are printable (includes spaces)
+Summary: ASCII: 0 alphabet ( 0 upper case and 0 lower case ) chars
+Summary: ASCII: 0 digit, 15 punctuation, 1 space and 32 control chars
+Summary: ASCII: 1 space (SP) and 1 horizontal tab (HT) chars
+Summary: ASCII: 1 carriage return (CR), 1 line feed (LF) and 1 full stop chars
+File: 'demo.bin' (48 bytes processed)
+```
+
+Option "-v5" provides more details including a listing of frequency of all bytes.
+Option "-v4" provides a listing of only bytes that have non-zero frequencies.
+A cryptogram mode has been added with the "-C" option. The "-C" option is just a
+shortcut to specifying "-I -H -w32 -v6". Note that the "-v6" option maybe used on
+its own without reference to "-C". For example; -
+```
+$ ./ihad -v6 -w24 test/ASD_Coin_Level2.encoded 
+File: 'test/ASD_Coin_Level2.encoded' is 79 bytes
+00000000 2e4d574e56475258464f4c4648524d564356584647524c4d .MWNVGRXFOLFHRMVCVXFGRLM
+00000018 c2b755524d57584f5a49524742524d374452574753433557 ..URMWXOZIRGBRM7DRWGSC5W
+00000030 564b4753c2b744565a49565a46575a58524c4648524d584c VKGS..DVZIVZFWZXRLFHRMXL
+00000048 4d58564b475a0a                                   MXVKGZ.
+Summary: ASCII: 75 chars in total of which 74 are printable (includes spaces)
+Summary: ASCII: 71 alphabet ( 71 upper case and 0 lower case ) chars
+Summary: ASCII: 2 digit, 1 punctuation, 0 space and 1 control chars
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+%Frq:  0  1  3  3  0  7  8  3  3  0  3  6 10  1  3  0  0 13  3  0  1 10  7  8  0  7 
+
+%Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
+Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
+File: 'test/ASD_Coin_Level2.encoded' (79 bytes processed)
+```
