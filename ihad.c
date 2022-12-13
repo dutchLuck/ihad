@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Sun Dec 11 23:18:43 2022 
+ * ihad.c last edited on Tue Dec 13 23:32:20 2022 
  *
  * Industry standard alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -57,6 +57,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.32  2022/12/13 12:32:26  owen
+ * Removed redundent initialization of global variables.
+ *
  * Revision 0.31  2022/12/11 12:18:54  owen
  * Options -c and -S have more ways to specify the character to use.
  *
@@ -168,9 +171,9 @@
 #include <ctype.h>	/* isprint() */
 #include <libgen.h>	/* basename() */
 
-#include "byteFreq.h"	/* printByteFrequencies() */
+#include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.31 2022/12/11 12:18:54 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.32 2022/12/13 12:32:26 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
@@ -179,7 +182,6 @@
 #define  TRUE (! FALSE)
 #endif
 #define  BYTE_MASK 0xff
-#define  WORD_MASK 0xffff
 #define  MIN_VERBOSITY_LEVEL 0
 #define  MAX_VERBOSITY_LEVEL 6
 #define  MIN_HEX_FIELD_SEPARATOR_WIDTH 0
@@ -199,79 +201,48 @@ const char  optionStr[] = "Ab:B:c:CdDf:hHIL:o:sS:v::w:";
 /* Global Flags & default data */
 int  A_Flg = FALSE;		/* ASCII option: Control Ascii column output */
 int  bFlg = FALSE;		/* begin option: begin offset bytes from the start of the file */
-long  beginOffset;		/*  or if < 0 then measure back from end of the file */
-char *  bStrng;
+long  beginOffset = 0L;	/*  or if < 0 then measure back from end of the file */
+char *  bStrng = ( char * ) NULL;
 int  B_Flg = FALSE;		/* Bytes option: Limit bytes dumped */
-long  bytesToDump;		/*  number of bytes to dump */
-char *  B_Strng;		/*  pointer to -B value (max number of bytes to dump) */
+long  bytesToDump = LONG_MAX;	/*  number of bytes to dump */
+char *  B_Strng = ( char * ) NULL;	/*  pointer to -B value (max number of bytes to dump) */
 int  cFlg = FALSE;		/* char option: use alternate char instead of full stops for non-ASCII or non-printable ASCII */
-char *  cStrng;		/*  pointer to -c value if there is a value */
+char *  cStrng = ( char * ) NULL;	/*  pointer to -c value if there is a value */
 char cCharStrng[] = ".";	/*  use period if no alternate is specified in the options */
 int  C_Flg = FALSE;		/* Cryptogram option: force Cryptogram info output */
 int  dFlg = FALSE;		/* decimal option: use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg = FALSE;		/* Debug option: Control Debug info output */
 int  fFlg = FALSE;		/* field option: Control hex field separation width */
-int  fieldSeparatorWidth;	/*  hex field separation width */
-char *  fStrng;
+int  fieldSeparatorWidth= MIN_HEX_FIELD_SEPARATOR_WIDTH;	/* Default to no spaces between hex bytes */
+char *  fStrng = ( char * ) NULL;
 int  hFlg = FALSE;		/* help option: Control help info output */
 int  H_Flg = FALSE;		/* Hex option: Control Hexadecimal column output */
 int  I_Flg = FALSE;		/* Index option: Control Index column output */
 int  L_Flg = FALSE;		/* Limit option: Limit lines dumped */
-long  linesToDump;		/*  number of lines to dump */
-char *  L_Strng;		/*  pointer to -L value (max number of lines to dump) */
+long  linesToDump = LONG_MAX;	/*  number of lines to dump */
+char *  L_Strng = ( char * ) NULL;	/*  pointer to -L value (max number of lines to dump) */
 int  oFlg = FALSE;		/* output option: Control output file output */
-char *  oStrng;		/*  pointer to -o string (output file name) */
+char *  oStrng = ( char * ) NULL;	/*  pointer to -o string (output file name) */
 FILE * ofp;			/*  output file pointer */
 int  sFlg = FALSE;		/* space option: Control whether space is considered printable in ascii column */
-char  lowestPrintableAsciiChar;
+char  lowestPrintableAsciiChar = '!';	/* '!' is next to space */
 int  S_Flg = FALSE;		/* Separator option: Allow alternate Char use between columns */
-char *  S_Strng;		/*  pointer to -S (Separator) value if there is a value */
+char *  S_Strng = ( char * ) NULL;	/*  pointer to -S (Separator) value if there is a value */
 char S_ColumnChar[] = " ";	/*  use space char if no alternate is specified in the options */
 int  vFlg = FALSE;		/* verbosity option: Control verbosity level */
-int  verbosityLevel;		/*  Control verbosity level */
-char *  vStrng;		/*  pointer to -v value string, if there is one */
+int  verbosityLevel = 0;	/*  Control verbosity level */
+char *  vStrng = ( char * ) NULL;	/*  pointer to -v value string, if there is one */
 int  wFlg = FALSE;		/* width option:  Control number of bytes dealt with per line */
-int  byteDisplayWidth;		/*  Control number of bytes dealt with per line */
-char *  wStrng;		/*  pointer to -w value string */
+int  byteDisplayWidth = DEFAULT_BYTES_PER_LINE;	/*  Control number of bytes dealt with per line */
+char *  wStrng = ( char * ) NULL;	/*  pointer to -w value string */
 char *  exeName;		/* name of this executable */
-char *  exePath;		/* path of this executable */
+char *  exePath = ( char * ) NULL;	/* path of this executable */
 
 
-void  setGlobalFlagDefaults( void )  {
+void  setGlobalFlagDefaults( char *  argv[] )  {
 /* Preset command line options */
-  A_Flg = FALSE;		/* Default is Ascii column output */
-  bFlg = FALSE;		/* Default to begin the dump at the beginning of the file */
-  beginOffset = 0L;
-  bStrng = ( char * ) NULL;
-  B_Flg = FALSE;		/* Default to unlimited number of dump bytes */
-  bytesToDump = LONG_MAX;
-  B_Strng = ( char * ) NULL;
-  cFlg = FALSE;		/* Non Printable ASCII char substitute is a period (i.e. full-stop) */
-  cStrng = ( char * ) NULL;
-  C_Flg = FALSE;		/* Default to Cryptogram mode off */
-  dFlg = FALSE;		/* Default to output hex index rather than decimal index */
-  D_Flg = FALSE;		/* Default to Debug off */
-  fFlg = FALSE;
-  fieldSeparatorWidth = MIN_HEX_FIELD_SEPARATOR_WIDTH;	/* Default to no spaces between hex bytes */
-  fStrng = ( char * ) NULL;
-  hFlg = FALSE;		/* Default to no help text output */
-  H_Flg = FALSE;		/* Default is Hexadecimal column output */
-  I_Flg = FALSE;		/* Default is Index column output */
-  L_Flg = FALSE;		/* Default to unlimited number of dump lines */
-  linesToDump = LONG_MAX;
-  L_Strng = ( char * ) NULL;
-  oFlg = FALSE;		/* Default to output to stdout */
-  oStrng = ( char * ) NULL;
   ofp = stdout;		/* Output file pointer defaults to stdout */
-  sFlg = FALSE;		/* Default to replacing space with a '.' in ascii column */
-  lowestPrintableAsciiChar = '!';	/* '!' is next to space */
-  S_Flg = FALSE;		/* Default to using space char as the column separator */
-  S_Strng = ( char * ) NULL;
-  vFlg = verbosityLevel = 0;	/* Default to no verbose output */
-  vStrng = ( char * ) NULL;
-  wFlg = FALSE;		/* Default to DEFAULT_BYTES_PER_LINE bytes per line */
-  byteDisplayWidth = DEFAULT_BYTES_PER_LINE;
-  wStrng = ( char * ) NULL;
+  exeName = argv[ 0 ];		/* Point to full path to exe as a default */
 }
 
 
@@ -812,7 +783,7 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
     }
     else  {	/* Begin first fseek successful block */
       fileSize = ( long ) ftell( fp );
-      /* Ensure file is reset back to starting at 0 */
+   /* Ensure file is reset back to starting at 0 */
       rewind( fp );
       if( vFlg )  fprintf( ofp, "File: '%s' is %ld bytes\n", nameStrng, fileSize );
       if( fileSize == 0L )  {	/* Is there any bytes in the file to process? */
@@ -885,7 +856,7 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
     else  {
       if(( lstIndx + 1 ) == frstIndx )  {
      /* There are no files specified in the command line so process stdin */
-        chrCnt = readByteStreamAndPrintIndexHexAscii( stdin, ofp, 0L );
+        chrCnt = readByteStreamAndPrintIndexHexAscii( stdin, ofp, 0L );	/* 0L means no fseek()/skip done on stdin */
         if( D_Flg || vFlg )  printf( "Processed %d chars from stdin\n", chrCnt );
       }
       else  {
@@ -911,7 +882,7 @@ int  main( int  argc, char *  argv[] )  {
   int  resultIndex, indx;
 
 /* Preset switch option Flags and Data */
-  setGlobalFlagDefaults();
+  setGlobalFlagDefaults( argv );	/* Set up any Global variables not already set at declaration */
 
 /* Process switch options from the command line */
   resultIndex = processCommandLineOptions( argc, argv );
