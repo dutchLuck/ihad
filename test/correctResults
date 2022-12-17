@@ -1,19 +1,19 @@
-++++++++++ ihad test00.dat  +++Zero Length File check+++++++++++
-++++++++++ ihad test01.dat  +++1 byte Length File check+++++++++++
+++++++++++ ihad test00.dat  +++Zero Length File check++++++++++
+++++++++++ ihad test01.dat  +++1 byte Length File check++++++++++
 00000000 55                               U
-++++++++++ ihad test15.dat  +++15 byte Length File check+++++++++++
+++++++++++ ihad test15.dat  +++15 byte Length File check++++++++++
 00000000 6162636465666768696a6b6c6d6e6f   abcdefghijklmno
-++++++++++ ihad test16.dat  +++16 byte Length File check+++++++++++
+++++++++++ ihad test16.dat  +++16 byte Length File check++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-++++++++++ ihad test17.dat  +++17 byte Length File check+++++++++++
+++++++++++ ihad test17.dat  +++17 byte Length File check++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 71                               q
-++++++++++ ihad test52.dat  +++52 byte Length File check+++++++++++
+++++++++++ ihad test52.dat  +++52 byte Length File check++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-++++++++++ ihad test256.dat  +++256 byte Length File check+++++++++++
+++++++++++ ihad test256.dat  +++256 byte Length File check++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
 00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
@@ -30,10 +30,10 @@
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
-++++++++++ ihad -d test00.dat  +++Zero Length File check in decimal mode+++++++++++
-++++++++++ ihad -d test01.dat  +++1 byte Length File check in decimal mode+++++++++++
+++++++++++ ihad -d test00.dat  +++Zero Length File check in decimal mode++++++++++
+++++++++++ ihad -d test01.dat  +++1 byte Length File check in decimal mode++++++++++
 00000000 55                   U
-++++++++++ ihad -d test09.dat  +++9 byte Length File check in decimal mode+++++++++++
+++++++++++ ihad -d test09.dat  +++9 byte Length File check in decimal mode++++++++++
 00000000 616263646566676869   abcdefghi
 ++++++++++ ihad -d test10.dat  +++10 byte Length File check in decimal mode++++++++++
 00000000 6162636465666768696a abcdefghij
@@ -144,6 +144,24 @@ f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
 00000010 7172737475767778797a414243444546
 00000020 4748494a4b4c4d4e4f50515253545556
 00000030 5758595a
+++++++++++ ihad -f invNum test52.dat  +++Test hex byte Field width with invalid number string++++++++++
+
+?? Unable to convert 'invNum' into an integer for option '-f'
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
+++++++++++ ihad -f "" test52.dat  +++Test hex byte Field width value set to zero length string++++++++++
+? Parameter value for option '-f' contains no information, using default value of 0
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
+++++++++++ ihad -f -1 test52.dat  +++Test explicit hex byte Field width option limit++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
 ++++++++++ ihad -f 0 test52.dat  +++Test explicit hex byte Field width 0 option++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
@@ -161,12 +179,9 @@ f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
 00000030  45  46  47  48  49  4a  4b  4c  4d  4e   EFGHIJKLMN
 00000040  4f  50  51  52  53  54  55  56  57  58   OPQRSTUVWX
 00000050  59  5a                                   YZ
-++++++++++ ihad -f "" test52.dat  +++Test hex byte Field width value set to zero length string++++++++++
-? Parameter value for option '-f' contains no information, using default value of 0
-00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
-00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
-00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
-00000030 5758595a                         WXYZ
+++++++++++ ihad -f3 test17.dat  +++Test hex byte Field width too large limit++++++++++
+00000000  61  62  63  64  65  66  67  68  69  6a  6b  6c  6d  6e  6f  70   abcdefghijklmnop
+00000010  71                                                               q
 ++++++++++ ihad -s test256.dat  +++Test show space characters++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
@@ -228,74 +243,6 @@ od -A x -t x1z -v
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-++++++++++ ihad -c_ test256.dat    +++Test non-Ascii indicator being underscore++++++++++
-00000000 000102030405060708090a0b0c0d0e0f ________________
-00000010 101112131415161718191a1b1c1d1e1f ________________
-00000020 202122232425262728292a2b2c2d2e2f _!"#$%&'()*+,-./
-00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
-00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
-00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
-00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
-00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~_
-00000080 808182838485868788898a8b8c8d8e8f ________________
-00000090 909192939495969798999a9b9c9d9e9f ________________
-000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ________________
-000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ________________
-000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ________________
-000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ________________
-000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ________________
-000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ________________
-++++++++++ ihad -c '*' test256.dat    +++Test non-Ascii indicator being asterisk++++++++++
-00000000 000102030405060708090a0b0c0d0e0f ****************
-00000010 101112131415161718191a1b1c1d1e1f ****************
-00000020 202122232425262728292a2b2c2d2e2f *!"#$%&'()*+,-./
-00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
-00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
-00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
-00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
-00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~*
-00000080 808182838485868788898a8b8c8d8e8f ****************
-00000090 909192939495969798999a9b9c9d9e9f ****************
-000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ****************
-000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ****************
-000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ****************
-000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ****************
-000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ****************
-000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ****************
-++++++++++ ihad -c _ test256.dat    +++Test non-Ascii indicator being octal for '_'++++++++++
-00000000 000102030405060708090a0b0c0d0e0f ________________
-00000010 101112131415161718191a1b1c1d1e1f ________________
-00000020 202122232425262728292a2b2c2d2e2f _!"#$%&'()*+,-./
-00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
-00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
-00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
-00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
-00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~_
-00000080 808182838485868788898a8b8c8d8e8f ________________
-00000090 909192939495969798999a9b9c9d9e9f ________________
-000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ________________
-000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ________________
-000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ________________
-000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ________________
-000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ________________
-000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ________________
-++++++++++ ihad -c 94 test256.dat    +++Test non-Ascii indicator being decimal for '^'++++++++++
-00000000 000102030405060708090a0b0c0d0e0f ^^^^^^^^^^^^^^^^
-00000010 101112131415161718191a1b1c1d1e1f ^^^^^^^^^^^^^^^^
-00000020 202122232425262728292a2b2c2d2e2f ^!"#$%&'()*+,-./
-00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
-00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
-00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
-00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
-00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~^
-00000080 808182838485868788898a8b8c8d8e8f ^^^^^^^^^^^^^^^^
-00000090 909192939495969798999a9b9c9d9e9f ^^^^^^^^^^^^^^^^
-000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ^^^^^^^^^^^^^^^^
-000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ^^^^^^^^^^^^^^^^
-000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ^^^^^^^^^^^^^^^^
-000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ^^^^^^^^^^^^^^^^
-000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ^^^^^^^^^^^^^^^^
-000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ^^^^^^^^^^^^^^^^
 ++++++++++ ihad -c "" test256.dat   +++Test non-Ascii indicator value string being zero length++++++++++
 ? Parameter value for option '-c' contains no information, using default value of '.'
 00000000 000102030405060708090a0b0c0d0e0f ................
@@ -314,6 +261,74 @@ od -A x -t x1z -v
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
+++++++++++ ihad -c_ test256.dat    +++Test non-Ascii indicator being underscore++++++++++
+00000000 000102030405060708090a0b0c0d0e0f ________________
+00000010 101112131415161718191a1b1c1d1e1f ________________
+00000020 202122232425262728292a2b2c2d2e2f _!"#$%&'()*+,-./
+00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
+00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
+00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~_
+00000080 808182838485868788898a8b8c8d8e8f ________________
+00000090 909192939495969798999a9b9c9d9e9f ________________
+000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ________________
+000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ________________
+000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ________________
+000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ________________
+000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ________________
+000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ________________
+++++++++++ Test non-Ascii indicator specified as an octal number equivalent to asterisk++++++++++
+00000000 000102030405060708090a0b0c0d0e0f ****************
+00000010 101112131415161718191a1b1c1d1e1f ****************
+00000020 202122232425262728292a2b2c2d2e2f *!"#$%&'()*+,-./
+00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
+00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
+00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~*
+00000080 808182838485868788898a8b8c8d8e8f ****************
+00000090 909192939495969798999a9b9c9d9e9f ****************
+000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ****************
+000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ****************
+000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ****************
+000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ****************
+000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ****************
+000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ****************
+++++++++++ Test non-Ascii indicator specified as an octal number equivalent to underscore++++++++++
+00000000 000102030405060708090a0b0c0d0e0f ________________
+00000010 101112131415161718191a1b1c1d1e1f ________________
+00000020 202122232425262728292a2b2c2d2e2f _!"#$%&'()*+,-./
+00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
+00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
+00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~_
+00000080 808182838485868788898a8b8c8d8e8f ________________
+00000090 909192939495969798999a9b9c9d9e9f ________________
+000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ________________
+000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ________________
+000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ________________
+000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ________________
+000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ________________
+000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ________________
+++++++++++ ihad -c 94 test256.dat    +++Test non-Ascii indicator being decimal equivalent to up-arrow++++++++++
+00000000 000102030405060708090a0b0c0d0e0f ^^^^^^^^^^^^^^^^
+00000010 101112131415161718191a1b1c1d1e1f ^^^^^^^^^^^^^^^^
+00000020 202122232425262728292a2b2c2d2e2f ^!"#$%&'()*+,-./
+00000030 303132333435363738393a3b3c3d3e3f 0123456789:;<=>?
+00000040 404142434445464748494a4b4c4d4e4f @ABCDEFGHIJKLMNO
+00000050 505152535455565758595a5b5c5d5e5f PQRSTUVWXYZ[\]^_
+00000060 606162636465666768696a6b6c6d6e6f `abcdefghijklmno
+00000070 707172737475767778797a7b7c7d7e7f pqrstuvwxyz{|}~^
+00000080 808182838485868788898a8b8c8d8e8f ^^^^^^^^^^^^^^^^
+00000090 909192939495969798999a9b9c9d9e9f ^^^^^^^^^^^^^^^^
+000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeaf ^^^^^^^^^^^^^^^^
+000000b0 b0b1b2b3b4b5b6b7b8b9babbbcbdbebf ^^^^^^^^^^^^^^^^
+000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecf ^^^^^^^^^^^^^^^^
+000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ^^^^^^^^^^^^^^^^
+000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ^^^^^^^^^^^^^^^^
+000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ^^^^^^^^^^^^^^^^
 ++++++++++ ihad -S "" test52.dat   +++Test column Separator value string being zero length++++++++++
 ? Parameter value for option '-S' contains no information, using default value of ' '
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
@@ -325,28 +340,44 @@ od -A x -t x1z -v
 00000010,7172737475767778797a414243444546,qrstuvwxyzABCDEF
 00000020,4748494a4b4c4d4e4f50515253545556,GHIJKLMNOPQRSTUV
 00000030,5758595a,,,,,,,,,,,,,,,,,,,,,,,,,WXYZ
+++++++++++ Test column Separator being a horizontal tab specified as backslash t++++++++++
+00000000 30303030303030300936313632363336 00000000.6162636
+00000010 34363536363637363836393661366236 465666768696a6b6
+00000020 63366436653666373009616263646566 c6d6e6f70.abcdef
+00000030 6768696a6b6c6d6e6f700a3030303030 ghijklmnop.00000
+00000040 30313009373109090909090909090909 010.71..........
+00000050 09090909090909090909090909090909 ................
+00000060 0909090909710a                   .....q.
+++++++++++ Test column Separator being a carriage return specified as backslash r++++++++++
+00000000 30303030303030300d36313632363336 00000000.6162636
+00000010 34363536363637363836393661366236 465666768696a6b6
+00000020 6336643665366637300d616263646566 c6d6e6f70.abcdef
+00000030 6768696a6b6c6d6e6f700a3030303030 ghijklmnop.00000
+00000040 3031300d37310d0d0d0d0d0d0d0d0d0d 010.71..........
+00000050 0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d ................
+00000060 0d0d0d0d0d710a                   .....q.
 ++++++++++ ihad -S : test52.dat    +++Test column Separator being a colon++++++++++
 00000000:6162636465666768696a6b6c6d6e6f70:abcdefghijklmnop
 00000010:7172737475767778797a414243444546:qrstuvwxyzABCDEF
 00000020:4748494a4b4c4d4e4f50515253545556:GHIJKLMNOPQRSTUV
 00000030:5758595a:::::::::::::::::::::::::WXYZ
-++++++++++ ihad -S \| -s test256.dat   +++Test column Separator being a vertical bar++++++++++
-00000000|000102030405060708090a0b0c0d0e0f|................
-00000010|101112131415161718191a1b1c1d1e1f|................
+++++++++++ ihad -S \| -s -c " " test256.dat   +++Test column Separator being a vertical bar++++++++++
+00000000|000102030405060708090a0b0c0d0e0f|                
+00000010|101112131415161718191a1b1c1d1e1f|                
 00000020|202122232425262728292a2b2c2d2e2f| !"#$%&'()*+,-./
 00000030|303132333435363738393a3b3c3d3e3f|0123456789:;<=>?
 00000040|404142434445464748494a4b4c4d4e4f|@ABCDEFGHIJKLMNO
 00000050|505152535455565758595a5b5c5d5e5f|PQRSTUVWXYZ[\]^_
 00000060|606162636465666768696a6b6c6d6e6f|`abcdefghijklmno
-00000070|707172737475767778797a7b7c7d7e7f|pqrstuvwxyz{|}~.
-00000080|808182838485868788898a8b8c8d8e8f|................
-00000090|909192939495969798999a9b9c9d9e9f|................
-000000a0|a0a1a2a3a4a5a6a7a8a9aaabacadaeaf|................
-000000b0|b0b1b2b3b4b5b6b7b8b9babbbcbdbebf|................
-000000c0|c0c1c2c3c4c5c6c7c8c9cacbcccdcecf|................
-000000d0|d0d1d2d3d4d5d6d7d8d9dadbdcdddedf|................
-000000e0|e0e1e2e3e4e5e6e7e8e9eaebecedeeef|................
-000000f0|f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff|................
+00000070|707172737475767778797a7b7c7d7e7f|pqrstuvwxyz{|}~ 
+00000080|808182838485868788898a8b8c8d8e8f|                
+00000090|909192939495969798999a9b9c9d9e9f|                
+000000a0|a0a1a2a3a4a5a6a7a8a9aaabacadaeaf|                
+000000b0|b0b1b2b3b4b5b6b7b8b9babbbcbdbebf|                
+000000c0|c0c1c2c3c4c5c6c7c8c9cacbcccdcecf|                
+000000d0|d0d1d2d3d4d5d6d7d8d9dadbdcdddedf|                
+000000e0|e0e1e2e3e4e5e6e7e8e9eaebecedeeef|                
+000000f0|f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff|                
 ++++++++++ ihad -S \| -s -f1 test256.dat   +++Test column Separator being a vertical bar++++++++++
 00000000||00|01|02|03|04|05|06|07|08|09|0a|0b|0c|0d|0e|0f||................
 00000010||10|11|12|13|14|15|16|17|18|19|1a|1b|1c|1d|1e|1f||................
@@ -364,10 +395,23 @@ od -A x -t x1z -v
 000000d0||d0|d1|d2|d3|d4|d5|d6|d7|d8|d9|da|db|dc|dd|de|df||................
 000000e0||e0|e1|e2|e3|e4|e5|e6|e7|e8|e9|ea|eb|ec|ed|ee|ef||................
 000000f0||f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff||................
-++++++++++ ihad -b 26 test52.dat    +++Test start dump at 26 bytes in++++++++++
+++++++++++ ihad -b abc test52.dat    +++Test begin dump value string being invalid as a number++++++++++
+
+?? Unable to convert 'abc' into a long integer for option '-b'
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
+++++++++++ ihad -b "" test52.dat    +++Test begin dump value string being zero length++++++++++
+? Parameter value for option '-b' contains no information, using default value of 0
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
+++++++++++ ihad -b 26 test52.dat    +++Test begin dump at 26 bytes in++++++++++
 0000001a 4142434445464748494a4b4c4d4e4f50 ABCDEFGHIJKLMNOP
 0000002a 5152535455565758595a             QRSTUVWXYZ
-++++++++++ ihad -b -32 test52.dat    +++Test start dump at 32 bytes from end of file++++++++++
+++++++++++ ihad -b -32 test52.dat    +++Test begin dump at 32 bytes from end of file++++++++++
 00000014 75767778797a4142434445464748494a uvwxyzABCDEFGHIJ
 00000024 4b4c4d4e4f505152535455565758595a KLMNOPQRSTUVWXYZ
 ++++++++++ ihad -d -b -10 -v0 test256.dat test52.dat  +++Test dump of last 10 bytes of two files++++++++++
@@ -771,6 +815,10 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 %Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
 Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
 File: 'test52.dat' (52 bytes processed)
+++++++++++ ihad -w sansDigits test11.dat  +++Test Width option with invalid number string++++++++++
+
+?? Unable to convert 'sansDigits' into an integer for option '-w'
+00000000 6162636465666768696a6b           abcdefghijk
 ++++++++++ ihad -w "" test11.dat  +++Test Width option zero length value string++++++++++
 ? Parameter value for option '-w' contains no information, using default value of 16
 00000000 6162636465666768696a6b           abcdefghijk
@@ -838,6 +886,13 @@ File: 'test52.dat' (52 bytes processed)
 ++++++++++ ihad -w 100 test52.dat  +++Test Width option large positive value limiting++++++++++
 00000000 6162636465666768696a6b6c6d6e6f707172737475767778797a414243444546 abcdefghijklmnopqrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f505152535455565758595a                         GHIJKLMNOPQRSTUVWXYZ
+++++++++++ ihad -L invalidNum test52.dat  +++Test Lines option with invalid number string++++++++++
+
+?? Unable to convert 'invalidNum' into a long integer for option '-L'
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
 ++++++++++ ihad -L "" test52.dat  +++Test Lines option zero length value string++++++++++
 ? Parameter value for option '-L' contains no information, using default value of 576460752303423487
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
@@ -865,6 +920,13 @@ File: 'test52.dat' (52 bytes processed)
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
 ++++++++++ ihad -L +100 test52.dat  +++Test much too large Lines option value++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+00000030 5758595a                         WXYZ
+++++++++++ ihad -B nonNumber test52.dat  +++Test Bytes option with invalid number string++++++++++
+
+?? Unable to convert 'nonNumber' into a long integer for option '-B'
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV

@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Tue Dec 13 23:32:20 2022 
+ * ihad.c last edited on Sat Dec 17 21:31:18 2022 
  *
  * Industry standard alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -57,6 +57,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.33  2022/12/17 10:33:00  owen
+ * Changed invalid number input message from stderr to stdout.
+ *
  * Revision 0.32  2022/12/13 12:32:26  owen
  * Removed redundent initialization of global variables.
  *
@@ -173,7 +176,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.32 2022/12/13 12:32:26 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.33 2022/12/17 10:33:00 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
@@ -275,7 +278,7 @@ long  convertOptionStringToLong( long  defltValue, char *  strng, char *  flgNam
     result = atol( strng );
  /* Rough check on atol() output - is result zero when option string likely wasn't zero */
     if(( result == 0L ) && ( *strng != '0' ))  {
-      fprintf( stderr, "\n?? Unable to convert '%s' into a long integer for option '%s'\n", strng, flgName );
+      printf( "\n?? Unable to convert '%s' into a long integer for option '%s'\n", strng, flgName );
       result = defltValue;
     }
     if( D_Flg )  printf( "Debug: The conversion of '%s' string for option '%s' resulted in %ld\n", strng, flgName, result );
@@ -313,7 +316,7 @@ int  convertOptionStringToInteger( int  defltValue, char *  strng, char *  flgNa
     result = atoi( strng );
  /* Rough check on atoi() output - is result zero when option string likely wasn't zero */
     if(( result == 0 ) && ( *strng != '0' ))  {
-      fprintf( stderr, "\n?? Unable to convert '%s' into an integer for option '%s'\n", strng, flgName );
+      printf( "\n?? Unable to convert '%s' into an integer for option '%s'\n", strng, flgName );
       result = defltValue;
     }
     if( D_Flg )  printf( "Debug: The conversion of '%s' string for option '%s' resulted in %d\n", strng, flgName, result );
@@ -376,11 +379,11 @@ unsigned char  convertOptionStringToByteChar( int *  flgPtr, char *  defltValue,
       }
     }
     else  {
-   /* Convert option string specified to (signed) integer, if possible */
+   /* Convert option string specified to (unsigned) integer, if possible */
       result = ( unsigned char ) ( atoi( strng ) & BYTE_MASK );
    /* Rough check on atoi() output - is result zero when option string likely wasn't zero */
       if(( result == 0 ) && ( *strng != '0' ))  {
-        fprintf( stderr, "\n?? Unable to convert '%s' into a byte value for option '%s'\n", strng, flgName );
+        printf( "\n?? Unable to convert '%s' into a byte value for option '%s'\n", strng, flgName );
         result = ( unsigned char ) *defltValue;
         *flgPtr = FALSE;
       }
