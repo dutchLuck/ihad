@@ -172,7 +172,7 @@ ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
    -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
-   -f X .. Set hex field separator to X spaces (where 0 < X < 2)
+   -f X .. Set hex field separator to X spaces (where 0 <= X <= 2)
    -h .. Print out this help message and exit
    -H .. Disable output of Hex column (bytes in Hexadecimal form normally in 2nd column)
    -I .. Disable output of Index column (Index number of first byte in a line, normally in 1st column)
@@ -214,8 +214,25 @@ $ ./ihad -S, demo.bin
 00000010,101112131415161718191a1b1c1d1e1f,................
 00000020,202122232425262728292a2b2c2d2e2f,.!"#$%&'()*+,-./
 ```
-Note however, that the last line in this case will have too many commas,
+Or if it desired to have every hexadecimal byte separated by a comma; -
+```
+$ ./ihad -S , -f 1 -B 44 demo.bin 
+00000000,,00,01,02,03,04,05,06,07,08,09,0a,0b,0c,0d,0e,0f,,................
+00000010,,10,11,12,13,14,15,16,17,18,19,1a,1b,1c,1d,1e,1f,,................
+00000020,,20,21,22,23,24,25,26,27,28,29,2a,2b,,,,,,,,,,,,,,.!"#$%&'()*+
+```
+Note however, that the last line in this pseudo CSV case can have too many commas,
 if it is shorter than the normal line length.
+
+The character to use may be specified in similar ways to the standard UNIX/Linux
+translate utility "tr" if the character if desired. For example a tab delimited
+dump could be done as follows; -
+```
+$ ./ihad -S '\t' demo.bin 
+00000000	000102030405060708090a0b0c0d0e0f	................
+00000010	101112131415161718191a1b1c1d1e1f	................
+00000020	202122232425262728292a2b2c2d2e2f	.!"#$%&'()*+,-./
+```
 
 The dump can begin at an offset into a file, using the -b X option, where the offset X is
 a decimal number smaller than the size of the file. If the X value is greater than zero then
@@ -258,9 +275,27 @@ File: 'demo.bin' (48 bytes processed)
 
 Option "-v5" provides more details including a listing of frequency of all bytes.
 Option "-v4" provides a listing of only bytes that have non-zero frequencies.
+
 A cryptogram mode has been added with the "-C" option. The "-C" option is just a
-shortcut to specifying "-I -H -w32 -v6". Note that the "-v6" option maybe used on
-its own without reference to "-C". For example; -
+shortcut to specifying "-I -H -w32 -v6". For example; -
+```
+$ ./ihad -C test/ASD_Coin_Level2.encoded 
+File: 'test/ASD_Coin_Level2.encoded' is 79 bytes
+.MWNVGRXFOLFHRMVCVXFGRLM..URMWXO
+ZIRGBRM7DRWGSC5WVKGS..DVZIVZFWZX
+RLFHRMXLMXVKGZ.
+Summary: ASCII: 75 chars in total of which 74 are printable (includes spaces)
+Summary: ASCII: 71 alphabet ( 71 upper case and 0 lower case ) chars
+Summary: ASCII: 2 digit, 1 punctuation, 0 space and 1 control chars
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+%Frq:  0  1  3  3  0  7  8  3  3  0  3  6 10  1  3  0  0 13  3  0  1 10  7  8  0  7 
+
+%Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
+Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
+File: 'test/ASD_Coin_Level2.encoded' (79 bytes processed)
+```
+Note that the "-v6" option maybe used on its own without reference to "-C".
+For example; -
 ```
 $ ./ihad -v6 -w24 test/ASD_Coin_Level2.encoded 
 File: 'test/ASD_Coin_Level2.encoded' is 79 bytes
