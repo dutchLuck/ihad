@@ -194,7 +194,7 @@ hexdump -C
 od -A x -t x1z -v
 ```
 
-If the displaying the period character (i.e. full stop) at end of ASCII sentences is
+If displaying the full stop or period character at the end of ASCII sentences is
 important then the -c C option enables the choice of a different indicator of non-ASCII
 or non-printable ASCII bytes. For example underscore could be specified with "-c_"
 and produces the following style dump; -
@@ -203,6 +203,14 @@ $ ./ihad -c_ demo.bin
 00000000 000102030405060708090a0b0c0d0e0f ________________
 00000010 101112131415161718191a1b1c1d1e1f ________________
 00000020 202122232425262728292a2b2c2d2e2f _!"#$%&'()*+,-./
+```
+If displaying the space character is desirable then it may be done with the use of the
+-s option. For example; -
+```
+$ ./ihad -s demo.bin 
+00000000 000102030405060708090a0b0c0d0e0f ................
+00000010 101112131415161718191a1b1c1d1e1f ................
+00000020 202122232425262728292a2b2c2d2e2f  !"#$%&'()*+,-./
 ```
 
 If a different column separator is desirable, instead of the space character, then
@@ -225,8 +233,8 @@ Note however, that the last line in this pseudo CSV case can have too many comma
 if it is shorter than the normal line length.
 
 The character to use may be specified in similar ways to the standard UNIX/Linux
-translate utility "tr" if the character if desired. For example a tab delimited
-dump could be done as follows; -
+translate utility "tr" can have characters specified, if desired. For example a
+tab delimited dump could be done as follows; -
 ```
 $ ./ihad -S '\t' demo.bin 
 00000000	000102030405060708090a0b0c0d0e0f	................
@@ -276,7 +284,7 @@ File: 'demo.bin' (48 bytes processed)
 Option "-v5" provides more details including a listing of frequency of all bytes.
 Option "-v4" provides a listing of only bytes that have non-zero frequencies.
 
-A cryptogram mode has been added with the "-C" option. The "-C" option is just a
+A cryptogram mode is available with the "-C" option. The "-C" option is just a
 shortcut to specifying "-I -H -w32 -v6". For example; -
 ```
 $ ./ihad -C test/ASD_Coin_Level2.encoded 
