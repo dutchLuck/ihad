@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Sat Dec 17 21:31:18 2022 
+ * ihad.c last edited on Sun Dec 18 22:01:10 2022 
  *
  * Industry standard alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -57,6 +57,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.34  2022/12/18 11:01:19  owen
+ * Ensure -c and -S option char values are limited to a suitable range.
+ *
  * Revision 0.33  2022/12/17 10:33:00  owen
  * Changed invalid number input message from stderr to stdout.
  *
@@ -171,12 +174,12 @@
 #include <string.h>	/* memset() strlen() strdup() */
 #include <limits.h>	/* LONG_MIN INT_MIN */
 #include <sys/stat.h>	/* fstat() */
-#include <ctype.h>	/* isprint() */
+#include <ctype.h>	/* isascii(), isprint(), isalpha(), isdigit() */
 #include <libgen.h>	/* basename() */
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.33 2022/12/17 10:33:00 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.34 2022/12/18 11:01:19 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
@@ -194,6 +197,10 @@
 #define  MAX_BYTES_PER_LINE 32
 #define  MIN_BYTES_PER_LINE 1
 #define  HEX_BYTE_FIELD_WIDTH 2		/* Default is 2 which is no spaces */
+#define  DEFAULT_COLUMN_SEPARATOR_CHAR ' '	/* Default to space (SP) char */
+#define  DEFAULT_COLUMN_SEPARATOR_STRING " "	/* Default to space (SP) char */
+#define  DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_CHAR '.'	/* Default to full stop (i.e. period) char */
+#define  DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_STRING "."	/* Default to full stop (i.e. period) char */
 
 
 /* Command line Optional Switches: */
@@ -211,7 +218,7 @@ long  bytesToDump = LONG_MAX;	/*  number of bytes to dump */
 char *  B_Strng = ( char * ) NULL;	/*  pointer to -B value (max number of bytes to dump) */
 int  cFlg = FALSE;		/* char option: use alternate char instead of full stops for non-ASCII or non-printable ASCII */
 char *  cStrng = ( char * ) NULL;	/*  pointer to -c value if there is a value */
-char cCharStrng[] = ".";	/*  use period if no alternate is specified in the options */
+char cCharStrng[] = DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_STRING;	/*  use full stop (i.e. period) if no alternate is specified in the options */
 int  C_Flg = FALSE;		/* Cryptogram option: force Cryptogram info output */
 int  dFlg = FALSE;		/* decimal option: use decimal index and a default hex width of 10 bytes per line */
 int  D_Flg = FALSE;		/* Debug option: Control Debug info output */
@@ -231,7 +238,7 @@ int  sFlg = FALSE;		/* space option: Control whether space is considered printab
 char  lowestPrintableAsciiChar = '!';	/* '!' is next to space */
 int  S_Flg = FALSE;		/* Separator option: Allow alternate Char use between columns */
 char *  S_Strng = ( char * ) NULL;	/*  pointer to -S (Separator) value if there is a value */
-char S_ColumnChar[] = " ";	/*  use space char if no alternate is specified in the options */
+char S_ColumnChar[] = DEFAULT_COLUMN_SEPARATOR_STRING;	/*  use space char if no alternate is specified in the options */
 int  vFlg = FALSE;		/* verbosity option: Control verbosity level */
 int  verbosityLevel = 0;	/*  Control verbosity level */
 char *  vStrng = ( char * ) NULL;	/*  pointer to -v value string, if there is one */
@@ -325,6 +332,11 @@ int  convertOptionStringToInteger( int  defltValue, char *  strng, char *  flgNa
 }
 
 
+unsigned char  limitUnsignedCharValueToEqualOrWithinRange( unsigned char  value, unsigned char  loBoundary, unsigned char  hiBoundary )  {
+  return(( value < loBoundary ) ? loBoundary : (( value > hiBoundary ) ? hiBoundary : value ));
+}
+
+
 unsigned char  convertOptionStringToByteChar( int *  flgPtr, char *  defltValue, char *  strng, char *  flgName )  {
   unsigned char  result;
   int  strngLength;
@@ -400,21 +412,26 @@ void  printOutHelpMessage( char * programName )  {
   printf( "  where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -\n" );
   printf( "   -A .. Disable output of ASCII column (bytes in ASCII form normally in 3rd column)\n" );
   printf( "   -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)\n" );
-  printf( "   -B X .. Limit file dumps to a maximum of X bytes\n" );
-  printf( "   -c C .. Use char C instead of '.' as substitute for a non-printable or non-ASCII char (also overides -A)\n" );
+  printf( "   -B X .. Limit dumps to a maximum of X bytes (where X > 0)\n" );
+  printf( "   -c C .. Use printable char C instead of '%c' for a non-printable or non-ASCII char (also overides -A)\n",
+    DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_CHAR );
   printf( "   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
-  printf( "   -f X .. Set hex field separator to X spaces (where %d <= X <= %d)\n", MIN_HEX_FIELD_SEPARATOR_WIDTH, MAX_HEX_FIELD_SEPARATOR_WIDTH );
+  printf( "   -f X .. Set hex field separator to X spaces (where %d <= X <= %d)\n",
+    MIN_HEX_FIELD_SEPARATOR_WIDTH, MAX_HEX_FIELD_SEPARATOR_WIDTH );
   printf( "   -h .. Print out this help message and exit\n" );
-  printf( "   -H .. Disable output of Hex column (bytes in Hexadecimal form normally in 2nd column)\n" );
+  printf( "   -H .. Disable output of Hexadecimal column (bytes in Hexadecimal form normally in 2nd column)\n" );
   printf( "   -I .. Disable output of Index column (Index number of first byte in a line, normally in 1st column)\n" );
-  printf( "   -L X .. Limit file dumps to a maximum of X lines\n" );
+  printf( "   -L X .. Limit dumps to a maximum of X lines (where X > 0)\n" );
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. Classify space char as printable in Ascii output\n" );
-  printf( "   -S C .. Use char C instead of default space (SP) char as column separator char\n" );
-  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where %d <= X <= %d)\n", MIN_VERBOSITY_LEVEL, MAX_VERBOSITY_LEVEL );
-  printf( "   -w X .. Set bytes per line to X (where %d < X <= %d)\n\n", MIN_BYTES_PER_LINE - 1, MAX_BYTES_PER_LINE );
+  printf( "   -S C .. Use char C instead of default '%c' char as column separator (where C > '\\0' i.e. not NUL)\n",
+    DEFAULT_COLUMN_SEPARATOR_CHAR );
+  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where %d <= X <= %d)\n",
+    MIN_VERBOSITY_LEVEL, MAX_VERBOSITY_LEVEL );
+  printf( "   -w X .. Set bytes per line to X (where %d < X <= %d)\n\n",
+    MIN_BYTES_PER_LINE - 1, MAX_BYTES_PER_LINE );
   printf( "  where; -\n" );
   printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
   printf( "    of file(s) to dump in hex & ascii\n" );
@@ -459,7 +476,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
       case 'v' :  vFlg = TRUE; vStrng = optarg; break;
       case 'w' :  wFlg = TRUE; wStrng = optarg; break;
       default :
-        fprintf( stderr, "\n?? command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
+        printf( "\nWarning: command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
         printf( " for help on command line options run '%s -h'\n", exeName );
         break;
     }
@@ -503,7 +520,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   bytesToDump = limitLongValueToEqualOrMorePositiveThan( bytesToDump, 1L );
   if( D_Flg )  printf( "Debug: Limit bytes to Dump from the file to a max of %ld bytes\n", bytesToDump );
 
-/* Postprocess -c switch option */
+/* Postprocess -c switch option substitute for a non-printable or non-ASCII char */
   if( D_Flg )  printf( "Debug: Option '-c' is %s (%d)\n", cFlg ? "True" : "False", cFlg );
   if( cFlg )  *cCharStrng = ( char ) convertOptionStringToByteChar( &cFlg, cCharStrng, cStrng, "-c" );
   else  {
@@ -512,6 +529,11 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   if( cFlg && A_Flg )  {
     A_Flg = FALSE;
     printf( "Warning: -A option reset as a valid -c option overides it\n" );
+  }
+  if( ! isprint( *cCharStrng ))  {
+    *cCharStrng = DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_CHAR;
+    printf( "Warning: -c C option only allows printable chars, defaulting to '%c' char for non-printable\n",
+      *cCharStrng );
   }
   
 /* Postprocess -d (decimal index) switch option */
@@ -550,7 +572,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     if( D_Flg )  printf( "Debug: Option '-o outfileName' was not found in the command line options\n" );
   }
 
-/* Postprocess -S switch option */
+/* Postprocess -S switch option char C instead of default space (SP) char as column Separator char */
   if( D_Flg )  printf( "Debug: Option '-S' is %s (%d)\n", S_Flg ? "True" : "False", S_Flg );
   if( S_Flg )  *S_ColumnChar = ( char ) convertOptionStringToByteChar( &S_Flg, S_ColumnChar, S_Strng, "-S" );
   else  {
@@ -558,7 +580,11 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   }
   if( S_Flg && D_Flg )
     printf( "Debug: Column separator is '%c' (1st part of option '-S' is '%s')\n", *S_ColumnChar, S_Strng );
-
+/* Note that the Column Separator may not be '\0' i.e. ASCII NUL as it is also the end of string delimiter in C code */
+  if( *S_ColumnChar == '\0' )  {
+    *S_ColumnChar = DEFAULT_COLUMN_SEPARATOR_CHAR;	/* Reset Column Separator to the default space char */
+    printf( "Warning: -S NUL option not allowed, defaulting to '%c' char for Column Separator\n", *S_ColumnChar );
+  }
 
 /* Postprocess -w (width) switch option */
   if( D_Flg )  printf( "Debug: Option '-w' is %s (%d)\n", wFlg ? "True" : "False", wFlg );
@@ -637,6 +663,8 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
   hexFldWdth = HEX_BYTE_FIELD_WIDTH + fieldSeparatorWidth;
   if( hexFldWdth > ( sizeof( hexFldFrmt ) - 7))  hexFldWdth = ( sizeof( hexFldFrmt ) - 7);
   else if( hexFldWdth < 2 )  hexFldWdth = 2;
+/* Note that the Column Separator may not be '\0' i.e. ASCII NUL as it is also the end of string delimiter in C code */
+  if( *S_ColumnChar == '\0' )  *S_ColumnChar = DEFAULT_COLUMN_SEPARATOR_CHAR;	/* Silently reset Column Separator to the default char */
   sprintf( hexFldFrmt, "%c02x%c%c%c%c%c",
     '%', *S_ColumnChar, *S_ColumnChar, *S_ColumnChar, *S_ColumnChar, *S_ColumnChar );	/* Set up a string of the form "%02x  " */
   bPtr = hexFldFrmt + ( 2 + hexFldWdth );	/* Temp use of bPtr to point to end of Hex format string */
@@ -655,6 +683,8 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
       fprintf( ofp, "Debug: Capacity of output string is %d characters\n", outputStringSize );
     }
     *outputString = '\0';		/* in-case the stdin or file has 0 length */
+ /* Silently reset the char indicating a non-ascii or non-printable ascii byte */
+    if( ! isprint( *cCharStrng ))  *cCharStrng = DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_CHAR;
  /* Take any fseek() skip into account if there was one */
     byteAddr = startOffset;
  /* Read bytes from stdin or file until either end of file or bytes to dump reaches zero */
@@ -698,7 +728,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
       if( ! A_Flg )  {
         if(( byte >= lowestPrintableAsciiChar ) && ( byte <= 0x7e ))	/* Test for printable Ascii */
           sprintf( aPtr, "%c", byte );		/* Print byte as ascii character */
-        else  *aPtr =  *cCharStrng;	/* Print a full stop or alternate char instead of non-printable ascii */
+        else  *aPtr =  *cCharStrng;	/* Print a full stop or alternate printable char instead of non-printable ascii */
         aPtr += 1;
       }
    /* Output current line if required */

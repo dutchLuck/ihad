@@ -88,8 +88,13 @@ rm test.tmp
 echo "$TEN_PLUSS cat test52.dat | ihad    +++Test input provided via a pipe into stdin${TEN_PLUSS}"
 cat test52.dat | ../ihad 
 #
+# Exercise -c C option substitute for a non-printable or non-ASCII char, instead of default '.'
+echo "$TEN_PLUSS ihad -c oddString test256.dat   +++Test non-Ascii indicator value string being unusual${TEN_PLUSS}"
+../ihad -c oddString test256.dat 
 echo "$TEN_PLUSS ihad -c \"\" test256.dat   +++Test non-Ascii indicator value string being zero length${TEN_PLUSS}"
 ../ihad -c "" test256.dat 
+echo "$TEN_PLUSS ihad -c 13 test256.dat    +++Test non-Ascii indicator being limited to printable chars${TEN_PLUSS}"
+../ihad -c 13 test256.dat 
 echo "$TEN_PLUSS ihad -c_ test256.dat    +++Test non-Ascii indicator being underscore${TEN_PLUSS}"
 ../ihad -c_ test256.dat 
 echo "$TEN_PLUSS Test non-Ascii indicator specified as an octal number equivalent to asterisk${TEN_PLUSS}"
@@ -98,9 +103,16 @@ echo "$TEN_PLUSS Test non-Ascii indicator specified as an octal number equivalen
 ../ihad -c '\137' test256.dat 
 echo "$TEN_PLUSS ihad -c 94 test256.dat    +++Test non-Ascii indicator being decimal equivalent to up-arrow${TEN_PLUSS}"
 ../ihad -c 94 test256.dat 
+echo "$TEN_PLUSS ihad -c 127 test256.dat    +++Test non-Ascii indicator being limited to printable chars${TEN_PLUSS}"
+../ihad -c 127 test256.dat 
 #
+# Exercise -S C option substitute for column Separator char, instead of default ' '
+echo "$TEN_PLUSS ihad -S wierd test52.dat   +++Test column Separator value string being unusual${TEN_PLUSS}"
+../ihad -S wierd test52.dat 
 echo "$TEN_PLUSS ihad -S \"\" test52.dat   +++Test column Separator value string being zero length${TEN_PLUSS}"
 ../ihad -S "" test52.dat 
+echo "$TEN_PLUSS ihad -S 0 test52.dat   +++Test column Separator value limitation when string is ASCII NUL${TEN_PLUSS}"
+../ihad -S '\0' test52.dat 
 echo "$TEN_PLUSS ihad -S, test52.dat   +++Test column Separator being a comma${TEN_PLUSS}"
 ../ihad -S, test52.dat 
 echo "$TEN_PLUSS Test column Separator being a horizontal tab specified as backslash t${TEN_PLUSS}"
@@ -118,7 +130,7 @@ echo "$TEN_PLUSS ihad -b abc test52.dat    +++Test begin dump value string being
 ../ihad -b abc test52.dat 
 echo "$TEN_PLUSS ihad -b \"\" test52.dat    +++Test begin dump value string being zero length${TEN_PLUSS}"
 ../ihad -b "" test52.dat 
-echo "$TEN_PLUSS ihad -b 26 test52.dat    +++Test begin dump at 26 bytes in${TEN_PLUSS}"
+echo "$TEN_PLUSS ihad -b 26 test52.dat    +++Test begin dump at 26 bytes in from start of file${TEN_PLUSS}"
 ../ihad -b 26 test52.dat 
 echo "$TEN_PLUSS ihad -b -32 test52.dat    +++Test begin dump at 32 bytes from end of file${TEN_PLUSS}"
 ../ihad -b -32 test52.dat 
@@ -227,4 +239,14 @@ echo "$TEN_PLUSS ihad -B 48 -L 2 test52.dat  +++Test Lines over-rides Bytes opti
 ../ihad -B 48 -L 2 test52.dat
 echo "$TEN_PLUSS ihad -d -B 20 -L 4 test52.dat  +++Test Bytes over-rides Lines option value to limit output${TEN_PLUSS}"
 ../ihad -d -B 20 -L 4 test52.dat
+#
+# Test invalid or dodgy options
+echo "$TEN_PLUSS ihad -a test16.dat  +++Test non-existant option${TEN_PLUSS}"
+../ihad -a test16.dat
+echo "$TEN_PLUSS ihad -B -L test52.dat  +++Test missing option values ${TEN_PLUSS}"
+../ihad -B -L test52.dat
+echo "$TEN_PLUSS ihad --begin test52.dat  +++Test non-existant option${TEN_PLUSS}"
+../ihad --begin test52.dat
+echo "$TEN_PLUSS ihad -IHAv6 test52.dat  +++Test concatenated option${TEN_PLUSS}"
+../ihad -IHAv6 test52.dat
 
