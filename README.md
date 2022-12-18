@@ -167,19 +167,19 @@ ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
   where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -
    -A .. Disable output of ASCII column (bytes in ASCII form normally in 3rd column)
    -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
-   -B X .. Limit file dumps to a maximum of X bytes
-   -c C .. Use char C instead of '.' as substitute for a non-printable or non-ASCII char (also overides -A)
+   -B X .. Limit dumps to a maximum of X bytes (where X > 0)
+   -c C .. Use printable char C instead of '.' for a non-printable or non-ASCII char (also overides -A)
    -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
    -f X .. Set hex field separator to X spaces (where 0 <= X <= 2)
    -h .. Print out this help message and exit
-   -H .. Disable output of Hex column (bytes in Hexadecimal form normally in 2nd column)
+   -H .. Disable output of Hexadecimal column (bytes in Hexadecimal form normally in 2nd column)
    -I .. Disable output of Index column (Index number of first byte in a line, normally in 1st column)
-   -L X .. Limit file dumps to a maximum of X lines
+   -L X .. Limit dumps to a maximum of X lines (where X > 0)
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
-   -S C .. Use char C instead of default space (SP) char as column separator char
+   -S C .. Use char C instead of default ' ' char as column separator (where C > '\0' i.e. not NUL)
    -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 6)
    -w X .. Set bytes per line to X (where 0 < X <= 32)
 
@@ -192,11 +192,13 @@ Note that if ihad output isn't acceptable you can try; -
 xxd -g 0
 hexdump -C
 od -A x -t x1z -v
+
 ```
 
 If displaying the full stop or period character at the end of ASCII sentences is
 important then the -c C option enables the choice of a different indicator of non-ASCII
-or non-printable ASCII bytes. For example underscore could be specified with "-c_"
+or non-printable ASCII bytes. The new value for option -c must be a printable ASCII
+character. For example underscore could be specified with "-c_"
 and produces the following style dump; -
 ```
 $ ./ihad -c_ demo.bin
@@ -214,7 +216,8 @@ $ ./ihad -s demo.bin
 ```
 
 If a different column separator is desirable, instead of the space character, then
-it may be specified with the -S C option. For example a pseudo comma separated variable (CSV)
+it may be specified with the -S C option. The new value for option -S may be any
+byte value except for ASCII NUL. For example a pseudo comma separated variable (CSV)
 output may be simulated with "-S,". This option dump will have the following style; -
 ```
 $ ./ihad -S, demo.bin
@@ -229,11 +232,11 @@ $ ./ihad -S , -f 1 -B 44 demo.bin
 00000010,,10,11,12,13,14,15,16,17,18,19,1a,1b,1c,1d,1e,1f,,................
 00000020,,20,21,22,23,24,25,26,27,28,29,2a,2b,,,,,,,,,,,,,,.!"#$%&'()*+
 ```
-Note however, that the last line in this pseudo CSV case can have too many commas,
+Note however, that the last line in these pseudo CSV cases can have too many commas,
 if it is shorter than the normal line length.
 
-The character to use may be specified in similar ways to the standard UNIX/Linux
-translate utility "tr" can have characters specified, if desired. For example a
+The character to use as the column separator may be specified in similar ways to the
+standard UNIX/Linux translate utility "tr" can have characters specified. For example a
 tab delimited dump could be done as follows; -
 ```
 $ ./ihad -S '\t' demo.bin 
@@ -321,3 +324,19 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
 File: 'test/ASD_Coin_Level2.encoded' (79 bytes processed)
 ```
+
+Note that some options may be concatentated together. For example; -
+```
+$ ./ihad -IHAv6 test/ASD_Coin_Level2.encoded 
+File: 'test/ASD_Coin_Level2.encoded' is 79 bytes
+Summary: ASCII: 75 chars in total of which 74 are printable (includes spaces)
+Summary: ASCII: 71 alphabet ( 71 upper case and 0 lower case ) chars
+Summary: ASCII: 2 digit, 1 punctuation, 0 space and 1 control chars
+Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
+%Frq:  0  1  3  3  0  7  8  3  3  0  3  6 10  1  3  0  0 13  3  0  1 10  7  8  0  7 
+
+%Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
+Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
+File: 'test/ASD_Coin_Level2.encoded' (79 bytes processed)
+```
+
