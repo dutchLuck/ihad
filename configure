@@ -1,5 +1,7 @@
 #! /bin/bash
 #
+# C O N F I G U R E
+#
 NAME1=ihad
 NAME2=byteFreq
 #
@@ -27,11 +29,11 @@ echo -e "\t$COMPILER -o "'$@ $^' >> $OP_FILE_NAME
 echo "" >> $OP_FILE_NAME
 #
 echo "$OBJ1: $SRC1 $HDR2" >> $OP_FILE_NAME
-echo -e "\t$COMPILER $OPTIONS -c "'$<' >> $OP_FILE_NAME
+echo -e "\t$COMPILER $OPTIONS -c -UDEBUG "'$<' >> $OP_FILE_NAME
 echo "" >> $OP_FILE_NAME
 #
 echo "$OBJ2: $SRC2 $HDR2" >> $OP_FILE_NAME
-echo -e "\t$COMPILER $OPTIONS -c "'$<' >> $OP_FILE_NAME
+echo -e "\t$COMPILER $OPTIONS -c -UDEBUG "'$<' >> $OP_FILE_NAME
 echo "" >> $OP_FILE_NAME
 #
 echo "check: $TRGT" >> $OP_FILE_NAME
@@ -43,7 +45,13 @@ echo -e "\tcd test; ./chk" >> $OP_FILE_NAME
 echo "" >> $OP_FILE_NAME
 #
 echo "clean:" >> $OP_FILE_NAME
-echo -e "\trm -f $TRGT $NAME1.o $NAME2.o" >> $OP_FILE_NAME
+echo -e "\trm -f $TRGT $OBJ1 $OBJ2" >> $OP_FILE_NAME
+echo "" >> $OP_FILE_NAME
+#
+echo "debug: clean" >> $OP_FILE_NAME
+echo -e "\t$COMPILER $OPTIONS -DDEBUG -c $SRC1" >> $OP_FILE_NAME
+echo -e "\t$COMPILER $OPTIONS -DDEBUG -c $SRC2" >> $OP_FILE_NAME
+echo -e "\t$COMPILER $OPTIONS -o $TRGT $OBJ1 $OBJ2" >> $OP_FILE_NAME
 echo "" >> $OP_FILE_NAME
 #
 
