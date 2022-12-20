@@ -3,9 +3,7 @@
  *
  * Support code for Index Hex Ascii Dump (ihad.c)
  *
- * byteFreq.c last edited on Sun Dec 11 23:16:44 2022 
- *
- * byteFreq was written for my own education.
+ * byteFreq.c last edited on Tue Dec 20 23:26:49 2022 
  *
  * This code is released under the MIT license
  *
@@ -18,6 +16,9 @@
 
 /*
  * $Log: byteFreq.c,v $
+ * Revision 0.10  2022/12/20 12:26:56  owen
+ * Ensured Warning: replaced ?? or ? at start of warning messages.
+ *
  * Revision 0.9  2022/12/11 12:16:56  owen
  * Output an explicit 0x on hex values and a \ on octal values.
  *
@@ -54,7 +55,7 @@
 #include <limits.h>	/* LONG_MIN LONG_MAX */
 #include <stdlib.h>	/* qsort() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.9 2022/12/11 12:16:56 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.10 2022/12/20 12:26:56 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 
@@ -203,9 +204,9 @@ void  printCryptoGramFrequencies( FILE * ofp, long  byteFreq[] )  {
     charTotal += (long long) *lPtr++;
   }
   if( charTotal == 0LL )
-    fprintf( ofp, "? There are no characters in the range of A to Z or a to z to print\n" );
+    fprintf( ofp, "Warning: There are no characters in the range of A to Z or a to z to print\n" );
   else if( charTotal < 0LL )
-    fprintf( ofp, "?? %lld characters in the range of A to Z or a to z, which shouldn't occur\n",  charTotal );
+    fprintf( ofp, "Warning: %lld characters in the range of A to Z or a to z, which shouldn't occur\n",  charTotal );
   else  {
     total = ( double ) charTotal;
     percentMult = ( double ) 100.0 / total;
@@ -221,9 +222,8 @@ void  printCryptoGramFrequencies( FILE * ofp, long  byteFreq[] )  {
     fprintf( ofp, "\n" );
     /* Print 2 line horizontal list of frequencies sorted highest to lowest  */
     /* Where two or more frequencies are the same ensure associated chars are in alphabetic order  */
-    if( largestFreq > ( LONG_MAX >> 5 ))  {
-      fprintf( ofp, "? Unable to sort frequency values due to size of largest frequency (%ld)\n", largestFreq );
-    }
+    if( largestFreq > ( LONG_MAX >> 5 ))
+      fprintf( ofp, "Warning: Unable to sort frequency values due to size of largest frequency (%ld)\n", largestFreq );
     else  {
       fprintf( ofp, "\n%%Frq: " );
       /* Cryptograms are generally short sayings, so can have multiple freq values the same */

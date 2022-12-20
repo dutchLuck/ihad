@@ -3,24 +3,23 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Mon Dec 19 23:20:23 2022 
+ * ihad.c last edited on Tue Dec 20 23:21:48 2022 
  *
- * Industry standard alternatives to ihad are; -
+ * Industry standard dump alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
  * OR  xxd -g 0 yourFile
  * OR  od -A x -t x1z -v yourFile
  * OR  format-hex on Microsoft Windows in powershell i.e.  format-hex yourFile
  *
- * In addition, Please do not look at the source code as an example
- * of how to code! or how not to code!
- *
- * ihad was written for my own education.
+ * ihad provides marginally cleaner default output (i.e. just three columns
+ * with spaces as column / field delimiters) than the command line
+ * utilities listed above.
  *
  * This code is released under the MIT license
  *
- * It provides marginally cleaner default output (i.e. just three columns
- * with spaces as column / field delimiters) than the command line
- * utilities listed above.
+ * ihad was written for my own education, but please do not look at the source code
+ * as an example of how to code! or how not to code!
+ *
  */
 
 /*
@@ -53,15 +52,18 @@
  *  cc -Wall -c -UDEBUG ihad.c
  *  cc -o ihad ihad.o byteFreq.o
  *
-  * Compile full DEBUG version with; -
+ * Compile full DEBUG version with; -
  *  cc -Wall -c -DDEBUG byteFreq.c
  *  cc -Wall -c -DDEBUG ihad.c
  *  cc -o ihad ihad.o byteFreq.o
  *
-*/
+ */
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.36  2022/12/20 12:21:56  owen
+ * Removed unused code, ensured double quotes on strings, ensured Warning: replaced ??
+ *
  * Revision 0.35  2022/12/19 12:20:31  owen
  * Limited -D debug print statements unless compiled with -DDEBUG.
  *
@@ -187,7 +189,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.35 2022/12/19 12:20:31 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.36 2022/12/20 12:21:56 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
@@ -264,9 +266,11 @@ void  setGlobalFlagDefaults( char *  argv[] )  {
 }
 
 
-long  limitLongValueToEqualOrMoreNegettiveThan( long  value, long  boundary )  {
-  return(( value > boundary ) ? boundary : value );
-}
+/*
+ * long  limitLongValueToEqualOrMoreNegettiveThan( long  value, long  boundary )  {
+ *  return(( value > boundary ) ? boundary : value );
+ * }
+ */
 
 
 long  limitLongValueToEqualOrMorePositiveThan( long  value, long  boundary )  {
@@ -279,40 +283,36 @@ long  limitLongValueToEqualOrWithinRange( long  value, long  loBoundary, long  h
 }
 
 
-long  convertOptionStringToLong( long  defltValue, char *  strng, char *  flgName )  {
+long  convertOptionStringToLong( long  defltValue, char *  strng, char *  flgName, int *  flgActive )  {
   long  result;
 
   result = defltValue;
-  if( strng == ( char * ) NULL )
-    printf( "Warning: Parameter value for option '%s' is uninitialised, using default value of %ld\n", flgName, result );
-  else if( *strng == '\0' )	/* Assume "" used as option value so return default */
-    printf( "Warning: Parameter value for option '%s' contains no information, using default value of %ld\n", flgName, result );
+  if( strng == ( char * ) NULL )  {
+    *flgActive = FALSE;
+    printf( "Warning: Parameter value for option %s is uninitialised, ignoring option %s\n", flgName, flgName );
+  }
+  else if( *strng == '\0' )  {	/* Assume "" used as option value so return default */
+    *flgActive = FALSE;
+    printf( "Warning: Parameter value for option %s contains no information, ignoring option %s\n", flgName, flgName );
+  }
   else  {
 #ifdef DEBUG  
-    if( D_Flg )  printf( "Debug: String for option '%s' is %s\n", flgName, strng );
+    if( D_Flg )  printf( "Debug: String for option %s is \"%s\"\n", flgName, strng );
 #endif
  /* Convert option string specified to signed long, if possible */
     result = atol( strng );
  /* Rough check on atol() output - is result zero when option string likely wasn't zero */
     if(( result == 0L ) && ( *strng != '0' ))  {
-      printf( "\n?? Unable to convert '%s' into a long integer for option '%s'\n", strng, flgName );
+      *flgActive = FALSE;
       result = defltValue;
+      printf( "Warning: Unable to convert \"%s\" into an integer for option %s, ignoring option %s\n",
+        strng, flgName, flgName );
     }
 #ifdef DEBUG  
-    if( D_Flg )  printf( "Debug: The conversion of '%s' string for option '%s' resulted in %ld\n", strng, flgName, result );
+    if( D_Flg )  printf( "Debug: The conversion of string \"%s\" for option %s resulted in %ld\n", strng, flgName, result );
 #endif
   }
   return( result );
-}
-
-
-int  limitIntegerValueToEqualOrMoreNegettiveThan( int  value, int  boundary )  {
-  return(( value > boundary ) ? boundary : value );
-}
-
-
-int  limitIntegerValueToEqualOrMorePositiveThan( int  value, int  boundary )  {
-  return(( value < boundary ) ? boundary : value );
 }
 
 
@@ -321,29 +321,12 @@ int  limitIntegerValueToEqualOrWithinRange( int  value, int  loBoundary, int  hi
 }
 
 
-int  convertOptionStringToInteger( int  defltValue, char *  strng, char *  flgName )  {
+int  convertOptionStringToInteger( int  defltValue, char *  strng, char *  flgName, int *  flgActive )  {
+  long  tempResult;
   int  result;
 
-  result = defltValue;
-  if( strng == ( char * ) NULL )
-    printf( "Warning: Parameter value for option '%s' is uninitialised, using default value of %d\n", flgName, result );
-  else if( *strng == '\0' )	/* Assume "" used as option value so return default */
-    printf( "Warning: Parameter value for option '%s' contains no information, using default value of %d\n", flgName, result );
-  else  {
-#ifdef DEBUG  
-    if( D_Flg )  printf( "Debug: String for option '%s' is %s\n", flgName, strng );
-#endif
- /* Convert option string specified to signed integer, if possible */
-    result = atoi( strng );
- /* Rough check on atoi() output - is result zero when option string likely wasn't zero */
-    if(( result == 0 ) && ( *strng != '0' ))  {
-      printf( "\n?? Unable to convert '%s' into an integer for option '%s'\n", strng, flgName );
-      result = defltValue;
-    }
-#ifdef DEBUG  
-    if( D_Flg )  printf( "Debug: The conversion of '%s' string for option '%s' resulted in %d\n", strng, flgName, result );
-#endif
-  }
+  tempResult = convertOptionStringToLong(( long ) defltValue, strng, flgName, flgActive );	/* use long int code */
+  result = ( int ) limitLongValueToEqualOrWithinRange( tempResult, ( long ) INT_MIN, ( long ) INT_MAX );	/* ensure result fits in an integer */
   return( result );
 }
 
@@ -360,15 +343,15 @@ unsigned char  convertOptionStringToByteChar( int *  flgPtr, char *  defltValue,
   result = ( unsigned char ) *defltValue;
   strngLength = strlen( strng );
   if( strng == ( char * ) NULL )  {
-    printf( "Warning: Parameter value for option '%s' is uninitialised, using default value of %c\n", flgName, result );
+    printf( "Warning: Parameter value for option %s is uninitialised, using default value of '%c'\n", flgName, result );
     *flgPtr = FALSE;
   }
   else  {
 #ifdef DEBUG  
-    if( D_Flg )  printf( "Debug: String for option '%s' is %s\n", flgName, strng );
+    if( D_Flg )  printf( "Debug: String for option %s is \"%s\"\n", flgName, strng );
 #endif
     if( strngLength == 0 )  {	/* Assume "" used so return default */
-      printf( "Warning: Parameter value for option '%s' contains no information, using default value of '%c'\n", flgName, ( char ) result );
+      printf( "Warning: Parameter value for option %s contains no information, using default value of '%c'\n", flgName, ( char ) result );
       *flgPtr = FALSE;
     }
     else if( strngLength == 1 )  {	/* Assume this single byte is the character to use */
@@ -413,13 +396,14 @@ unsigned char  convertOptionStringToByteChar( int *  flgPtr, char *  defltValue,
       result = ( unsigned char ) ( atoi( strng ) & BYTE_MASK );
    /* Rough check on atoi() output - is result zero when option string likely wasn't zero */
       if(( result == 0 ) && ( *strng != '0' ))  {
-        printf( "\n?? Unable to convert '%s' into a byte value for option '%s'\n", strng, flgName );
+        printf( "Warning: Unable to convert \"%s\" into a byte value for option %s, using default value of '%c'\n",
+          strng, flgName, *defltValue);
         result = ( unsigned char ) *defltValue;
         *flgPtr = FALSE;
       }
     }
 #ifdef DEBUG  
-    if( D_Flg )  printf( "Debug: The conversion of '%s' string for option '%s' resulted in 0x%02x\n", strng, flgName, result );
+    if( D_Flg )  printf( "Debug: The conversion of string \"%s\" for option %s resulted in 0x%02x\n", strng, flgName, result );
 #endif
   }
   return( result & BYTE_MASK );
@@ -460,17 +444,23 @@ void  printOutHelpMessage( char * programName )  {
 }
 
 
+void  printOptionStatusIfRequired( int  optionFlg, char *  optionName )  {
+  if( D_Flg )  printf( "Debug: Option %s is %s (%d)\n", optionName, optionFlg ? "On" : "Off", optionFlg );
+}
+
+
 int  processCommandLineOptions( int  argc, char *  argv[] )  {
   int  result;
+  int  ignored;	/* dummy variable */
   extern char *  optarg;
   extern int  optind, opterr, optopt;
 
 /* Isolate the name of the executable */
   exeName = argv[0];	/* set global variable to default */
   if(( exePath = strdup( argv[0] )) == NULL )
-    perror( "?? Unable to create duplicate of path to this executable" );
+    perror( "Warning: Unable to create duplicate of path to this executable" );
   else if(( exeName = basename( exePath )) == NULL )  {
-    perror( "?? Unable to obtain the name of this executable" );
+    perror( "Warning: Unable to obtain the name of this executable" );
     exeName = argv[0];	/* set back to the default again */
   }
 /* Set all the global flags from command line options */
@@ -496,62 +486,68 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
       case 'v' :  vFlg = TRUE; vStrng = optarg; break;
       case 'w' :  wFlg = TRUE; wStrng = optarg; break;
       default :
-        printf( "\nWarning: command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
-        printf( " for help on command line options run '%s -h'\n", exeName );
+        printf( "Warning: command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
+        printf( "Information: For help on command line options run '%s -h'\n", exeName );
         break;
     }
   }
 
 /* Postprocess -D (debug) switch option */
-  if( D_Flg )  printf( "Debug: Option '-D' is %s (%d)\n", D_Flg ? "True" : "False", D_Flg );
-  if( D_Flg )  {
-    if( ! vFlg )  {
-      vFlg = TRUE;     /* -v processing still to come will set level to 0 if not specified */
-      printf( "Warning: verbose option '-v' set True by -D option\n" );
-    }
-  }
-
+  printOptionStatusIfRequired( D_Flg, "-D" );
+  
 /* Postprocess -v (verbosityLevel) switch option */
-  if( D_Flg )  printf( "Debug: Option '-v' is %s (%d)\n", vFlg ? "True" : "False", vFlg );
-  if( vFlg )  verbosityLevel = convertOptionStringToInteger( 0, vStrng, "-v" );
+  printOptionStatusIfRequired( vFlg, "-v" );
+/* Don't turn off vFlg even if level value is nonsense */
+  if( vFlg )  verbosityLevel = convertOptionStringToInteger( MIN_VERBOSITY_LEVEL, vStrng, "-v", &ignored );
   else  {
+    verbosityLevel = MIN_VERBOSITY_LEVEL;
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-v' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -v was not found in the command line options\n" );
 #endif
   }
 /* Ensure the verbosity level is in the expected range */
   verbosityLevel = limitIntegerValueToEqualOrWithinRange( verbosityLevel, MIN_VERBOSITY_LEVEL, MAX_VERBOSITY_LEVEL );
-  if( D_Flg )  printf( "Debug: verbosity level is %d\n", verbosityLevel );
+  if( D_Flg )  {
+    printf( "Debug: verbosity level is %d\n", verbosityLevel );
+    if( ! vFlg )  {
+      vFlg = TRUE;
+      printf( "Warning: verbose option -v set active by -D option\n" );
+      printOptionStatusIfRequired( vFlg, "-v" );
+    }
+  }
   
 /* Postprocess -b (begin at offset) switch option */
-  if( D_Flg )  printf( "Debug: Option '-b' is %s (%d)\n", bFlg ? "True" : "False", bFlg );
-  if( bFlg )  beginOffset = convertOptionStringToLong( 0L, bStrng, "-b" );
+  printOptionStatusIfRequired( bFlg, "-b" );
+  if( bFlg )  beginOffset = convertOptionStringToLong( 0L, bStrng, "-b", &bFlg );
   else  {
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-b' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -b was not found in the command line options\n" );
 #endif
     beginOffset = 0L;	/* Ensure beginOffset is set to default of start of file */
   }
   if( D_Flg )  printf( "Debug: Begin at an offset in the file of %ld bytes\n", beginOffset );
 
 /* Postprocess -B (dump at most X bytes) switch option */
-  if( D_Flg )  printf( "Debug: Option '-B' is %s (%d)\n", B_Flg ? "True" : "False", B_Flg );
-  if( B_Flg )  bytesToDump = convertOptionStringToLong( LONG_MAX, B_Strng, "-B" );
+  printOptionStatusIfRequired( B_Flg, "-B" );
+  if( B_Flg )  bytesToDump = convertOptionStringToLong( LONG_MAX, B_Strng, "-B", &B_Flg );
   else  {
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-B' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -B was not found in the command line options\n" );
 #endif
     bytesToDump = LONG_MAX;	/* Ensure bytesToDump is set to default */
   }
   bytesToDump = limitLongValueToEqualOrMorePositiveThan( bytesToDump, 1L );
-  if( D_Flg )  printf( "Debug: Limit bytes to Dump from the file to a max of %ld bytes\n", bytesToDump );
+  if( D_Flg )  {
+    if( B_Flg )  printf( "Debug: Limit bytes to Dump from the file to a max of %ld bytes\n", bytesToDump );
+    else  printf( "Debug: Number of bytes to Dump from the file is not limited by -B option\n" );
+  }
 
 /* Postprocess -c switch option substitute for a non-printable or non-ASCII char */
-  if( D_Flg )  printf( "Debug: Option '-c' is %s (%d)\n", cFlg ? "True" : "False", cFlg );
+  printOptionStatusIfRequired( cFlg, "-c" );
   if( cFlg )  *cCharStrng = ( char ) convertOptionStringToByteChar( &cFlg, cCharStrng, cStrng, "-c" );
   else  {
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-c alternateChar' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -c alternateChar was not found in the command line options\n" );
 #endif
   }
   if( cFlg && A_Flg )  {
@@ -560,65 +556,65 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   }
   if( ! isprint(( int ) *cCharStrng ))  {
     *cCharStrng = DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_CHAR;
-    printf( "Warning: -c C option only allows printable chars, defaulting to '%c' char for non-printable\n",
+    printf( "Warning: -c C option only allows printable chars, defaulting to '%c' as non-printable indicator\n",
       *cCharStrng );
   }
   
 /* Postprocess -d (decimal index) switch option */
-  if( D_Flg )  printf( "Debug: Option '-d' is %s (%d)\n", dFlg ? "True" : "False", dFlg );
+  printOptionStatusIfRequired( dFlg, "-d" );
 #ifdef DEBUG
-  if( D_Flg && ( ! dFlg ))  printf( "Debug: Option '-d' was not found in the command line options\n" );
+  if( D_Flg && ( ! dFlg ))  printf( "Debug: Option -d was not found in the command line options\n" );
 #endif
 
 /* Postprocess -f (fieldSeparatorWidth) switch option */
-  if( D_Flg )  printf( "Debug: Option '-f' is %s (%d)\n", fFlg ? "True" : "False", fFlg );
-  if( fFlg )  fieldSeparatorWidth = convertOptionStringToInteger( MIN_HEX_FIELD_SEPARATOR_WIDTH, fStrng, "-f" );
+  printOptionStatusIfRequired( fFlg, "-f" );
+  if( fFlg )  fieldSeparatorWidth = convertOptionStringToInteger( MIN_HEX_FIELD_SEPARATOR_WIDTH, fStrng, "-f", &fFlg );
   else  {
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-f' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -f was not found in the command line options\n" );
 #endif
   }
 /* Ensure the field separator width is in the expected range */
   fieldSeparatorWidth = limitIntegerValueToEqualOrWithinRange( fieldSeparatorWidth, MIN_HEX_FIELD_SEPARATOR_WIDTH, MAX_HEX_FIELD_SEPARATOR_WIDTH );
   if( D_Flg )  printf( "Debug: field separator width is %d\n", fieldSeparatorWidth );
 
-/* Report on -h switch option */
-  if( D_Flg )  printf( "Debug: Option '-h' is %s (%d)\n", hFlg ? "True" : "False", hFlg );
+/* Report on -h ( help ) switch option */
+  printOptionStatusIfRequired( hFlg, "-h" );
   if( ! hFlg )  {
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-h' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -h was not found in the command line options\n" );
 #endif
   }
 
 /* Postprocess -o switch option */
-  if( D_Flg )  printf( "Debug: Option '-o' is %s (%d)\n", oFlg ? "True" : "False", oFlg );
+  printOptionStatusIfRequired( oFlg, "-o" );
   if( oFlg )  {
     if( oStrng == ( char * ) NULL )  {
-      printf( "?? File name string for option '-o outfileName' is uninitialised\n" );
+      printf( "Warning: File name string for option -o outfileName is uninitialised\n" );
       oFlg = FALSE;
       ofp = stdout;
-      fprintf( stderr, "Defaulting to writing output to stdout\n" );
+      fprintf( stderr, "Warning: Defaulting to writing output to stdout\n" );
     }
     else  {
-      if( D_Flg )  printf( "Debug: File name string part of option '-o' is '%s'\n", oStrng );
+      if( D_Flg )  printf( "Debug: File name string part of option -o is \"%s\"\n", oStrng );
     }
   }
   else  {
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-o outfileName' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -o outfileName was not found in the command line options\n" );
 #endif
   }
 
 /* Postprocess -S switch option char C instead of default space (SP) char as column Separator char */
-  if( D_Flg )  printf( "Debug: Option '-S' is %s (%d)\n", S_Flg ? "True" : "False", S_Flg );
+  printOptionStatusIfRequired( S_Flg, "-S" );
   if( S_Flg )  *S_ColumnChar = ( char ) convertOptionStringToByteChar( &S_Flg, S_ColumnChar, S_Strng, "-S" );
   else  {
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-S char' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -S char was not found in the command line options\n" );
 #endif
   }
   if( S_Flg && D_Flg )
-    printf( "Debug: Column separator is '%c' (1st part of option '-S' is '%s')\n", *S_ColumnChar, S_Strng );
+    printf( "Debug: Column separator is '%c' (1st part of option -S is '%s')\n", *S_ColumnChar, S_Strng );
 /* Note that the Column Separator may not be '\0' i.e. ASCII NUL as it is also the end of string delimiter in C code */
   if( *S_ColumnChar == '\0' )  {
     *S_ColumnChar = DEFAULT_COLUMN_SEPARATOR_CHAR;	/* Reset Column Separator to the default space char */
@@ -626,20 +622,20 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
   }
 
 /* Postprocess -w (width) switch option */
-  if( D_Flg )  printf( "Debug: Option '-w' is %s (%d)\n", wFlg ? "True" : "False", wFlg );
-  if( wFlg )  byteDisplayWidth = convertOptionStringToInteger( DEFAULT_BYTES_PER_LINE, wStrng, "-w" );
+  printOptionStatusIfRequired( wFlg, "-w" );
+  if( wFlg )  byteDisplayWidth = convertOptionStringToInteger( DEFAULT_BYTES_PER_LINE, wStrng, "-w", &wFlg );
   else  {
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-w' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -w was not found in the command line options\n" );
 #endif
     byteDisplayWidth = (( dFlg ) ? DEFAULT_DECIMAL_BYTES_PER_LINE : DEFAULT_BYTES_PER_LINE );
   }
 /* Ensure the display width is not negetive, not zero and not bigger than MAX_BYTES_PER_LINE */
   byteDisplayWidth = limitIntegerValueToEqualOrWithinRange( byteDisplayWidth, MIN_BYTES_PER_LINE, MAX_BYTES_PER_LINE );
-  if( D_Flg )  printf( "Debug: byte Display Width is %d\n", byteDisplayWidth );
+  if( D_Flg )  printf( "Debug: Hex and ASCII column Width is %d bytes\n", byteDisplayWidth );
 
 /* Postprocess -C (cryptogram mode) switch option - must be after -w processing */
-  if( D_Flg )  printf( "Debug: Option '-C' is %s (%d)\n", C_Flg ? "True" : "False", C_Flg );
+  printOptionStatusIfRequired( C_Flg, "-C" );
   if( C_Flg )  {
     I_Flg = TRUE;	/* don't print index */
     H_Flg = TRUE;	/* don't print hex */
@@ -653,28 +649,40 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     }
   }
 #ifdef DEBUG
-  if( D_Flg && ( ! C_Flg ))  printf( "Debug: Option '-C' was not found in the command line options\n" );
+  if( D_Flg && ( ! C_Flg ))  printf( "Debug: Option -C was not found in the command line options\n" );
 #endif
 
 /* Postprocess -L (dump at most X lines) switch option - must be after both -B & -w processing */
-  if( D_Flg )  printf( "Debug: Option '-L' is %s (%d)\n", L_Flg ? "True" : "False", L_Flg );
+  printOptionStatusIfRequired( L_Flg, "-L" );
   if( L_Flg )  {
-    linesToDump = convertOptionStringToLong( LONG_MAX / byteDisplayWidth, L_Strng, "-L" );
+    linesToDump = convertOptionStringToLong( LONG_MAX / byteDisplayWidth, L_Strng, "-L", &L_Flg);
     linesToDump = limitLongValueToEqualOrWithinRange( linesToDump, 1L, LONG_MAX / byteDisplayWidth );
-    if( bytesToDump > byteDisplayWidth * linesToDump )  {	/* Take smaller of max number of lines * width and max number of bytes */
+    if( L_Flg && ( bytesToDump > byteDisplayWidth * linesToDump ))  {	/* Take smaller of max number of lines * width and max number of bytes */
       bytesToDump = byteDisplayWidth * linesToDump;	/* Convert from max number of lines to max number of bytes */
       B_Flg = TRUE;
     }
   }
   else  {
 #ifdef DEBUG
-    if( D_Flg )  printf( "Debug: Option '-L' was not found in the command line options\n" );
+    if( D_Flg )  printf( "Debug: Option -L was not found in the command line options\n" );
 #endif
     linesToDump = LONG_MAX / byteDisplayWidth;	/* Ensure linesToDump is set to default */
   }
   linesToDump = limitLongValueToEqualOrWithinRange( linesToDump, 1L, LONG_MAX / byteDisplayWidth );
-  if( D_Flg )  printf( "Debug: Limit lines to Dump from the file to a max of %ld lines\n", linesToDump );
-  
+  if( D_Flg )  {
+    if( L_Flg )  printf( "Debug: Limit lines to Dump from the file to a max of %ld lines\n", linesToDump );
+    else  printf( "Debug: Number of lines to Dump from the file is not limited by -L option\n" );
+  }
+
+/* Report on -A ( ASCII column suppress) switch option */
+  printOptionStatusIfRequired( A_Flg, "-A" );
+
+/* Report on -H ( Hex column suppress) switch option */
+  printOptionStatusIfRequired( H_Flg, "-H" );
+
+/* Report on -I ( Index column suppress) switch option */
+  printOptionStatusIfRequired( I_Flg, "-I" );
+
 /* return the index of the first positional argument (i.e. input file name?) */
   return( optind );
 }
@@ -719,7 +727,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
   outputStringSize = (( I_Flg ) ? 4 : 14 ) + ( hexFldWdth + (( A_Flg ) ? 0 : 1 )) * byteDisplayWidth;
   outputString = malloc( outputStringSize );
   if( outputString == NULL )  {
-    fprintf( stderr, "?? malloc( %d ) failed\n", outputStringSize );
+    fprintf( stderr, "PANIC: malloc( %d ) failed\n", outputStringSize );
     perror( "readByteStreamAndPrintIndexHexAscii()" ); 
   }
   else  {
@@ -735,7 +743,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
     if( ! isprint(( int ) *cCharStrng ))  *cCharStrng = DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_CHAR;
  /* Take any fseek() skip into account if there was one */
     byteAddr = startOffset;
- /* Read bytes from stdin or file until either end of file or bytes to dump reaches zero */
+ /* Read bytes from stdin or file until end of file or if -B or -L options are active the bytes to dump count reaches zero */
     while((( byte = fgetc( fp )) != EOF ) && (( ! B_Flg ) || ( bytesToDump-- > 0L ))) {
       byte &= BYTE_MASK;
       if( collectSummary )  {
@@ -854,7 +862,7 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
 /* Open the file for reading (in binary mode) */
   result = (( fp = fopen( nameStrng, "rb" ) ) != NULL );
   if( ! result )  {
-    fprintf( stderr, "?? Unable to open a file named '%s' for reading\n", nameStrng );
+    fprintf( stderr, "Warning: Unable to open a file named '%s' for reading\n", nameStrng );
     perror( "processA_SingleCommandLineParameter()" );
   }
   else  {	/* Begin file opened ok block */
@@ -862,7 +870,7 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
     result = fseek( fp, 0L, SEEK_END );
     if( result != 0 )  {
       fileSize = LONG_MIN;
-      fprintf( stderr, "?? Unable to determine file size by seeking to the end of the file named '%s'\n", nameStrng );
+      fprintf( stderr, "Warning: Unable to determine file size by seeking to the end of the file named '%s'\n", nameStrng );
       perror( "processA_SingleCommandLineParameter()" );
    /* If there was a problem with the seek make sure it starts at 0 */
       rewind( fp );
@@ -874,10 +882,10 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
       rewind( fp );
       if( vFlg )  fprintf( ofp, "File: '%s' is %ld bytes\n", nameStrng, fileSize );
       if( fileSize == 0L )  {	/* Is there any bytes in the file to process? */
-        if( vFlg )  fprintf( ofp, "? There are no bytes to dump in '%s'\n", nameStrng );
+        if( vFlg )  fprintf( ofp, "Warning: There are no bytes to dump in '%s'\n", nameStrng );
       }
       else if( fileSize < 0L )  {
-        fprintf( ofp, "?? There are less than zero (%ld) bytes to dump in '%s' - trying anyway\n", fileSize, nameStrng );
+        fprintf( ofp, "Warning: There are less than zero (%ld) bytes to dump in '%s' - trying anyway\n", fileSize, nameStrng );
       }
       else  {	/* Begin file size greater than zero block, so process the file */
         if( D_Flg )
@@ -910,11 +918,12 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
         }
       }	/* End of file size is greater than 0 block */
     }	/* End first fseek successful block */
- /* Process the file just opened */
+ /* Process the file opened near the start of this block of code */
     byteCnt = readByteStreamAndPrintIndexHexAscii( fp, ofp, fileOffset );
+ /* Close the file just processed */
     result = ( fclose( fp ) == 0 );
     if( ! result )  {
-      fprintf( stderr, "?? Unable to close the file named '%s'\n", nameStrng );
+      fprintf( stderr, "Warning: Unable to close the file named '%s'\n", nameStrng );
       perror( "processA_SingleCommandLineParameter()" );
     }
     if( D_Flg || vFlg )
@@ -934,16 +943,16 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
     printf( "Debug: Executing: processNonSwitchCommandLineParameters()\n" );
     printf( "Debug: first index is %d and last index is %d\n", frstIndx, lstIndx );
     for( indx = frstIndx; indx <= lstIndx; indx++ )
-      printf( "Debug: cmdLnStrngs[ %d ] string is '%s'\n", indx, cmdLnStrngs[ indx ] );
+      printf( "Debug: cmdLnStrngs[ %d ] string is \"%s\"\n", indx, cmdLnStrngs[ indx ] );
   }
 #endif
   if(( oFlg ) && ( oStrng == ( char * ) NULL ))
-    fprintf( stderr, "?? -o specified, but no output file name specified - aborting\n" );
+    fprintf( stderr, "Warning: -o specified, but no output file name specified - aborting\n" );
   else  {
   /* Attempt to open the output file if required */
     result = ( oFlg ) ? (( ofp = fopen( oStrng, "w" )) != NULL ) : 1;
     if( ! result )  {
-      fprintf( stderr, "?? Unable to open a file named '%s' for writing output\n", oStrng );
+      fprintf( stderr, "Warning: Unable to open a file named \"%s\" for writing output\n", oStrng );
       perror( "processNonSwitchCommandLineParameters" );
     }
     else  {
@@ -962,7 +971,7 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
    /* Close output file specified in the command line */
       result = ( oFlg ) ? (fclose( ofp ) == 0) : 1;
       if( ! result )  {
-        fprintf( stderr, "?? Attempt to close the output file named '%s' failed\n", oStrng );
+        fprintf( stderr, "Warning: Attempt to close the output file named \"%s\" failed\n", oStrng );
         perror( "processNonSwitchCommandLineParameters" );
       }
     }
@@ -1002,7 +1011,7 @@ int  main( int  argc, char *  argv[] )  {
   if( D_Flg )  {
     printf( "Debug: argc is %d and option index is %d\n", argc, resultIndex );
     for( indx = resultIndex; indx < argc; indx++ )  {
-      printf( "Debug: argv[ %d ] string is '%s'\n", indx, argv[ indx ] );
+      printf( "Debug: argv[ %d ] string is \"%s\"\n", indx, argv[ indx ] );
     }
   }
 #endif

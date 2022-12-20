@@ -38,15 +38,20 @@
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
 ++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d test00.dat  +++Zero Length File check in decimal mode++++++++++
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d test01.dat  +++1 byte Length File check in decimal mode++++++++++
 00000000 55                   U
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d test09.dat  +++9 byte Length File check in decimal mode++++++++++
 00000000 616263646566676869   abcdefghi
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d test10.dat  +++10 byte Length File check in decimal mode++++++++++
 00000000 6162636465666768696a abcdefghij
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d test11.dat  +++11 byte Length File check in decimal mode++++++++++
 00000000 6162636465666768696a abcdefghij
 00000010 6b                   k
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d test52.dat  +++52 byte Length File check in decimal mode++++++++++
 00000000 6162636465666768696a abcdefghij
 00000010 6b6c6d6e6f7071727374 klmnopqrst
@@ -54,6 +59,7 @@
 00000030 45464748494a4b4c4d4e EFGHIJKLMN
 00000040 4f505152535455565758 OPQRSTUVWX
 00000050 595a                 YZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d test256.dat  +++256 byte Length File check in decimal mode++++++++++
 00000000 00010203040506070809 ..........
 00000010 0a0b0c0d0e0f10111213 ..........
@@ -81,9 +87,12 @@
 00000230 e6e7e8e9eaebecedeeef ..........
 00000240 f0f1f2f3f4f5f6f7f8f9 ..........
 00000250 fafbfcfdfeff         ......
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w1 test00.dat +++Test narrow output on zero length file++++++++++
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w1 test01.dat +++Test narrow output on 1 byte length file++++++++++
 00000000 55 U
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w2 test15.dat +++Test narrow output++++++++++
 00000000 6162 ab
 00000002 6364 cd
@@ -93,6 +102,7 @@
 0000000a 6b6c kl
 0000000c 6d6e mn
 0000000e 6f   o
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w3 test16.dat +++Test narrow output++++++++++
 00000000 616263 abc
 00000003 646566 def
@@ -100,16 +110,19 @@
 00000009 6a6b6c jkl
 0000000c 6d6e6f mno
 0000000f 70     p
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w4 test17.dat +++Test narrow output++++++++++
 00000000 61626364 abcd
 00000004 65666768 efgh
 00000008 696a6b6c ijkl
 0000000c 6d6e6f70 mnop
 00000010 71       q
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w24 test52.dat +++Test wide output++++++++++
 00000000 6162636465666768696a6b6c6d6e6f707172737475767778 abcdefghijklmnopqrstuvwx
 00000018 797a4142434445464748494a4b4c4d4e4f50515253545556 yzABCDEFGHIJKLMNOPQRSTUV
 00000030 5758595a                                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w32 test256.dat +++Test widest output++++++++++
 00000000 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f ................................
 00000020 202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f .!"#$%&'()*+,-./0123456789:;<=>?
@@ -119,6 +132,7 @@
 000000a0 a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf ................................
 000000c0 c0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................................
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -I -A test256.dat +++Test Hex only output++++++++++
 000102030405060708090a0b0c0d0e0f
 101112131415161718191a1b1c1d1e1f
@@ -136,49 +150,57 @@ c0c1c2c3c4c5c6c7c8c9cacbcccdcecf
 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
 e0e1e2e3e4e5e6e7e8e9eaebecedeeef
 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -I test52.dat  +++Test output sans Index++++++++++
 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -H test52.dat  +++Test output sans Hexadecimal++++++++++
 00000000 abcdefghijklmnop
 00000010 qrstuvwxyzABCDEF
 00000020 GHIJKLMNOPQRSTUV
 00000030 WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -A test52.dat  +++Test output sans Ascii++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70
 00000010 7172737475767778797a414243444546
 00000020 4748494a4b4c4d4e4f50515253545556
 00000030 5758595a
-++++++++++ ihad -f invNum test52.dat  +++Test hex byte Field width with invalid number 0 ++++++++++
-
-?? Unable to convert 'invNum' into an integer for option '-f'
+++++++++++ Shell got Return code number 0 ++++++++++
+++++++++++ ihad -f invNum test52.dat  +++Test hex byte Field width with invalid number string++++++++++
+Warning: Unable to convert "invNum" into an integer for option -f, ignoring option -f
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -f "" test52.dat  +++Test hex byte Field width value set to zero length string++++++++++
-Warning: Parameter value for option '-f' contains no information, using default value of 0
+Warning: Parameter value for option -f contains no information, ignoring option -f
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -f -1 test52.dat  +++Test explicit hex byte Field width option limit++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -f 0 test52.dat  +++Test explicit hex byte Field width 0 option++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -f 1 test52.dat  +++Test hex byte Field width 1 option++++++++++
 00000000  61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f 70  abcdefghijklmnop
 00000010  71 72 73 74 75 76 77 78 79 7a 41 42 43 44 45 46  qrstuvwxyzABCDEF
 00000020  47 48 49 4a 4b 4c 4d 4e 4f 50 51 52 53 54 55 56  GHIJKLMNOPQRSTUV
 00000030  57 58 59 5a                                      WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d -f2 test52.dat  +++Test decimal mode with hex byte Field width of 2++++++++++
 00000000  61  62  63  64  65  66  67  68  69  6a   abcdefghij
 00000010  6b  6c  6d  6e  6f  70  71  72  73  74   klmnopqrst
@@ -186,9 +208,11 @@ Warning: Parameter value for option '-f' contains no information, using default 
 00000030  45  46  47  48  49  4a  4b  4c  4d  4e   EFGHIJKLMN
 00000040  4f  50  51  52  53  54  55  56  57  58   OPQRSTUVWX
 00000050  59  5a                                   YZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -f3 test17.dat  +++Test hex byte Field width too large limit++++++++++
 00000000  61  62  63  64  65  66  67  68  69  6a  6b  6c  6d  6e  6f  70   abcdefghijklmnop
 00000010  71                                                               q
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -s test256.dat  +++Test show space characters++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
@@ -206,7 +230,8 @@ Warning: Parameter value for option '-f' contains no information, using default 
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
-++++++++++ ihad -h              +++Test help option++++++++++
+++++++++++ Shell got Return code number 0 ++++++++++
+++++++++++ ihad -h        +++Test help option++++++++++
 
 Useage:
 ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
@@ -241,6 +266,7 @@ od -A x -t x1z -v
 
 ++++++++++ Shell got Return code number 1 ++++++++++
 ++++++++++ ihad -o test.tmp test11.dat test52.dat  +++Test output to a file with 2 input files++++++++++
+++++++++++ Shell got Return code number 0 ++++++++++
 00000000 6162636465666768696a6b           abcdefghijk
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
@@ -251,9 +277,9 @@ od -A x -t x1z -v
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -c oddString test256.dat   +++Test non-Ascii indicator value string being unusual++++++++++
-
-?? Unable to convert 'oddString' into a byte value for option '-c'
+Warning: Unable to convert "oddString" into a byte value for option -c, using default value of '.'
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
 00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
@@ -270,8 +296,9 @@ od -A x -t x1z -v
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -c "" test256.dat   +++Test non-Ascii indicator value string being zero length++++++++++
-Warning: Parameter value for option '-c' contains no information, using default value of '.'
+Warning: Parameter value for option -c contains no information, using default value of '.'
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
 00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
@@ -288,8 +315,9 @@ Warning: Parameter value for option '-c' contains no information, using default 
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -c 13 test256.dat    +++Test non-Ascii indicator being limited to printable chars++++++++++
-Warning: -c C option only allows printable chars, defaulting to '.' char for non-printable
+Warning: -c C option only allows printable chars, defaulting to '.' as non-printable indicator
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
 00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
@@ -306,6 +334,7 @@ Warning: -c C option only allows printable chars, defaulting to '.' char for non
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -c_ test256.dat    +++Test non-Ascii indicator being underscore++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ________________
 00000010 101112131415161718191a1b1c1d1e1f ________________
@@ -323,6 +352,7 @@ Warning: -c C option only allows printable chars, defaulting to '.' char for non
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ________________
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ________________
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ________________
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ Test non-Ascii indicator specified as an octal number 0  to asterisk++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ****************
 00000010 101112131415161718191a1b1c1d1e1f ****************
@@ -340,6 +370,7 @@ Warning: -c C option only allows printable chars, defaulting to '.' char for non
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ****************
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ****************
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ****************
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ Test non-Ascii indicator specified as an octal number 0  to underscore++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ________________
 00000010 101112131415161718191a1b1c1d1e1f ________________
@@ -357,6 +388,7 @@ Warning: -c C option only allows printable chars, defaulting to '.' char for non
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ________________
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ________________
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ________________
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -c 94 test256.dat    +++Test non-Ascii indicator being decimal equivalent to up-arrow++++++++++
 00000000 000102030405060708090a0b0c0d0e0f ^^^^^^^^^^^^^^^^
 00000010 101112131415161718191a1b1c1d1e1f ^^^^^^^^^^^^^^^^
@@ -374,8 +406,9 @@ Warning: -c C option only allows printable chars, defaulting to '.' char for non
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ^^^^^^^^^^^^^^^^
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ^^^^^^^^^^^^^^^^
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ^^^^^^^^^^^^^^^^
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -c 127 test256.dat    +++Test non-Ascii indicator being limited to printable chars++++++++++
-Warning: -c C option only allows printable chars, defaulting to '.' char for non-printable
+Warning: -c C option only allows printable chars, defaulting to '.' as non-printable indicator
 00000000 000102030405060708090a0b0c0d0e0f ................
 00000010 101112131415161718191a1b1c1d1e1f ................
 00000020 202122232425262728292a2b2c2d2e2f .!"#$%&'()*+,-./
@@ -392,30 +425,34 @@ Warning: -c C option only allows printable chars, defaulting to '.' char for non
 000000d0 d0d1d2d3d4d5d6d7d8d9dadbdcdddedf ................
 000000e0 e0e1e2e3e4e5e6e7e8e9eaebecedeeef ................
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -S wierd test52.dat   +++Test column Separator value string being unusual++++++++++
-
-?? Unable to convert 'wierd' into a byte value for option '-S'
+Warning: Unable to convert "wierd" into a byte value for option -S, using default value of ' '
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -S "" test52.dat   +++Test column Separator value string being zero length++++++++++
-Warning: Parameter value for option '-S' contains no information, using default value of ' '
+Warning: Parameter value for option -S contains no information, using default value of ' '
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -S 0 test52.dat   +++Test column Separator value limitation when string is ASCII NUL++++++++++
 Warning: -S NUL option not allowed, defaulting to ' ' char for Column Separator
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -S, test52.dat   +++Test column Separator being a comma++++++++++
 00000000,6162636465666768696a6b6c6d6e6f70,abcdefghijklmnop
 00000010,7172737475767778797a414243444546,qrstuvwxyzABCDEF
 00000020,4748494a4b4c4d4e4f50515253545556,GHIJKLMNOPQRSTUV
 00000030,5758595a,,,,,,,,,,,,,,,,,,,,,,,,,WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ Test column Separator being a horizontal tab specified as backslash t++++++++++
 00000000 30303030303030300936313632363336 00000000.6162636
 00000010 34363536363637363836393661366236 465666768696a6b6
@@ -424,6 +461,7 @@ Warning: -S NUL option not allowed, defaulting to ' ' char for Column Separator
 00000040 30313009373109090909090909090909 010.71..........
 00000050 09090909090909090909090909090909 ................
 00000060 0909090909710a                   .....q.
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ Test column Separator being a carriage return specified as backslash r++++++++++
 00000000 30303030303030300d36313632363336 00000000.6162636
 00000010 34363536363637363836393661366236 465666768696a6b6
@@ -432,11 +470,13 @@ Warning: -S NUL option not allowed, defaulting to ' ' char for Column Separator
 00000040 3031300d37310d0d0d0d0d0d0d0d0d0d 010.71..........
 00000050 0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d ................
 00000060 0d0d0d0d0d710a                   .....q.
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -S : test52.dat    +++Test column Separator being a colon++++++++++
 00000000:6162636465666768696a6b6c6d6e6f70:abcdefghijklmnop
 00000010:7172737475767778797a414243444546:qrstuvwxyzABCDEF
 00000020:4748494a4b4c4d4e4f50515253545556:GHIJKLMNOPQRSTUV
 00000030:5758595a:::::::::::::::::::::::::WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -S \| -s -c " " test256.dat   +++Test column Separator being a vertical bar++++++++++
 00000000|000102030405060708090a0b0c0d0e0f|                
 00000010|101112131415161718191a1b1c1d1e1f|                
@@ -454,6 +494,7 @@ Warning: -S NUL option not allowed, defaulting to ' ' char for Column Separator
 000000d0|d0d1d2d3d4d5d6d7d8d9dadbdcdddedf|                
 000000e0|e0e1e2e3e4e5e6e7e8e9eaebecedeeef|                
 000000f0|f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff|                
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -S \| -s -f1 test256.dat   +++Test column Separator being a vertical bar++++++++++
 00000000||00|01|02|03|04|05|06|07|08|09|0a|0b|0c|0d|0e|0f||................
 00000010||10|11|12|13|14|15|16|17|18|19|1a|1b|1c|1d|1e|1f||................
@@ -471,25 +512,29 @@ Warning: -S NUL option not allowed, defaulting to ' ' char for Column Separator
 000000d0||d0|d1|d2|d3|d4|d5|d6|d7|d8|d9|da|db|dc|dd|de|df||................
 000000e0||e0|e1|e2|e3|e4|e5|e6|e7|e8|e9|ea|eb|ec|ed|ee|ef||................
 000000f0||f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff||................
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -b abc test52.dat    +++Test begin dump value string being invalid as a number++++++++++
-
-?? Unable to convert 'abc' into a long integer for option '-b'
+Warning: Unable to convert "abc" into an integer for option -b, ignoring option -b
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -b "" test52.dat    +++Test begin dump value string being zero length++++++++++
-Warning: Parameter value for option '-b' contains no information, using default value of 0
+Warning: Parameter value for option -b contains no information, ignoring option -b
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -b 26 test52.dat    +++Test begin dump at 26 bytes in from start of file++++++++++
 0000001a 4142434445464748494a4b4c4d4e4f50 ABCDEFGHIJKLMNOP
 0000002a 5152535455565758595a             QRSTUVWXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -b -32 test52.dat    +++Test begin dump at 32 bytes from end of file++++++++++
 00000014 75767778797a4142434445464748494a uvwxyzABCDEFGHIJ
 00000024 4b4c4d4e4f505152535455565758595a KLMNOPQRSTUVWXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d -b -10 -v0 test256.dat test52.dat  +++Test dump of last 10 bytes of two files++++++++++
 File: 'test256.dat' is 256 bytes
 00000246 f6f7f8f9fafbfcfdfeff ..........
@@ -497,6 +542,7 @@ File: 'test256.dat' (10 bytes processed)
 File: 'test52.dat' is 52 bytes
 00000042 5152535455565758595a QRSTUVWXYZ
 File: 'test52.dat' (10 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -I -H -A -v3 test256.dat   +++Test summary only output++++++++++
 File: 'test256.dat' is 256 bytes
 Summary: ASCII: 128 chars in total of which 95 are printable (includes spaces)
@@ -505,6 +551,7 @@ Summary: ASCII: 10 digit, 32 punctuation, 1 space and 33 control chars
 Summary: ASCII: 1 space (SP) and 1 horizontal tab (HT) chars
 Summary: ASCII: 1 carriage return (CR), 1 line feed (LF) and 1 full stop chars
 File: 'test256.dat' (256 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v4 test11.dat   +++Test expanded summary mode output ++++++++++
 File: 'test11.dat' is 11 bytes
 00000000 6162636465666768696a6b           abcdefghijk
@@ -525,6 +572,7 @@ Frequency: 0x6b 107 \153   k   9.1% 1
 Highest:   0x61  97 \141   a   9.1% 1
 Lowest:    0x00   0 \000 NUL   0.0% 0
 File: 'test11.dat' (11 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v5 test11.dat   +++Test expanded summary mode output ++++++++++
 File: 'test11.dat' is 11 bytes
 00000000 6162636465666768696a6b           abcdefghijk
@@ -790,6 +838,7 @@ Frequency: 0xff 255 \377       0.0% 0
 Highest:   0x61  97 \141   a   9.1% 1
 Lowest:    0x00   0 \000 NUL   0.0% 0
 File: 'test11.dat' (11 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -C ASD_Coin_Level2.encoded   +++Test Cryptogram mode++++++++++
 File: 'ASD_Coin_Level2.encoded' is 79 bytes
 .MWNVGRXFOLFHRMVCVXFGRLM..URMWXO
@@ -804,14 +853,17 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 %Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
 File: 'ASD_Coin_Level2.encoded' (79 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v-100 test11.dat  +++Test Verbosity option negetive value limiting++++++++++
 File: 'test11.dat' is 11 bytes
 00000000 6162636465666768696a6b           abcdefghijk
 File: 'test11.dat' (11 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v-1 test11.dat  +++Test Verbosity option small negetive value limiting++++++++++
 File: 'test11.dat' is 11 bytes
 00000000 6162636465666768696a6b           abcdefghijk
 File: 'test11.dat' (11 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v0 test52.dat  +++Test valid Verbosity option value++++++++++
 File: 'test52.dat' is 52 bytes
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
@@ -819,6 +871,7 @@ File: 'test52.dat' is 52 bytes
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
 File: 'test52.dat' (52 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v3 test52.dat  +++Test valid Verbosity option value++++++++++
 File: 'test52.dat' is 52 bytes
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
@@ -831,6 +884,7 @@ Summary: ASCII: 0 digit, 0 punctuation, 0 space and 0 control chars
 Summary: ASCII: 0 space (SP) and 0 horizontal tab (HT) chars
 Summary: ASCII: 0 carriage return (CR), 0 line feed (LF) and 0 full stop chars
 File: 'test52.dat' (52 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v6 test52.dat  +++Test valid Verbosity option value++++++++++
 File: 'test52.dat' is 52 bytes
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
@@ -846,6 +900,7 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 %Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
 Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
 File: 'test52.dat' (52 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v7 test52.dat  +++Test Verbosity option small positive value limiting++++++++++
 File: 'test52.dat' is 52 bytes
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
@@ -861,6 +916,7 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 %Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
 Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
 File: 'test52.dat' (52 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v10 test52.dat  +++Test Verbosity option positive value limiting++++++++++
 File: 'test52.dat' is 52 bytes
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
@@ -876,6 +932,7 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 %Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
 Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
 File: 'test52.dat' (52 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v+100 test52.dat  +++Test Verbosity option large positive value limiting++++++++++
 File: 'test52.dat' is 52 bytes
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
@@ -891,13 +948,15 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 %Frq:  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4 
 Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z 
 File: 'test52.dat' (52 bytes processed)
-++++++++++ ihad -w sansDigits test11.dat  +++Test Width option with invalid number 0 ++++++++++
-
-?? Unable to convert 'sansDigits' into an integer for option '-w'
+++++++++++ Shell got Return code number 0 ++++++++++
+++++++++++ ihad -w sansDigits test11.dat  +++Test Width option with invalid number string++++++++++
+Warning: Unable to convert "sansDigits" into an integer for option -w, ignoring option -w
 00000000 6162636465666768696a6b           abcdefghijk
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w "" test11.dat  +++Test Width option zero length value string++++++++++
-Warning: Parameter value for option '-w' contains no information, using default value of 16
+Warning: Parameter value for option -w contains no information, ignoring option -w
 00000000 6162636465666768696a6b           abcdefghijk
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w -100 test11.dat  +++Test Width option negetive value limiting++++++++++
 00000000 61 a
 00000001 62 b
@@ -910,6 +969,7 @@ Warning: Parameter value for option '-w' contains no information, using default 
 00000008 69 i
 00000009 6a j
 0000000a 6b k
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w -1 test11.dat  +++Test Width option small negetive value limiting++++++++++
 00000000 61 a
 00000001 62 b
@@ -922,6 +982,7 @@ Warning: Parameter value for option '-w' contains no information, using default 
 00000008 69 i
 00000009 6a j
 0000000a 6b k
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w 0 test11.dat  +++Test Width option zero value limiting++++++++++
 00000000 61 a
 00000001 62 b
@@ -934,16 +995,19 @@ Warning: Parameter value for option '-w' contains no information, using default 
 00000008 69 i
 00000009 6a j
 0000000a 6b k
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w 1 -L 4 test52.dat  +++Test valid small Width option value++++++++++
 00000000 61 a
 00000001 62 b
 00000002 63 c
 00000003 64 d
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w 2 -L 4 test52.dat  +++Test valid small Width option value++++++++++
 00000000 6162 ab
 00000002 6364 cd
 00000004 6566 ef
 00000006 6768 gh
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d test52.dat  +++Test implicit Width option value set by decimal option++++++++++
 00000000 6162636465666768696a abcdefghij
 00000010 6b6c6d6e6f7071727374 klmnopqrst
@@ -951,139 +1015,175 @@ Warning: Parameter value for option '-w' contains no information, using default 
 00000030 45464748494a4b4c4d4e EFGHIJKLMN
 00000040 4f505152535455565758 OPQRSTUVWX
 00000050 595a                 YZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w +16 test52.dat  +++Test default Width option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w 32 test52.dat  +++Test valid Width option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f707172737475767778797a414243444546 abcdefghijklmnopqrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f505152535455565758595a                         GHIJKLMNOPQRSTUVWXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -w 100 test52.dat  +++Test Width option large positive value limiting++++++++++
 00000000 6162636465666768696a6b6c6d6e6f707172737475767778797a414243444546 abcdefghijklmnopqrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f505152535455565758595a                         GHIJKLMNOPQRSTUVWXYZ
-++++++++++ ihad -L invalidNum test52.dat  +++Test Lines option with invalid number 0 ++++++++++
-
-?? Unable to convert 'invalidNum' into a long integer for option '-L'
+++++++++++ Shell got Return code number 0 ++++++++++
+++++++++++ ihad -L invalidNum test52.dat  +++Test Lines option with invalid number string++++++++++
+Warning: Unable to convert "invalidNum" into an integer for option -L, ignoring option -L
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -L "" test52.dat  +++Test Lines option zero length value string++++++++++
-Warning: Parameter value for option '-L' contains no information, using default value of 576460752303423487
+Warning: Parameter value for option -L contains no information, ignoring option -L
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -L -100 test52.dat  +++Test Lines option negetive value limiting++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -L -1 test52.dat  +++Test Lines option small negetive value limiting++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -L 0 test52.dat  +++Test Lines option zero value limiting++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -L 1 test52.dat  +++Test valid small Lines option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -L 2 test52.dat  +++Test valid Lines option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -L 3 test52.dat  +++Test valid Lines option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -L 4 test52.dat  +++Test large Lines option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -L +100 test52.dat  +++Test much too large Lines option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-++++++++++ ihad -B nonNumber test52.dat  +++Test Bytes option with invalid number 0 ++++++++++
-
-?? Unable to convert 'nonNumber' into a long integer for option '-B'
+++++++++++ Shell got Return code number 0 ++++++++++
+++++++++++ ihad -B nonNumber test52.dat  +++Test Bytes option with invalid number string++++++++++
+Warning: Unable to convert "nonNumber" into an integer for option -B, ignoring option -B
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B "" test52.dat  +++Test Bytes option zero length value string++++++++++
-Warning: Parameter value for option '-B' contains no information, using default value of 9223372036854775807
+Warning: Parameter value for option -B contains no information, ignoring option -B
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B -50 test52.dat  +++Test Bytes option negetive value limiting++++++++++
 00000000 61                               a
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B -1 test52.dat  +++Test Bytes option small negetive value limiting++++++++++
 00000000 61                               a
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B 0 test52.dat  +++Test Bytes option zero value limiting++++++++++
 00000000 61                               a
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B 1 test52.dat  +++Test valid small Bytes option value++++++++++
 00000000 61                               a
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B 2 test52.dat  +++Test valid small Bytes option value++++++++++
 00000000 6162                             ab
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B 32 test52.dat  +++Test valid Bytes option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B 50 test52.dat  +++Test valid Bytes option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758                             WX
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B +100 test52.dat  +++Test too large Bytes option value++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -b 48 -B 80 -w 20 -d test256.dat  +++Test combination of -b -B -w -d options++++++++++
 00000048 303132333435363738393a3b3c3d3e3f40414243 0123456789:;<=>?@ABC
 00000068 4445464748494a4b4c4d4e4f5051525354555657 DEFGHIJKLMNOPQRSTUVW
 00000088 58595a5b5c5d5e5f606162636465666768696a6b XYZ[\]^_`abcdefghijk
 00000108 6c6d6e6f707172737475767778797a7b7c7d7e7f lmnopqrstuvwxyz{|}~.
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -b 48 -L 4 -w 20 -d test256.dat  +++Test combination of -b -L -w -d options++++++++++
 00000048 303132333435363738393a3b3c3d3e3f40414243 0123456789:;<=>?@ABC
 00000068 4445464748494a4b4c4d4e4f5051525354555657 DEFGHIJKLMNOPQRSTUVW
 00000088 58595a5b5c5d5e5f606162636465666768696a6b XYZ[\]^_`abcdefghijk
 00000108 6c6d6e6f707172737475767778797a7b7c7d7e7f lmnopqrstuvwxyz{|}~.
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v0 -b32 -B96 -w32 test256.dat  +++Test combination of -v -b -B -w options++++++++++
 File: 'test256.dat' is 256 bytes
 00000020 202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f .!"#$%&'()*+,-./0123456789:;<=>?
 00000040 404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
 00000060 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f `abcdefghijklmnopqrstuvwxyz{|}~.
 File: 'test256.dat' (96 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -v0 -b32 -L3 -w32 test256.dat  +++Test combination of -v -b -L -w options++++++++++
 File: 'test256.dat' is 256 bytes
 00000020 202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f .!"#$%&'()*+,-./0123456789:;<=>?
 00000040 404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
 00000060 606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f `abcdefghijklmnopqrstuvwxyz{|}~.
 File: 'test256.dat' (96 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B 48 -L 2 test52.dat  +++Test Lines over-rides Bytes option value to limit output++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -d -B 20 -L 4 test52.dat  +++Test Bytes over-rides Lines option value to limit output++++++++++
 00000000 6162636465666768696a abcdefghij
 00000010 6b6c6d6e6f7071727374 klmnopqrst
+++++++++++ Shell got Return code number 0 ++++++++++
+++++++++++ Test lots of options including Bytes over-rides Lines option value to limit output++++++++++
+++++++++++ Shell got Return code number 0 ++++++++++
+File: 'test256.dat' is 256 bytes
+00000030||1e|1f|20|21|22||~~ !"
+00000035||23|24|25|26|27||#$%&'
+00000040||28|29|2a|2b|2c||()*+,
+00000045||2d|2e|2f|30|31||-./01
+00000050||32|33|34|35|36||23456
+00000055||37|38|39|3a|3b||789:;
+00000060||3c|3d|3e|3f|40||<=>?@
+00000065||41|42|43||||||||ABC
+File: 'test256.dat' (38 bytes processed)
 ++++++++++ ihad -a test16.dat  +++Test non-existant option++++++++++
-
 Warning: command line option '-a' is unrecognised or incomplete and has been ignored
- for help on command line options run 'ihad -h'
+Information: For help on command line options run 'ihad -h'
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 ++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -B -L test52.dat  +++Test missing option values ++++++++++
-
-?? Unable to convert '-L' into a long integer for option '-B'
+Warning: Unable to convert "-L" into an integer for option -B, ignoring option -B
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
 ++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad --begin test52.dat  +++Test non-existant option++++++++++
-
 Warning: command line option '--' is unrecognised or incomplete and has been ignored
- for help on command line options run 'ihad -h'
-
-?? Unable to convert 'egin' into a long integer for option '-b'
+Information: For help on command line options run 'ihad -h'
+Warning: Unable to convert "egin" into an integer for option -b, ignoring option -b
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV

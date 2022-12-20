@@ -2,9 +2,12 @@
 #
 # T S T
 #
+# tst last edited on Tue Dec 20 23:29:57 2022 
+#
 #
 TEN_PLUSS=++++++++++
 #
+# Test if no options mode has any sensitivity to file length
 echo "$TEN_PLUSS ihad test00.dat  +++Zero Length File check${TEN_PLUSS}"
 ../ihad test00.dat
 echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
@@ -27,226 +30,344 @@ echo "$TEN_PLUSS ihad test256.dat  +++256 byte Length File check${TEN_PLUSS}"
 ../ihad test256.dat
 echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
+# Test if decimal mode has any sensitivity to file length
 echo "$TEN_PLUSS ihad -d test00.dat  +++Zero Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test00.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d test01.dat  +++1 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test01.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d test09.dat  +++9 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test09.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d test10.dat  +++10 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test10.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d test11.dat  +++11 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d test52.dat  +++52 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d test256.dat  +++256 byte Length File check in decimal mode${TEN_PLUSS}"
 ../ihad -d test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
+# Test if any sensitivity to width mode / file length
 echo "$TEN_PLUSS ihad -w1 test00.dat +++Test narrow output on zero length file${TEN_PLUSS}"
 ../ihad -w1 test00.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w1 test01.dat +++Test narrow output on 1 byte length file${TEN_PLUSS}"
 ../ihad -w1 test01.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w2 test15.dat +++Test narrow output${TEN_PLUSS}"
 ../ihad -w2 test15.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w3 test16.dat +++Test narrow output${TEN_PLUSS}"
 ../ihad -w3 test16.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w4 test17.dat +++Test narrow output${TEN_PLUSS}"
 ../ihad -w4 test17.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w24 test52.dat +++Test wide output${TEN_PLUSS}"
 ../ihad -w24 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w32 test256.dat +++Test widest output${TEN_PLUSS}"
 ../ihad -w32 test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
+# Test suppression of individual or combinations of output columns
 echo "$TEN_PLUSS ihad -I -A test256.dat +++Test Hex only output${TEN_PLUSS}"
 ../ihad -I -A test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -I test52.dat  +++Test output sans Index${TEN_PLUSS}"
 ../ihad -I test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -H test52.dat  +++Test output sans Hexadecimal${TEN_PLUSS}"
 ../ihad -H test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -A test52.dat  +++Test output sans Ascii${TEN_PLUSS}"
 ../ihad -A test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
-echo "$TEN_PLUSS ihad -f invNum test52.dat  +++Test hex byte Field width with invalid number $? $REN_PLUSSstring${TEN_PLUSS}"
+# Test option -f which allows the space occupied by each Hex byte to be adjusted
+echo "$TEN_PLUSS ihad -f invNum test52.dat  +++Test hex byte Field width with invalid number string${TEN_PLUSS}"
 ../ihad -f invNum test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -f \"\" test52.dat  +++Test hex byte Field width value set to zero length string${TEN_PLUSS}"
 ../ihad -f "" test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -f -1 test52.dat  +++Test explicit hex byte Field width option limit${TEN_PLUSS}"
 ../ihad -f -1 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -f 0 test52.dat  +++Test explicit hex byte Field width 0 option${TEN_PLUSS}"
 ../ihad -f 0 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -f 1 test52.dat  +++Test hex byte Field width 1 option${TEN_PLUSS}"
 ../ihad -f 1 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d -f2 test52.dat  +++Test decimal mode with hex byte Field width of 2${TEN_PLUSS}"
 ../ihad -d -f2 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -f3 test17.dat  +++Test hex byte Field width too large limit${TEN_PLUSS}"
 ../ihad -f3 test17.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
+# Test option -s which allows any space char in the input stream to be shown as a gap in the ascii column
 echo "$TEN_PLUSS ihad -s test256.dat  +++Test show space characters${TEN_PLUSS}"
 ../ihad -s test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
-echo "$TEN_PLUSS ihad -h              +++Test help option${TEN_PLUSS}"
+# Test option -h which outputs help information
+echo "$TEN_PLUSS ihad -h        +++Test help option${TEN_PLUSS}"
 ../ihad -h
 echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
+# Test option -o which outputs to a file instead of stdout
 echo "$TEN_PLUSS ihad -o test.tmp test11.dat test52.dat  +++Test output to a file with 2 input files${TEN_PLUSS}"
 ../ihad -o test.tmp test11.dat test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 cat test.tmp
 rm test.tmp
 #
+# Test input stream through stdin instead of from a file
 echo "$TEN_PLUSS cat test52.dat | ihad    +++Test input provided via a pipe into stdin${TEN_PLUSS}"
 cat test52.dat | ../ihad 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
 # Exercise -c C option substitute for a non-printable or non-ASCII char, instead of default '.'
 echo "$TEN_PLUSS ihad -c oddString test256.dat   +++Test non-Ascii indicator value string being unusual${TEN_PLUSS}"
 ../ihad -c oddString test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -c \"\" test256.dat   +++Test non-Ascii indicator value string being zero length${TEN_PLUSS}"
 ../ihad -c "" test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -c 13 test256.dat    +++Test non-Ascii indicator being limited to printable chars${TEN_PLUSS}"
 ../ihad -c 13 test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -c_ test256.dat    +++Test non-Ascii indicator being underscore${TEN_PLUSS}"
 ../ihad -c_ test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS Test non-Ascii indicator specified as an octal number $? $REN_PLUSSequivalent to asterisk${TEN_PLUSS}"
 ../ihad -c '\052' test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS Test non-Ascii indicator specified as an octal number $? $REN_PLUSSequivalent to underscore${TEN_PLUSS}"
 ../ihad -c '\137' test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -c 94 test256.dat    +++Test non-Ascii indicator being decimal equivalent to up-arrow${TEN_PLUSS}"
 ../ihad -c 94 test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -c 127 test256.dat    +++Test non-Ascii indicator being limited to printable chars${TEN_PLUSS}"
 ../ihad -c 127 test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
 # Exercise -S C option substitute for column Separator char, instead of default ' '
 echo "$TEN_PLUSS ihad -S wierd test52.dat   +++Test column Separator value string being unusual${TEN_PLUSS}"
 ../ihad -S wierd test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -S \"\" test52.dat   +++Test column Separator value string being zero length${TEN_PLUSS}"
 ../ihad -S "" test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -S 0 test52.dat   +++Test column Separator value limitation when string is ASCII NUL${TEN_PLUSS}"
 ../ihad -S '\0' test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -S, test52.dat   +++Test column Separator being a comma${TEN_PLUSS}"
 ../ihad -S, test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS Test column Separator being a horizontal tab specified as backslash t${TEN_PLUSS}"
 ../ihad -S '\t' test17.dat | ../ihad
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS Test column Separator being a carriage return specified as backslash r${TEN_PLUSS}"
 ../ihad -S '\r' test17.dat | ../ihad
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -S : test52.dat    +++Test column Separator being a colon${TEN_PLUSS}"
 ../ihad -S : test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -S \| -s -c \" \" test256.dat   +++Test column Separator being a vertical bar${TEN_PLUSS}"
 ../ihad -S \| -s -c " " test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -S \| -s -f1 test256.dat   +++Test column Separator being a vertical bar${TEN_PLUSS}"
 ../ihad -S \| -s -f1 test256.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
+# Exercise -b begin dump of a file at an offset from the start or end
 echo "$TEN_PLUSS ihad -b abc test52.dat    +++Test begin dump value string being invalid as a number${TEN_PLUSS}"
 ../ihad -b abc test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -b \"\" test52.dat    +++Test begin dump value string being zero length${TEN_PLUSS}"
 ../ihad -b "" test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -b 26 test52.dat    +++Test begin dump at 26 bytes in from start of file${TEN_PLUSS}"
 ../ihad -b 26 test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -b -32 test52.dat    +++Test begin dump at 32 bytes from end of file${TEN_PLUSS}"
 ../ihad -b -32 test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d -b -10 -v0 test256.dat test52.dat  +++Test dump of last 10 bytes of two files${TEN_PLUSS}"
 ../ihad -d -b -10 -v0 test256.dat test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
+# Exercise -v verbosity level option
 echo "$TEN_PLUSS ihad -I -H -A -v3 test256.dat   +++Test summary only output${TEN_PLUSS}"
 ../ihad -I -H -A -v3 test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v4 test11.dat   +++Test expanded summary mode output ${TEN_PLUSS}"
 ../ihad -v4 test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v5 test11.dat   +++Test expanded summary mode output ${TEN_PLUSS}"
 ../ihad -v5 test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -C ASD_Coin_Level2.encoded   +++Test Cryptogram mode${TEN_PLUSS}"
 ../ihad -C ASD_Coin_Level2.encoded
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v-100 test11.dat  +++Test Verbosity option negetive value limiting${TEN_PLUSS}"
 ../ihad -v-100 test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v-1 test11.dat  +++Test Verbosity option small negetive value limiting${TEN_PLUSS}"
 ../ihad -v-1 test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v0 test52.dat  +++Test valid Verbosity option value${TEN_PLUSS}"
 ../ihad -v0 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v3 test52.dat  +++Test valid Verbosity option value${TEN_PLUSS}"
 ../ihad -v3 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v6 test52.dat  +++Test valid Verbosity option value${TEN_PLUSS}"
 ../ihad -v6 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v7 test52.dat  +++Test Verbosity option small positive value limiting${TEN_PLUSS}"
 ../ihad -v7 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v10 test52.dat  +++Test Verbosity option positive value limiting${TEN_PLUSS}"
 ../ihad -v10 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v+100 test52.dat  +++Test Verbosity option large positive value limiting${TEN_PLUSS}"
 ../ihad -v+100 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
-echo "$TEN_PLUSS ihad -w sansDigits test11.dat  +++Test Width option with invalid number $? $REN_PLUSSstring${TEN_PLUSS}"
+# Exercise -w ( and possibly -d) width of hex column in bytes option
+echo "$TEN_PLUSS ihad -w sansDigits test11.dat  +++Test Width option with invalid number string${TEN_PLUSS}"
 ../ihad -w sansDigits test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w \"\" test11.dat  +++Test Width option zero length value string${TEN_PLUSS}"
 ../ihad -w "" test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w -100 test11.dat  +++Test Width option negetive value limiting${TEN_PLUSS}"
 ../ihad -w -100 test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w -1 test11.dat  +++Test Width option small negetive value limiting${TEN_PLUSS}"
 ../ihad -w -1 test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w 0 test11.dat  +++Test Width option zero value limiting${TEN_PLUSS}"
 ../ihad -w 0 test11.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w 1 -L 4 test52.dat  +++Test valid small Width option value${TEN_PLUSS}"
 ../ihad -w 1 -L 4 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w 2 -L 4 test52.dat  +++Test valid small Width option value${TEN_PLUSS}"
 ../ihad -w 2 -L 4 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d test52.dat  +++Test implicit Width option value set by decimal option${TEN_PLUSS}"
 ../ihad -d test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w +16 test52.dat  +++Test default Width option value${TEN_PLUSS}"
 ../ihad -w +16 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w 32 test52.dat  +++Test valid Width option value${TEN_PLUSS}"
 ../ihad -w 32 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -w 100 test52.dat  +++Test Width option large positive value limiting${TEN_PLUSS}"
 ../ihad -w 100 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
-echo "$TEN_PLUSS ihad -L invalidNum test52.dat  +++Test Lines option with invalid number $? $REN_PLUSSstring${TEN_PLUSS}"
+# Exercise -L max lines to output option
+echo "$TEN_PLUSS ihad -L invalidNum test52.dat  +++Test Lines option with invalid number string${TEN_PLUSS}"
 ../ihad -L invalidNum test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -L \"\" test52.dat  +++Test Lines option zero length value string${TEN_PLUSS}"
 ../ihad -L "" test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -L -100 test52.dat  +++Test Lines option negetive value limiting${TEN_PLUSS}"
 ../ihad -L -100 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -L -1 test52.dat  +++Test Lines option small negetive value limiting${TEN_PLUSS}"
 ../ihad -L -1 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -L 0 test52.dat  +++Test Lines option zero value limiting${TEN_PLUSS}"
 ../ihad -L 0 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -L 1 test52.dat  +++Test valid small Lines option value${TEN_PLUSS}"
 ../ihad -L 1 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -L 2 test52.dat  +++Test valid Lines option value${TEN_PLUSS}"
 ../ihad -L 2 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -L 3 test52.dat  +++Test valid Lines option value${TEN_PLUSS}"
 ../ihad -L 3 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -L 4 test52.dat  +++Test large Lines option value${TEN_PLUSS}"
 ../ihad -L 4 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -L +100 test52.dat  +++Test much too large Lines option value${TEN_PLUSS}"
 ../ihad -L +100 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
-echo "$TEN_PLUSS ihad -B nonNumber test52.dat  +++Test Bytes option with invalid number $? $REN_PLUSSstring${TEN_PLUSS}"
+# Exercise -B max bytes to output option
+echo "$TEN_PLUSS ihad -B nonNumber test52.dat  +++Test Bytes option with invalid number string${TEN_PLUSS}"
 ../ihad -B nonNumber test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B \"\" test52.dat  +++Test Bytes option zero length value string${TEN_PLUSS}"
 ../ihad -B "" test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B -50 test52.dat  +++Test Bytes option negetive value limiting${TEN_PLUSS}"
 ../ihad -B -50 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B -1 test52.dat  +++Test Bytes option small negetive value limiting${TEN_PLUSS}"
 ../ihad -B -1 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B 0 test52.dat  +++Test Bytes option zero value limiting${TEN_PLUSS}"
 ../ihad -B 0 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B 1 test52.dat  +++Test valid small Bytes option value${TEN_PLUSS}"
 ../ihad -B 1 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B 2 test52.dat  +++Test valid small Bytes option value${TEN_PLUSS}"
 ../ihad -B 2 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B 32 test52.dat  +++Test valid Bytes option value${TEN_PLUSS}"
 ../ihad -B 32 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B 50 test52.dat  +++Test valid Bytes option value${TEN_PLUSS}"
 ../ihad -B 50 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B +100 test52.dat  +++Test too large Bytes option value${TEN_PLUSS}"
 ../ihad -B +100 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
+# Exercise combinations of options
 echo "$TEN_PLUSS ihad -b 48 -B 80 -w 20 -d test256.dat  +++Test combination of -b -B -w -d options${TEN_PLUSS}"
 ../ihad -b 48 -B 80 -w 20 -d test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -b 48 -L 4 -w 20 -d test256.dat  +++Test combination of -b -L -w -d options${TEN_PLUSS}"
 ../ihad -b 48 -L 4 -w 20 -d test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v0 -b32 -B96 -w32 test256.dat  +++Test combination of -v -b -B -w options${TEN_PLUSS}"
 ../ihad -v0 -b32 -B96 -w32 test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v0 -b32 -L3 -w32 test256.dat  +++Test combination of -v -b -L -w options${TEN_PLUSS}"
 ../ihad -v0 -b32 -L3 -w32 test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B 48 -L 2 test52.dat  +++Test Lines over-rides Bytes option value to limit output${TEN_PLUSS}"
 ../ihad -B 48 -L 2 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d -B 20 -L 4 test52.dat  +++Test Bytes over-rides Lines option value to limit output${TEN_PLUSS}"
 ../ihad -d -B 20 -L 4 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Test lots of options including Bytes over-rides Lines option value to limit output${TEN_PLUSS}"
+../ihad -B 38 -L 8 -f 1 -d -b 30 -c '~' -s -w 5 -S '|' -v0 -o test.tmp test256.dat
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+cat test.tmp
+rm test.tmp
 #
 # Test invalid or dodgy options
 echo "$TEN_PLUSS ihad -a test16.dat  +++Test non-existant option${TEN_PLUSS}"
