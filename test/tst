@@ -2,7 +2,7 @@
 #
 # T S T
 #
-# tst last edited on Tue Dec 20 23:29:57 2022 
+# tst last edited on Wed Dec 21 23:02:27 2022 
 #
 #
 TEN_PLUSS=++++++++++
@@ -10,25 +10,25 @@ TEN_PLUSS=++++++++++
 # Test if no options mode has any sensitivity to file length
 echo "$TEN_PLUSS ihad test00.dat  +++Zero Length File check${TEN_PLUSS}"
 ../ihad test00.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Zero Length File check$TEN_PLUSS"
 echo "$TEN_PLUSS ihad test01.dat  +++1 byte Length File check${TEN_PLUSS}"
 ../ihad test01.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for 1 byte Length File check$TEN_PLUSS"
 echo "$TEN_PLUSS ihad test15.dat  +++15 byte Length File check${TEN_PLUSS}"
 ../ihad test15.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for 15 byte Length File check$TEN_PLUSS"
 echo "$TEN_PLUSS ihad test16.dat  +++16 byte Length File check${TEN_PLUSS}"
 ../ihad test16.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for 16 byte Length File check$TEN_PLUSS"
 echo "$TEN_PLUSS ihad test17.dat  +++17 byte Length File check${TEN_PLUSS}"
 ../ihad test17.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for 17 byte Length File check$TEN_PLUSS"
 echo "$TEN_PLUSS ihad test52.dat  +++52 byte Length File check${TEN_PLUSS}"
 ../ihad test52.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for 52 byte Length File check$TEN_PLUSS"
 echo "$TEN_PLUSS ihad test256.dat  +++256 byte Length File check${TEN_PLUSS}"
 ../ihad test256.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for 256 byte Length File check$TEN_PLUSS"
 #
 # Test if decimal mode has any sensitivity to file length
 echo "$TEN_PLUSS ihad -d test00.dat  +++Zero Length File check in decimal mode${TEN_PLUSS}"
@@ -124,9 +124,17 @@ echo "$TEN_PLUSS ihad -h        +++Test help option${TEN_PLUSS}"
 echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
 # Test option -o which outputs to a file instead of stdout
-echo "$TEN_PLUSS ihad -o test.tmp test11.dat test52.dat  +++Test output to a file with 2 input files${TEN_PLUSS}"
-../ihad -o test.tmp test11.dat test52.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS ihad -o \"\" test52.dat  +++Test output to a file, but with no filename specified${TEN_PLUSS}"
+../ihad -o "" test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test output to a file, but with no filename specified$TEN_PLUSS"
+echo "$TEN_PLUSS ihad -o test.tmp test52.dat  +++Test output to a file with 1 input files${TEN_PLUSS}"
+../ihad -o test.tmp test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test output to a file with 1 input files$TEN_PLUSS"
+cat test.tmp
+rm test.tmp
+echo "$TEN_PLUSS ihad -v0 -o test.tmp +++Test output to a file with multiple input files${TEN_PLUSS}"
+../ihad -v0 -o test.tmp test1*.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test output to a file with multiple input files$TEN_PLUSS"
 cat test.tmp
 rm test.tmp
 #
@@ -347,39 +355,42 @@ echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 # Exercise combinations of options
 echo "$TEN_PLUSS ihad -b 48 -B 80 -w 20 -d test256.dat  +++Test combination of -b -B -w -d options${TEN_PLUSS}"
 ../ihad -b 48 -B 80 -w 20 -d test256.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test combination of -b -B -w -d options$TEN_PLUSS"
 echo "$TEN_PLUSS ihad -b 48 -L 4 -w 20 -d test256.dat  +++Test combination of -b -L -w -d options${TEN_PLUSS}"
 ../ihad -b 48 -L 4 -w 20 -d test256.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test combination of -b -L -w -d options$TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v0 -b32 -B96 -w32 test256.dat  +++Test combination of -v -b -B -w options${TEN_PLUSS}"
 ../ihad -v0 -b32 -B96 -w32 test256.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test combination of -v -b -B -w options$TEN_PLUSS"
 echo "$TEN_PLUSS ihad -v0 -b32 -L3 -w32 test256.dat  +++Test combination of -v -b -L -w options${TEN_PLUSS}"
 ../ihad -v0 -b32 -L3 -w32 test256.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test combination of -v -b -L -w options$TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B 48 -L 2 test52.dat  +++Test Lines over-rides Bytes option value to limit output${TEN_PLUSS}"
 ../ihad -B 48 -L 2 test52.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test Lines over-rides Bytes$TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d -B 20 -L 4 test52.dat  +++Test Bytes over-rides Lines option value to limit output${TEN_PLUSS}"
 ../ihad -d -B 20 -L 4 test52.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test Bytes over-rides Lines$TEN_PLUSS"
 echo "$TEN_PLUSS Test lots of options including Bytes over-rides Lines option value to limit output${TEN_PLUSS}"
 ../ihad -B 38 -L 8 -f 1 -d -b 30 -c '~' -s -w 5 -S '|' -v0 -o test.tmp test256.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test lots of options$TEN_PLUSS"
 cat test.tmp
 rm test.tmp
 #
 # Test invalid or dodgy options
 echo "$TEN_PLUSS ihad -a test16.dat  +++Test non-existant option${TEN_PLUSS}"
 ../ihad -a test16.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
-echo "$TEN_PLUSS ihad -B -L test52.dat  +++Test missing option values ${TEN_PLUSS}"
+echo "$TEN_PLUSS Shell got Return code number $? for Test non-existant option$TEN_PLUSS"
+echo "$TEN_PLUSS ihad -B -L test52.dat  +++Test missing option values${TEN_PLUSS}"
 ../ihad -B -L test52.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test missing option values$TEN_PLUSS"
 echo "$TEN_PLUSS ihad --begin test52.dat  +++Test non-existant option${TEN_PLUSS}"
 ../ihad --begin test52.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test non-existant option$TEN_PLUSS"
 echo "$TEN_PLUSS ihad -IHAv6 test52.dat  +++Test concatenated option${TEN_PLUSS}"
 ../ihad -IHAv6 test52.dat
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for Test concatenated option$TEN_PLUSS"
+echo "$TEN_PLUSS ihad nonExistantFile.dat  +++Test non-existant file handling${TEN_PLUSS}"
+../ihad nonExistantFile.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test non-existant file handling$TEN_PLUSS"
 

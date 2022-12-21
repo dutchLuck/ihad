@@ -3,7 +3,7 @@
  *
  * Support code for Index Hex Ascii Dump (ihad.c)
  *
- * byteFreq.c last edited on Tue Dec 20 23:26:49 2022 
+ * byteFreq.c last edited on Wed Dec 21 22:59:26 2022 
  *
  * This code is released under the MIT license
  *
@@ -16,6 +16,11 @@
 
 /*
  * $Log: byteFreq.c,v $
+ * Revision 0.11  2022/12/21 11:59:55  owen
+ * Note version 0.1.0 going to beta.
+ *
+ * Release Version 0.1.0-beta
+ *
  * Revision 0.10  2022/12/20 12:26:56  owen
  * Ensured Warning: replaced ?? or ? at start of warning messages.
  *
@@ -55,7 +60,7 @@
 #include <limits.h>	/* LONG_MIN LONG_MAX */
 #include <stdlib.h>	/* qsort() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.10 2022/12/20 12:26:56 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: byteFreq.c,v 0.11 2022/12/21 11:59:55 owen Exp owen $"
 
 #define  BYTE_MASK 0xff
 

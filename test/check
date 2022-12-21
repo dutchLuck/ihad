@@ -7,7 +7,8 @@ echo 1. Test predefine data file dumps against known correct results
 #
 rm -f tstResults
 #
-./tst > tstResults
+# redirect both stdout and stderr output to tstResults file
+./tst > tstResults 2>&1
 diff -s tstResults correctResults
 #
 #

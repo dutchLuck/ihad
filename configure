@@ -45,7 +45,7 @@ echo -e "\tcd test; ./chk" >> $OP_FILE_NAME
 echo "" >> $OP_FILE_NAME
 #
 echo "clean:" >> $OP_FILE_NAME
-echo -e "\trm -f $TRGT $OBJ1 $OBJ2" >> $OP_FILE_NAME
+echo -e "\trm -f $TRGT $TRGT.exe *.o" >> $OP_FILE_NAME
 echo "" >> $OP_FILE_NAME
 #
 echo "debug: clean" >> $OP_FILE_NAME

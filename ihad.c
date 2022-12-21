@@ -61,6 +61,11 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.37  2022/12/21 11:57:00  owen
+ * Improved return code handling.
+ *
+ * Release Version 0.1.0-beta
+ *
  * Revision 0.36  2022/12/20 12:21:56  owen
  * Removed unused code, ensured double quotes on strings, ensured Warning: replaced ??
  *
@@ -189,7 +194,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.36 2022/12/20 12:21:56 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.37 2022/12/21 11:57:00 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
@@ -848,6 +853,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
 
 int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
   int  result;
+  int  returnVal;	/* this code returns 0 for success */
   long  byteCnt;
   FILE *  fp;
   long  fileSize;
@@ -857,21 +863,22 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
   if( D_Flg )
     fprintf( ofp, "Debug: Executing: processA_SingleCommandLineParameter( %s )\n", nameStrng );
 #endif
+  returnVal = 0;
 /* Keep beginOffset global variable safe from modification in case there are multiple files */
   fileOffset = beginOffset;
 /* Open the file for reading (in binary mode) */
-  result = (( fp = fopen( nameStrng, "rb" ) ) != NULL );
-  if( ! result )  {
-    fprintf( stderr, "Warning: Unable to open a file named '%s' for reading\n", nameStrng );
-    perror( "processA_SingleCommandLineParameter()" );
+  returnVal = (( fp = fopen( nameStrng, "rb" ) ) == NULL );
+  if( returnVal )  {
+    fprintf( ofp, "Warning: Unable to open a file named '%s' for reading\n", nameStrng );
+    perror( nameStrng );
   }
   else  {	/* Begin file opened ok block */
  /* obtain file size for the file that was just opened */
     result = fseek( fp, 0L, SEEK_END );
     if( result != 0 )  {
       fileSize = LONG_MIN;
-      fprintf( stderr, "Warning: Unable to determine file size by seeking to the end of the file named '%s'\n", nameStrng );
-      perror( "processA_SingleCommandLineParameter()" );
+      fprintf( ofp, "Warning: Unable to determine file size by seeking to the end of the file named '%s'\n", nameStrng );
+      perror( nameStrng );
    /* If there was a problem with the seek make sure it starts at 0 */
       rewind( fp );
       fileOffset = 0L;
@@ -921,23 +928,24 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
  /* Process the file opened near the start of this block of code */
     byteCnt = readByteStreamAndPrintIndexHexAscii( fp, ofp, fileOffset );
  /* Close the file just processed */
-    result = ( fclose( fp ) == 0 );
-    if( ! result )  {
-      fprintf( stderr, "Warning: Unable to close the file named '%s'\n", nameStrng );
-      perror( "processA_SingleCommandLineParameter()" );
+    result = ( fclose( fp ) != 0 );
+    if( result )  {
+      fprintf( ofp, "Warning: Unable to close the file named '%s'\n", nameStrng );
+      perror( nameStrng );
     }
+    returnVal += result;	/* increment returnVal if fclose() on input file failed */
     if( D_Flg || vFlg )
       fprintf( ofp, "File: '%s' (%ld bytes processed)\n", nameStrng, byteCnt );
   }	/* End of file opened ok block */
-  return( result );
+  return( returnVal );
 }
 
 
 int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char *  cmdLnStrngs[] )  {
+  int  returnVal;	/* returnVal is incremented for each error */
   int  result, indx;
   int  chrCnt;
 
-  result = 0;
 #ifdef DEBUG
   if( D_Flg )  {
     printf( "Debug: Executing: processNonSwitchCommandLineParameters()\n" );
@@ -946,14 +954,15 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
       printf( "Debug: cmdLnStrngs[ %d ] string is \"%s\"\n", indx, cmdLnStrngs[ indx ] );
   }
 #endif
-  if(( oFlg ) && ( oStrng == ( char * ) NULL ))
+  returnVal = (( oFlg ) && (( oStrng == ( char * ) NULL ) || ( *oStrng == '\0' )));
+  if( returnVal )
     fprintf( stderr, "Warning: -o specified, but no output file name specified - aborting\n" );
   else  {
   /* Attempt to open the output file if required */
-    result = ( oFlg ) ? (( ofp = fopen( oStrng, "w" )) != NULL ) : 1;
-    if( ! result )  {
-      fprintf( stderr, "Warning: Unable to open a file named \"%s\" for writing output\n", oStrng );
-      perror( "processNonSwitchCommandLineParameters" );
+    returnVal = ( oFlg ) ? (( ofp = fopen( oStrng, "w" )) == NULL ) : 0;
+    if( returnVal )  {
+      printf( "Warning: Unable to open a file named \"%s\" for writing output- aborting\n", oStrng );
+      if( D_Flg )  perror( oStrng );
     }
     else  {
       if(( lstIndx + 1 ) == frstIndx )  {
@@ -965,18 +974,22 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
         if( D_Flg )
           printf( "Debug: Largest file size that can be safely handled is %ld bytes\n", LONG_MAX );
      /* Process each file specified in the command line */
-        for( indx = frstIndx; indx <= lstIndx; indx++ )
+        for( indx = frstIndx; indx <= lstIndx; indx++ )  {
           result = processA_SingleCommandLineParameter( ofp, cmdLnStrngs[ indx ] );
+          returnVal += result;	/* Count the unsuccessful results */
+          if( D_Flg )  printf( "Debug: result %d, returnVal %d\n", result, returnVal );
+        }
       }
-   /* Close output file specified in the command line */
-      result = ( oFlg ) ? (fclose( ofp ) == 0) : 1;
-      if( ! result )  {
+   /* Close output file specified in the command line, if there was one */
+      result = ( oFlg ) ? (fclose( ofp ) != 0) : 0;
+      if( result )  {
         fprintf( stderr, "Warning: Attempt to close the output file named \"%s\" failed\n", oStrng );
-        perror( "processNonSwitchCommandLineParameters" );
+        if( D_Flg )  perror( oStrng );
       }
+      returnVal += result;	/* Count any unsuccessful fclose() on output file */
     }
   }
-  return( result );
+  return( returnVal );
 }
 
 
@@ -1017,6 +1030,6 @@ int  main( int  argc, char *  argv[] )  {
 #endif
   
 /* Attempt to dump Index, Hex and Ascii and return 0 if successful */
-  return( ! processNonSwitchCommandLineParameters( resultIndex, argc - 1, argv ));
+  return( processNonSwitchCommandLineParameters( resultIndex, argc - 1, argv ));
 }
 
