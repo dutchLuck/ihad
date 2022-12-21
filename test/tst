@@ -127,9 +127,9 @@ echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -o \"\" test52.dat  +++Test output to a file, but with no filename specified${TEN_PLUSS}"
 ../ihad -o "" test52.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test output to a file, but with no filename specified$TEN_PLUSS"
-echo "$TEN_PLUSS ihad -o readOnlyFile.dat test52.dat  +++Test output to a read-only file${TEN_PLUSS}"
-../ihad -o readOnlyFile.dat test52.dat
-echo "$TEN_PLUSS Shell got Return code number $? for Test output to a read-only file$TEN_PLUSS"
+#echo "$TEN_PLUSS ihad -o readOnlyFile.dat test52.dat  +++Test output to a read-only file${TEN_PLUSS}"
+#../ihad -o readOnlyFile.dat test52.dat
+#echo "$TEN_PLUSS Shell got Return code number $? for Test output to a read-only file$TEN_PLUSS"
 echo "$TEN_PLUSS ihad -o test.tmp test52.dat  +++Test output to a file with 1 input files${TEN_PLUSS}"
 ../ihad -o test.tmp test52.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test output to a file with 1 input files$TEN_PLUSS"

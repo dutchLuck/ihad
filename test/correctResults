@@ -268,9 +268,6 @@ od -A x -t x1z -v
 ++++++++++ ihad -o "" test52.dat  +++Test output to a file, but with no filename specified++++++++++
 Warning: -o specified, but no output file name specified - aborting
 ++++++++++ Shell got Return code number 1 for Test output to a file, but with no filename specified++++++++++
-++++++++++ ihad -o readOnlyFile.dat test52.dat  +++Test output to a read-only file++++++++++
-Warning: Unable to open a file named "readOnlyFile.dat" for writing output- aborting
-++++++++++ Shell got Return code number 1 for Test output to a read-only file++++++++++
 ++++++++++ ihad -o test.tmp test52.dat  +++Test output to a file with 1 input files++++++++++
 ++++++++++ Shell got Return code number 0 for Test output to a file with 1 input files++++++++++
 00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
