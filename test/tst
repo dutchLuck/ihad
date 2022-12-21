@@ -2,7 +2,7 @@
 #
 # T S T
 #
-# tst last edited on Wed Dec 21 23:02:27 2022 
+# tst last edited on Wed Dec 21 23:22:24 2022 
 #
 #
 TEN_PLUSS=++++++++++
@@ -127,6 +127,9 @@ echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -o \"\" test52.dat  +++Test output to a file, but with no filename specified${TEN_PLUSS}"
 ../ihad -o "" test52.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test output to a file, but with no filename specified$TEN_PLUSS"
+echo "$TEN_PLUSS ihad -o readOnlyFile.dat test52.dat  +++Test output to a read-only file${TEN_PLUSS}"
+../ihad -o readOnlyFile.dat test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test output to a read-only file$TEN_PLUSS"
 echo "$TEN_PLUSS ihad -o test.tmp test52.dat  +++Test output to a file with 1 input files${TEN_PLUSS}"
 ../ihad -o test.tmp test52.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test output to a file with 1 input files$TEN_PLUSS"
@@ -376,6 +379,9 @@ echo "$TEN_PLUSS Test lots of options including Bytes over-rides Lines option va
 echo "$TEN_PLUSS Shell got Return code number $? for Test lots of options$TEN_PLUSS"
 cat test.tmp
 rm test.tmp
+echo "$TEN_PLUSS ihad -IHAv6 test52.dat  +++Test concatenated option${TEN_PLUSS}"
+../ihad -IHAv6 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test concatenated option$TEN_PLUSS"
 #
 # Test invalid or dodgy options
 echo "$TEN_PLUSS ihad -a test16.dat  +++Test non-existant option${TEN_PLUSS}"
@@ -387,9 +393,6 @@ echo "$TEN_PLUSS Shell got Return code number $? for Test missing option values$
 echo "$TEN_PLUSS ihad --begin test52.dat  +++Test non-existant option${TEN_PLUSS}"
 ../ihad --begin test52.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test non-existant option$TEN_PLUSS"
-echo "$TEN_PLUSS ihad -IHAv6 test52.dat  +++Test concatenated option${TEN_PLUSS}"
-../ihad -IHAv6 test52.dat
-echo "$TEN_PLUSS Shell got Return code number $? for Test concatenated option$TEN_PLUSS"
 echo "$TEN_PLUSS ihad nonExistantFile.dat  +++Test non-existant file handling${TEN_PLUSS}"
 ../ihad nonExistantFile.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test non-existant file handling$TEN_PLUSS"
