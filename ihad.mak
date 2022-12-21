@@ -1,1 +1,1 @@
-/home/owen/src/c/ihad/Makefile
+./Makefile
