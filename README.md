@@ -194,6 +194,7 @@ hexdump -C
 od -A x -t x1z -v
 
 ```
+The ihad utility exits with 0 on success and greater than zero if an error occurs.
 
 If displaying the full stop or period character at the end of ASCII sentences is
 important then the -c C option enables the choice of a different indicator of non-ASCII
