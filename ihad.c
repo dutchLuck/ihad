@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Tue Dec 20 23:21:48 2022 
+ * ihad.c last edited on Fri Dec 23 23:15:48 2022 
  *
  * Industry standard dump alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -61,6 +61,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.38  2022/12/23 12:17:58  owen
+ * Ensured all string quotes are double quote delimited.
+ *
  * Revision 0.37  2022/12/21 11:57:00  owen
  * Improved return code handling.
  *
@@ -194,7 +197,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.37 2022/12/21 11:57:00 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.38 2022/12/23 12:17:58 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
@@ -491,8 +494,8 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
       case 'v' :  vFlg = TRUE; vStrng = optarg; break;
       case 'w' :  wFlg = TRUE; wStrng = optarg; break;
       default :
-        printf( "Warning: command line option '-%c' is unrecognised or incomplete and has been ignored\n", optopt );
-        printf( "Information: For help on command line options run '%s -h'\n", exeName );
+        printf( "Warning: command line option -%c is unrecognised or incomplete and has been ignored\n", optopt );
+        printf( "Information: For help on command line options run \"%s -h\"\n", exeName );
         break;
     }
   }
@@ -619,7 +622,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 #endif
   }
   if( S_Flg && D_Flg )
-    printf( "Debug: Column separator is '%c' (1st part of option -S is '%s')\n", *S_ColumnChar, S_Strng );
+    printf( "Debug: Column separator is '%c' (1st part of option -S is \"%s\")\n", *S_ColumnChar, S_Strng );
 /* Note that the Column Separator may not be '\0' i.e. ASCII NUL as it is also the end of string delimiter in C code */
   if( *S_ColumnChar == '\0' )  {
     *S_ColumnChar = DEFAULT_COLUMN_SEPARATOR_CHAR;	/* Reset Column Separator to the default space char */
@@ -738,7 +741,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
   else  {
 #ifdef DEBUG
     if( D_Flg )  {
-      fprintf( ofp, "Debug: hexFldWdth is %d and hexFldFrmt is '%s'\n", hexFldWdth, hexFldFrmt ); 
+      fprintf( ofp, "Debug: hexFldWdth is %d and hexFldFrmt is \"%s\"\n", hexFldWdth, hexFldFrmt ); 
       fprintf( ofp, "Debug: Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
       fprintf( ofp, "Debug: Capacity of output string is %d characters\n", outputStringSize );
     }
@@ -869,7 +872,7 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
 /* Open the file for reading (in binary mode) */
   returnVal = (( fp = fopen( nameStrng, "rb" ) ) == NULL );
   if( returnVal )  {
-    fprintf( ofp, "Warning: Unable to open a file named '%s' for reading\n", nameStrng );
+    fprintf( ofp, "Warning: Unable to open a file named \"%s\" for reading\n", nameStrng );
     perror( nameStrng );
   }
   else  {	/* Begin file opened ok block */
@@ -877,7 +880,7 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
     result = fseek( fp, 0L, SEEK_END );
     if( result != 0 )  {
       fileSize = LONG_MIN;
-      fprintf( ofp, "Warning: Unable to determine file size by seeking to the end of the file named '%s'\n", nameStrng );
+      fprintf( ofp, "Warning: Unable to determine file size by seeking to the end of the file named \"%s\"\n", nameStrng );
       perror( nameStrng );
    /* If there was a problem with the seek make sure it starts at 0 */
       rewind( fp );
@@ -887,16 +890,16 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
       fileSize = ( long ) ftell( fp );
    /* Ensure file is reset back to starting at 0 */
       rewind( fp );
-      if( vFlg )  fprintf( ofp, "File: '%s' is %ld bytes\n", nameStrng, fileSize );
+      if( vFlg )  fprintf( ofp, "File: \"%s\" is %ld bytes\n", nameStrng, fileSize );
       if( fileSize == 0L )  {	/* Is there any bytes in the file to process? */
-        if( vFlg )  fprintf( ofp, "Warning: There are no bytes to dump in '%s'\n", nameStrng );
+        if( vFlg )  fprintf( ofp, "Warning: There are no bytes to dump in \"%s\"\n", nameStrng );
       }
       else if( fileSize < 0L )  {
-        fprintf( ofp, "Warning: There are less than zero (%ld) bytes to dump in '%s' - trying anyway\n", fileSize, nameStrng );
+        fprintf( ofp, "Warning: There are less than zero (%ld) bytes to dump in \"%s\" - trying anyway\n", fileSize, nameStrng );
       }
       else  {	/* Begin file size greater than zero block, so process the file */
         if( D_Flg )
-          fprintf( ofp, "Debug: The size of %s is %ld bytes\n", nameStrng, fileSize );
+          fprintf( ofp, "Debug: The size of \"%s\" is %ld bytes\n", nameStrng, fileSize );
      /* If begin option has been set then seek to the new start */
         if( bFlg )  {
           if( fileOffset > 0L )  {
@@ -930,12 +933,12 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
  /* Close the file just processed */
     result = ( fclose( fp ) != 0 );
     if( result )  {
-      fprintf( ofp, "Warning: Unable to close the file named '%s'\n", nameStrng );
+      fprintf( ofp, "Warning: Unable to close the file named \"%s\"\n", nameStrng );
       perror( nameStrng );
     }
     returnVal += result;	/* increment returnVal if fclose() on input file failed */
     if( D_Flg || vFlg )
-      fprintf( ofp, "File: '%s' (%ld bytes processed)\n", nameStrng, byteCnt );
+      fprintf( ofp, "File: \"%s\" (%ld bytes processed)\n", nameStrng, byteCnt );
   }	/* End of file opened ok block */
   return( returnVal );
 }
@@ -1009,7 +1012,7 @@ int  main( int  argc, char *  argv[] )  {
   if( D_Flg || (( verbosityLevel > 0 ) && ( verbosityLevel < 3 )))  {
     printf( "Source Code Control Id (RCS) %s\n", SRC_CODE_CNTRL_ID );
     print_byteFreq_SourceCodeControlIdentifier( stdout );
-    printf( "Source file %s, compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
+    printf( "Source file \"%s\", compiled on %s at %s\n", __FILE__, __DATE__, __TIME__ );
     print_byteFreq_SourceCompileDetails( stdout );
   }
 
