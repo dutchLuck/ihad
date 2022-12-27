@@ -217,6 +217,9 @@ echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 echo "$TEN_PLUSS ihad -d -b -10 -v0 test256.dat test52.dat  +++Test dump of last 10 bytes of two files${TEN_PLUSS}"
 ../ihad -d -b -10 -v0 test256.dat test52.dat 
 echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS ihad -b10 -L1 -v0 test256.dat test52.dat  +++Test dump of 16 bytes at 10 bytes offset into 2 files${TEN_PLUSS}"
+../ihad -b10 -L1 -v0 test256.dat test52.dat 
+echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
 #
 # Exercise -v verbosity level option
 echo "$TEN_PLUSS ihad -I -H -A -v3 test256.dat   +++Test summary only output${TEN_PLUSS}"

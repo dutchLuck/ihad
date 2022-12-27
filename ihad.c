@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Fri Dec 23 23:15:48 2022 
+ * ihad.c last edited on Tue Dec 27 23:07:54 2022 
  *
  * Industry standard dump alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -61,6 +61,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.39  2022/12/27 12:08:09  owen
+ * Fixed -L and -B options to be per input file, if there a multiple input files.
+ *
  * Revision 0.38  2022/12/23 12:17:58  owen
  * Ensured all string quotes are double quote delimited.
  *
@@ -197,7 +200,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.38 2022/12/23 12:17:58 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.39 2022/12/27 12:08:09 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
@@ -696,7 +699,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 }
 
 
-long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOffset )  {
+long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOffset, long  bytesToDumpCnt )  {
   int  byte;
   int  collectSummary;	/* Flag that summary information is required */
   long  byteCnt = 0L;
@@ -752,7 +755,7 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
  /* Take any fseek() skip into account if there was one */
     byteAddr = startOffset;
  /* Read bytes from stdin or file until end of file or if -B or -L options are active the bytes to dump count reaches zero */
-    while((( byte = fgetc( fp )) != EOF ) && (( ! B_Flg ) || ( bytesToDump-- > 0L ))) {
+    while((( byte = fgetc( fp )) != EOF ) && (( ! B_Flg ) || ( bytesToDumpCnt-- > 0L ))) {
       byte &= BYTE_MASK;
       if( collectSummary )  {
         freqArray[ byte ]++;	/* Accumalate counts of all bytes */
@@ -929,7 +932,7 @@ int  processA_SingleCommandLineParameter( FILE *  ofp, char *  nameStrng )  {
       }	/* End of file size is greater than 0 block */
     }	/* End first fseek successful block */
  /* Process the file opened near the start of this block of code */
-    byteCnt = readByteStreamAndPrintIndexHexAscii( fp, ofp, fileOffset );
+    byteCnt = readByteStreamAndPrintIndexHexAscii( fp, ofp, fileOffset, bytesToDump );
  /* Close the file just processed */
     result = ( fclose( fp ) != 0 );
     if( result )  {
@@ -970,7 +973,7 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
     else  {
       if(( lstIndx + 1 ) == frstIndx )  {
      /* There are no files specified in the command line so process stdin */
-        chrCnt = readByteStreamAndPrintIndexHexAscii( stdin, ofp, 0L );	/* 0L means no fseek()/skip done on stdin */
+        chrCnt = readByteStreamAndPrintIndexHexAscii( stdin, ofp, 0L, bytesToDump );	/* 0L means no fseek()/skip done on stdin */
         if( D_Flg || vFlg )  printf( "Processed %d chars from stdin\n", chrCnt );
       }
       else  {

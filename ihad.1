@@ -1,0 +1,145 @@
+.TH IHAD "1" "December 2022" "ihad 0.1.0" "User Commands"
+.SH NAME
+.I ihad
+\- index hex ascii dump
+.SH SYNOPSIS
+.B ihad
+\f\ -h\fR
+.br
+.B ihad
+[\fI\,options\/\fR] [\fI\,file1 \/\fR[\fI\,file2\/\fR ... [\fI\,fileN\/\fR]]]
+.SH DESCRIPTION
+.PP
+.I ihad
+dumps files or standard input, writing to standard output or a file if the -o option is used.
+The normal format of the dump is lines with three columns. The first column is an index,
+the second is a hexadecimal representation of input bytes and the third is an ASCII
+representation of the bytes dependent on whether they fall in the range of printable
+ASCII characters.
+.SH OPTIONS
+.TP
+\fB\-A\fR
+Suppress output of the ASCII column
+.TP
+\fB\-b \fI\,offset\/\fR
+begin file dumps at an \fI\,offset\/\fR specified as a decimal number. A positive number specifies an
+offset from the start of a file and a negetive number specifies an offset from the end
+of a file.
+.TP
+\fB\-B \fI\,byte_limit\/\fR
+Limit dumps to a maximum of \fI\,byte_limit\/\fR bytes, specified as a decimal number.
+.TP
+\fB\-c \fI\,printable_char\/\fR
+Replace '.' with a \fI\,printable_char\/\fR as the indicator of a byte that is
+non-ASCII or non-printable ASCII. It also over-rides -A
+.TP
+\fB\-C\fR
+Cryptogram mode Enable. This is a shortcut for -I -H -w32 -v6
+.TP
+\fB\-d\fR
+Replace hexadecimal index with a decimal index and process 10 bytes per line.
+.TP
+\fB\-D\fR
+Debug information output enable.
+.TP
+\fB\-f \fI\,separation\/\fR
+Separate each hexadecimal byte by \fI\,separation\/\fR number of characters.
+.TP
+\fB\-h\fR
+Output help and usage information and exit.
+.TP
+\fB\-H\fR
+Suppress output of the Hexadecimal column.
+.TP
+\fB\-I\fR
+Suppress output of the Index column.
+.TP
+\fB\-L \fI\,line_limit\/\fR
+Limit dumps to a maximum of \fI\,line_limit\/\fR lines, specified as a decimal number.
+.TP
+\fB\-o \fI\,output_file\/\fR
+Dumps to output file \fI\,output_file\/\fR instead of standard output.
+.TP
+\fB\-s\fR
+Classify the space (SP) character as printable in the ASCII column.
+.TP
+\fB\-S \fI\,column_separator_char\/\fR
+Replace ' ' (SP) with the specified \fI\,column_separator_char\/\fR.
+.TP
+\fB\-v\fI\,[verbosity_level]\/\fR
+Verbose output enable optionally set to a level specified by \fI\,verbosity_level\/\fR.
+.TP
+\fB\-w \fI\,bytes_per_line\/\fR
+Set bytes processed in each line specified by decimal number \fI\,bytes_per_line\/\fR.
+.PP
+.SH Character representation
+Characters for the -c and -S options generally represent themselves. However, it may be
+convenient to specify -S characters as a decimal number or one of the following interpreted sequences; -
+.TP
+\eNNN
+character with octal value NNN (1 to 3 octal digits)
+.TP
+\e\e
+backslash
+.TP
+\ea
+audible BEL
+.TP
+\eb
+backspace
+.TP
+\ef
+form feed
+.TP
+\en
+new line
+.TP
+\er
+return
+.TP
+\et
+horizontal tab
+.TP
+\ev
+vertical tab
+.PP
+.SH "EXIT STATUS"
+The ihad utility returns 0 on success, and greater than zero if an error occurs.
+.PP
+.SH EXAMPLES
+\fB\ihad a_local_file\fR
+.br
+dump a local file in lines of three columns to the standard output.
+.PP
+\fB\ihad -S , -o out.csv a_local_file\fR
+.br
+dump a local file to an output file named "out.csv" in pseudo comma separated variable format.
+.PP
+\fB\ihad -v5 a_local_file\fR
+.br
+dump a local file and include a list of the frequency of occurrence of each byte value.
+.PP
+\fB\ihad -b -32 a_local_file\fR
+.br
+dump the last 32 bytes of a local file.
+.PP
+\fB\ihad -b100 -B16 -v0 local_file1 local_file2\fR
+.br
+Allow visual comparison of 16 bytes at an offset of 100 bytes into two local files.
+.PP
+.SH AUTHOR
+Written by Owen Holland.
+.PP
+.SH "REPORTING BUGS"
+Report ihad bugs as issues on https://github.com/dutchLuck/ihad/issues
+.SH LICENSE
+Released under the MIT License (https://github.com/dutchLuck/ihad/blob/master/LICENSE). 
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.PP
+.SH "SEE ALSO"
+od(1), xxd(1), hexdump(1)
+.br
+More documentation at: <https://github.com/dutchLuck/ihad>
+.PP

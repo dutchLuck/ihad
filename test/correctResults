@@ -563,6 +563,14 @@ File: "test52.dat" is 52 bytes
 00000042 5152535455565758595a QRSTUVWXYZ
 File: "test52.dat" (10 bytes processed)
 ++++++++++ Shell got Return code number 0 ++++++++++
+++++++++++ ihad -b10 -L1 -v0 test256.dat test52.dat  +++Test dump of 16 bytes at 10 bytes offset into 2 files++++++++++
+File: "test256.dat" is 256 bytes
+0000000a 0a0b0c0d0e0f10111213141516171819 ................
+File: "test256.dat" (16 bytes processed)
+File: "test52.dat" is 52 bytes
+0000000a 6b6c6d6e6f707172737475767778797a klmnopqrstuvwxyz
+File: "test52.dat" (16 bytes processed)
+++++++++++ Shell got Return code number 0 ++++++++++
 ++++++++++ ihad -I -H -A -v3 test256.dat   +++Test summary only output++++++++++
 File: "test256.dat" is 256 bytes
 Summary: ASCII: 128 chars in total of which 95 are printable (includes spaces)
