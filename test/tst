@@ -144,7 +144,10 @@ rm test.tmp
 # Test input stream through stdin instead of from a file
 echo "$TEN_PLUSS cat test52.dat | ihad    +++Test input provided via a pipe into stdin${TEN_PLUSS}"
 cat test52.dat | ../ihad 
-echo "$TEN_PLUSS Shell got Return code number $? $TEN_PLUSS"
+echo "$TEN_PLUSS Shell got Return code number $? for test stdin triggered by absence of file names$TEN_PLUSS"
+echo "$TEN_PLUSS cat test17.dat | ihad -v0 -   +++Test stdin input flagged by '-' as a file name${TEN_PLUSS}"
+cat test17.dat | ../ihad -v0 -
+echo "$TEN_PLUSS Shell got Return code number $? for test stdin input flagged by a trailing minus sign$TEN_PLUSS"
 #
 # Exercise -c C option substitute for a non-printable or non-ASCII char, instead of default '.'
 echo "$TEN_PLUSS ihad -c oddString test256.dat   +++Test non-Ascii indicator value string being unusual${TEN_PLUSS}"

@@ -297,7 +297,12 @@ File: "test17.dat" (17 bytes processed)
 00000010 7172737475767778797a414243444546 qrstuvwxyzABCDEF
 00000020 4748494a4b4c4d4e4f50515253545556 GHIJKLMNOPQRSTUV
 00000030 5758595a                         WXYZ
-++++++++++ Shell got Return code number 0 ++++++++++
+++++++++++ Shell got Return code number 0 for test stdin triggered by absence of file names++++++++++
+++++++++++ cat test17.dat | ihad -v0 -   +++Test stdin input flagged by '-' as a file name++++++++++
+00000000 6162636465666768696a6b6c6d6e6f70 abcdefghijklmnop
+00000010 71                               q
+Processed 17 chars from stdin
+++++++++++ Shell got Return code number 0 for test stdin input flagged by a trailing minus sign++++++++++
 ++++++++++ ihad -c oddString test256.dat   +++Test non-Ascii indicator value string being unusual++++++++++
 Warning: Unable to convert "oddString" into a byte value for option -c, using default value of '.'
 00000000 000102030405060708090a0b0c0d0e0f ................

@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Tue Dec 27 23:07:54 2022 
+ * ihad.c last edited on Wed Dec 28 20:11:10 2022 
  *
  * Industry standard dump alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -61,6 +61,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.40  2022/12/28 09:11:28  owen
+ * Ensure '-' as the file name is taken as accept input from stdin.
+ *
  * Revision 0.39  2022/12/27 12:08:09  owen
  * Fixed -L and -B options to be per input file, if there a multiple input files.
  *
@@ -192,15 +195,15 @@
 #include <stdio.h>	/* printf() fopen() perror() fgetc() fclose() fprintf() fseek() */
 #include <stdlib.h>	/* atoi() malloc() free() atol() */
 #include <unistd.h>	/* getopt() */
-#include <string.h>	/* memset() strlen() strdup() */
-#include <limits.h>	/* LONG_MIN INT_MIN */
+#include <string.h>	/* memset() strlen() strdup() strncmp() */
+#include <limits.h>	/* LONG_MIN LONG_MAX INT_MIN */
 #include <sys/stat.h>	/* fstat() */
 #include <ctype.h>	/* isascii(), isprint(), isalpha(), isdigit() */
 #include <libgen.h>	/* basename() */
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.39 2022/12/27 12:08:09 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.40 2022/12/28 09:11:28 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
@@ -971,8 +974,11 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
       if( D_Flg )  perror( oStrng );
     }
     else  {
-      if(( lstIndx + 1 ) == frstIndx )  {
-     /* There are no files specified in the command line so process stdin */
+      if((( lstIndx + 1 ) == frstIndx ) ||
+        (( lstIndx  == frstIndx ) && ( strncmp( cmdLnStrngs[ frstIndx ], "-", 1 ) == 0 )))  {
+     /* There are no files specified in the command line or the filename is "-" so process stdin */
+        if( D_Flg )
+          printf( "Debug: Reading bytes from stdin - mark end of any manually typed input with EOT (i.e. ^D)\n" );
         chrCnt = readByteStreamAndPrintIndexHexAscii( stdin, ofp, 0L, bytesToDump );	/* 0L means no fseek()/skip done on stdin */
         if( D_Flg || vFlg )  printf( "Processed %d chars from stdin\n", chrCnt );
       }
