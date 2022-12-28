@@ -242,9 +242,9 @@ $ ./ihad -S '\t' demo.bin
 00000020	202122232425262728292a2b2c2d2e2f	.!"#$%&'()*+,-./
 ```
 
-The dump can begin at an offset into a file, using the -b X option, where the offset X is
-a decimal number smaller than the size of the file. If the X value is greater than zero then
-the offset is applied from the start of the file. If the X value is negetive then the offset
+The dump can begin at an offset into a file, using the -b N option, where the offset N is
+a decimal number smaller than the size of the file. If the N value is greater than zero then
+the offset is applied from the start of the file. If the N value is negetive then the offset
 is applied back from the end of the file.
 For example; -
 ```
@@ -256,8 +256,8 @@ $ ./ihad -b -16 demo.bin
 ```
 
 The dump can be limited to a maximum number of lines or a maximum number of bytes.
-The -L X option limits the file dump to a maximum of X lines. In a similar
-fashion the option -B X limits the file dump to a maximum of X bytes. If both
+The -L N option limits the file dump to a maximum of N lines. In a similar
+fashion the option -B N limits the file dump to a maximum of N bytes. If both
 -L and -B options are used at the same time then the one resulting in the
 smallest number of bytes being dumped is chosen. Examples of -L or -B use are; -
 ```
