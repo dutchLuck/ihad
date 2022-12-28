@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Wed Dec 28 20:11:10 2022 
+ * ihad.c last edited on Wed Dec 28 23:19:30 2022 
  *
  * Industry standard dump alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -61,6 +61,9 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.41  2022/12/28 12:19:38  owen
+ * Updated Useage help message.
+ *
  * Revision 0.40  2022/12/28 09:11:28  owen
  * Ensure '-' as the file name is taken as accept input from stdin.
  *
@@ -203,7 +206,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.40 2022/12/28 09:11:28 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.41 2022/12/28 12:19:38 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
@@ -427,34 +430,34 @@ unsigned char  convertOptionStringToByteChar( int *  flgPtr, char *  defltValue,
 void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
-  printf( "  where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -\n" );
+  printf( "  where [options] are; -\n" );
   printf( "   -A .. Disable output of ASCII column (bytes in ASCII form normally in 3rd column)\n" );
-  printf( "   -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)\n" );
-  printf( "   -B X .. Limit dumps to a maximum of X bytes (where X > 0)\n" );
+  printf( "   -b N .. Begin file dumps at an offset (N > 0 offset from start, N < 0 offset from end)\n" );
+  printf( "   -B N .. Limit dumps to a maximum of N bytes (where N > 0)\n" );
   printf( "   -c C .. Use printable char C instead of '%c' for a non-printable or non-ASCII char (also overides -A)\n",
     DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_CHAR );
   printf( "   -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6\n" );
   printf( "   -d .. Decimal index output enable & default to 10 bytes per line\n" );
   printf( "   -D .. Debug output enable\n" );
-  printf( "   -f X .. Set hex field separator to X spaces (where %d <= X <= %d)\n",
+  printf( "   -f N .. Set hex field separator to N character spaces (where %d <= N <= %d)\n",
     MIN_HEX_FIELD_SEPARATOR_WIDTH, MAX_HEX_FIELD_SEPARATOR_WIDTH );
   printf( "   -h .. Print out this help message and exit\n" );
   printf( "   -H .. Disable output of Hexadecimal column (bytes in Hexadecimal form normally in 2nd column)\n" );
   printf( "   -I .. Disable output of Index column (Index number of first byte in a line, normally in 1st column)\n" );
-  printf( "   -L X .. Limit dumps to a maximum of X lines (where X > 0)\n" );
+  printf( "   -L N .. Limit dumps to a maximum of N lines (where N > 0)\n" );
   printf( "   -o outfileName .. Specify an output file instead of sending output to stdout\n" );
   printf( "   -s .. Classify space char as printable in Ascii output\n" );
   printf( "   -S C .. Use char C instead of default '%c' char as column separator (where C > '\\0' i.e. not NUL)\n",
     DEFAULT_COLUMN_SEPARATOR_CHAR );
-  printf( "   -v[X] .. Verbose output enable, optionally set level to X (where %d <= X <= %d)\n",
+  printf( "   -v[N] .. Verbose output enable, optionally set level to N (where %d <= N <= %d)\n",
     MIN_VERBOSITY_LEVEL, MAX_VERBOSITY_LEVEL );
-  printf( "   -w X .. Set bytes per line to X (where %d < X <= %d)\n\n",
+  printf( "   -w N .. Set bytes processed per line to N (where %d < N <= %d)\n\n",
     MIN_BYTES_PER_LINE - 1, MAX_BYTES_PER_LINE );
-  printf( "  where; -\n" );
-  printf( "   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)\n" );
-  printf( "    of file(s) to dump in hex & ascii\n" );
-  printf( "   Note that if no input file is specified then input is taken from stdin.\n\n" );
-  printf( "Note that if ihad output isn't acceptable you can try; -\nxxd -g 0\nhexdump -C\nod -A x -t x1z -v\n\n" );
+  printf( "  where  [inputFile1 [inputFile2 [.. inputFileN]]]\n" );
+  printf( "    are optional file name(s) of file(s) to dump. If no input files are specified\n" );
+  printf( "    or the file name specified is '-' then input is taken from stdin.\n\n" );
+  printf( "Note that if ihad output isn't to your liking you can try; -\n" );
+  printf( "  od -A x -t x1z -v inputFile  or  xxd -g 0 inputFile  or  hexdump -C inputFile\n\n" );
 }
 
 

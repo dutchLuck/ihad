@@ -235,34 +235,31 @@ Warning: Parameter value for option -f contains no information, ignoring option 
 
 Useage:
 ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
-  where options are '-A -b X -B X -c C -d -D -f X -h -H -I -L X -o outfileName -s -S C -v[X] -w X'; -
+  where [options] are; -
    -A .. Disable output of ASCII column (bytes in ASCII form normally in 3rd column)
-   -b X .. Begin file dumps at an offset (X > 0 offset from start, X < 0 offset from end)
-   -B X .. Limit dumps to a maximum of X bytes (where X > 0)
+   -b N .. Begin file dumps at an offset (N > 0 offset from start, N < 0 offset from end)
+   -B N .. Limit dumps to a maximum of N bytes (where N > 0)
    -c C .. Use printable char C instead of '.' for a non-printable or non-ASCII char (also overides -A)
    -C .. Cryptogram mode output enable - i.e. shortcut for -I -H -w32 -v6
    -d .. Decimal index output enable & default to 10 bytes per line
    -D .. Debug output enable
-   -f X .. Set hex field separator to X spaces (where 0 <= X <= 2)
+   -f N .. Set hex field separator to N character spaces (where 0 <= N <= 2)
    -h .. Print out this help message and exit
    -H .. Disable output of Hexadecimal column (bytes in Hexadecimal form normally in 2nd column)
    -I .. Disable output of Index column (Index number of first byte in a line, normally in 1st column)
-   -L X .. Limit dumps to a maximum of X lines (where X > 0)
+   -L N .. Limit dumps to a maximum of N lines (where N > 0)
    -o outfileName .. Specify an output file instead of sending output to stdout
    -s .. Classify space char as printable in Ascii output
    -S C .. Use char C instead of default ' ' char as column separator (where C > '\0' i.e. not NUL)
-   -v[X] .. Verbose output enable, optionally set level to X (where 0 <= X <= 6)
-   -w X .. Set bytes per line to X (where 0 < X <= 32)
+   -v[N] .. Verbose output enable, optionally set level to N (where 0 <= N <= 6)
+   -w N .. Set bytes processed per line to N (where 0 < N <= 32)
 
-  where; -
-   [inputFile1 [inputFile2 [.. inputFileN]]]  are optional file name(s)
-    of file(s) to dump in hex & ascii
-   Note that if no input file is specified then input is taken from stdin.
+  where  [inputFile1 [inputFile2 [.. inputFileN]]]
+    are optional file name(s) of file(s) to dump. If no input files are specified
+    or the file name specified is '-' then input is taken from stdin.
 
-Note that if ihad output isn't acceptable you can try; -
-xxd -g 0
-hexdump -C
-od -A x -t x1z -v
+Note that if ihad output isn't to your liking you can try; -
+  od -A x -t x1z -v inputFile  or  xxd -g 0 inputFile  or  hexdump -C inputFile
 
 ++++++++++ Shell got Return code number 1 ++++++++++
 ++++++++++ ihad -o "" test52.dat  +++Test output to a file, but with no filename specified++++++++++
