@@ -1,13 +1,13 @@
 # ihad
 This utility program is named "ihad" because it provides "index" "hex" "ascii" "dump"
 of bytes (8 bit data) sent to it's input or obtained from one or more files.
-By default "ihad" dumps stdin input or file data in a format of multiple
-lines of three columns separated by a space character to stdout output.
+By default "ihad" dumps standard input or file data in a format of multiple
+lines of three columns separated by a space character to standard output.
 The first column is an index number representing an offset from the start
 of the input/file to the leftmost data byte in the second and third columns.
 The second column is a hexadecimal representation of the value of each byte in
-the stream of input data and the third column shows any ASCII characters in
-those same bytes of data.
+the stream of input data and the third column shows any printable ASCII
+characters in those same bytes of data.
 An example of the default output of ihad is; -
 
 ```
@@ -194,7 +194,7 @@ hexdump -C
 od -A x -t x1z -v
 
 ```
-The ihad utility exits with 0 on success and greater than zero if an error occurs.
+The ihad utility exits with a return value of 0 on success and greater than zero if an error occurs.
 
 If displaying the full stop or period character at the end of ASCII sentences is
 important then the -c C option enables the choice of a different indicator of non-ASCII
@@ -260,9 +260,9 @@ $ ./ihad -b -16 demo.bin
 ```
 
 The dump can be limited to a maximum number of lines or a maximum number of bytes.
-The "-L X" option limits the file dump to a maximum of X lines. In a similar
-fashion the option "-B X" limits the file dump to a maximum of X bytes. If both
-"-L" and "-B" options are used at the same time then the one resulting in the
+The -L X option limits the file dump to a maximum of X lines. In a similar
+fashion the option -B X limits the file dump to a maximum of X bytes. If both
+-L and -B options are used at the same time then the one resulting in the
 smallest number of bytes being dumped is chosen. Examples of -L or -B use are; -
 ```
 $ ./ihad -L 1 demo.bin 
@@ -271,28 +271,28 @@ $ ./ihad -B 16 demo.bin
 00000000 000102030405060708090a0b0c0d0e0f ................
 ```
 
-Summary information about the characters in files can be obtained by using "-v3" and
+Summary information about the characters in files can be obtained by using -v3 and
 above vebosity levels. For example  "ihad -I -H -A -v3 demo.bin" could be used to
 show just summary information about file "demo.bin"; -
 ```
 $ ./ihad -I -H -A -v3 demo.bin
-File: 'demo.bin' is 48 bytes
+File: "demo.bin" is 48 bytes
 Summary: ASCII: 48 chars in total of which 16 are printable (includes spaces)
 Summary: ASCII: 0 alphabet ( 0 upper case and 0 lower case ) chars
 Summary: ASCII: 0 digit, 15 punctuation, 1 space and 32 control chars
 Summary: ASCII: 1 space (SP) and 1 horizontal tab (HT) chars
 Summary: ASCII: 1 carriage return (CR), 1 line feed (LF) and 1 full stop chars
-File: 'demo.bin' (48 bytes processed)
+File: "demo.bin" (48 bytes processed)
 ```
 
-Option "-v5" provides more details including a listing of frequency of all bytes.
-Option "-v4" provides a listing of only bytes that have non-zero frequencies.
+Option -v5 provides more details including a listing of frequency of all bytes.
+Option -v4 provides a listing of only bytes that have non-zero frequencies.
 
-A cryptogram mode is available with the "-C" option. The "-C" option is just a
+A cryptogram mode is available with the -C option. The -C option is just a
 shortcut to specifying "-I -H -w32 -v6". For example; -
 ```
 $ ./ihad -C test/ASD_Coin_Level2.encoded 
-File: 'test/ASD_Coin_Level2.encoded' is 79 bytes
+File: "test/ASD_Coin_Level2.encoded" is 79 bytes
 .MWNVGRXFOLFHRMVCVXFGRLM..URMWXO
 ZIRGBRM7DRWGSC5WVKGS..DVZIVZFWZX
 RLFHRMXLMXVKGZ.
@@ -304,13 +304,13 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 
 %Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
-File: 'test/ASD_Coin_Level2.encoded' (79 bytes processed)
+File: "test/ASD_Coin_Level2.encoded" (79 bytes processed)
 ```
-Note that the "-v6" option maybe used on its own without reference to "-C".
+Note that the -v6 option maybe used on its own without reference to -C.
 For example; -
 ```
 $ ./ihad -v6 -w24 test/ASD_Coin_Level2.encoded 
-File: 'test/ASD_Coin_Level2.encoded' is 79 bytes
+File: "test/ASD_Coin_Level2.encoded" is 79 bytes
 00000000 2e4d574e56475258464f4c4648524d564356584647524c4d .MWNVGRXFOLFHRMVCVXFGRLM
 00000018 c2b755524d57584f5a49524742524d374452574753433557 ..URMWXOZIRGBRM7DRWGSC5W
 00000030 564b4753c2b744565a49565a46575a58524c4648524d584c VKGS..DVZIVZFWZXRLFHRMXL
@@ -323,13 +323,13 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 
 %Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
-File: 'test/ASD_Coin_Level2.encoded' (79 bytes processed)
+File: "test/ASD_Coin_Level2.encoded" (79 bytes processed)
 ```
 
 Note that some options may be concatentated together. For example; -
 ```
 $ ./ihad -IHAv6 test/ASD_Coin_Level2.encoded 
-File: 'test/ASD_Coin_Level2.encoded' is 79 bytes
+File: "test/ASD_Coin_Level2.encoded" is 79 bytes
 Summary: ASCII: 75 chars in total of which 74 are printable (includes spaces)
 Summary: ASCII: 71 alphabet ( 71 upper case and 0 lower case ) chars
 Summary: ASCII: 2 digit, 1 punctuation, 0 space and 1 control chars
@@ -338,6 +338,5 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 
 %Frq: 13 10 10  8  8  7  7  7  6  3  3  3  3  3  3  3  1  1  1  0  0  0  0  0  0  0 
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
-File: 'test/ASD_Coin_Level2.encoded' (79 bytes processed)
+File: "test/ASD_Coin_Level2.encoded" (79 bytes processed)
 ```
-
