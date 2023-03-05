@@ -30,7 +30,7 @@ $ ./ihad tmp.dat
 000000f0 f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff ................
 00000100 54686973206973206120737472696e67 This.is.a.string
 00000110 206f6620415343494920636861726163 .of.ASCII.charac
-00000120 746572732e0a                     ters..
+00000120 746572732e0a ters..
 $
 ```
 
@@ -150,8 +150,6 @@ instead of strictly ASCII output; -
 With so many well established utilites to dump a file or stdin, why bother to create another?
 Well... the output of ihad is somewhat cleaner than the output from the utility programs mentioned above.
 The default output of ihad has just a single space between each of the three columns of output.
-(The one exception to this philosophy is that there may be multiple padding spaces in the last line
-of the dump if it is short of the full compliment of bytes.)
 In contrast "hexdump -C" puts in extra space characters and book-ends the
 Ascii column with the "|" character, "od -A x -t x1z" puts in extra space characters
 and puts ">" "<" bookends around the Ascii column and "xxd -g 0" puts a colon on the end of the index number.
@@ -222,15 +220,6 @@ $ ./ihad -S, demo.bin
 00000010,101112131415161718191a1b1c1d1e1f,................
 00000020,202122232425262728292a2b2c2d2e2f,.!"#$%&'()*+,-./
 ```
-Or if it desired to have every hexadecimal byte separated by a comma; -
-```
-$ ./ihad -S , -f 1 -B 44 demo.bin 
-00000000,,00,01,02,03,04,05,06,07,08,09,0a,0b,0c,0d,0e,0f,,................
-00000010,,10,11,12,13,14,15,16,17,18,19,1a,1b,1c,1d,1e,1f,,................
-00000020,,20,21,22,23,24,25,26,27,28,29,2a,2b,,,,,,,,,,,,,,.!"#$%&'()*+
-```
-Note however, that the last line in these pseudo CSV cases can have too many commas,
-if it is shorter than the normal line length.
 
 The character to use as the column separator may be specified in similar ways to the
 standard UNIX/Linux translate utility "tr" can have characters specified. For example a
