@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Wed Dec 28 23:19:30 2022 
+ * ihad.c last edited on Sun Mar  5 21:59:05 2023 
  *
  * Industry standard dump alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -195,7 +195,7 @@
  *
  */
 
-#include <stdio.h>	/* printf() fopen() perror() fgetc() fclose() fprintf() fseek() */
+#include <stdio.h>	/* printf() fopen() perror() fgetc() fclose() fprintf() fseek() fread() */
 #include <stdlib.h>	/* atoi() malloc() free() atol() */
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() strdup() strncmp() */
@@ -274,7 +274,8 @@ int  byteDisplayWidth = DEFAULT_BYTES_PER_LINE;	/*  Control number of bytes deal
 char *  wStrng = ( char * ) NULL;	/*  pointer to -w value string */
 char *  exeName;		/* name of this executable */
 char *  exePath = ( char * ) NULL;	/* path of this executable */
-
+int  bytesInInputBfr = 0;
+unsigned char  inputBfr[ MAX_BYTES_PER_LINE ];	/* Storage for a block of input bytes */
 
 void  setGlobalFlagDefaults( char *  argv[] )  {
 /* Preset command line options */
@@ -705,8 +706,37 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 }
 
 
+void  outputIndex( unsigned long  index )  {
+  fprintf( ofp, ( dFlg ) ? "%08lu" : "%08lx", index );
+}
+
+
+void  outputHex( unsigned char *  ptr, long  bytesInBuffer )  {
+  int  cnt;
+
+  while( bytesInBuffer-- > 0L )  {
+    for( cnt = fieldSeparatorWidth; cnt > 0; cnt-- )  fprintf( ofp, " " );
+    fprintf( ofp, "%02x", ( int ) *ptr++ );	/* Print byte as hex number */
+  }
+}
+
+
+void  outputAscii( unsigned char *  ptr, long  cnt, char *  nonPrntblIndctr )  {
+  int  byte;
+
+  while( cnt-- > 0L )  {
+    byte = ( int ) *ptr++;
+    fprintf( ofp, "%c", (( byte >= lowestPrintableAsciiChar ) && ( byte <= 0x7e )) ? byte : ( int ) *nonPrntblIndctr );
+  }
+}
+
+
 long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOffset, long  bytesToDumpCnt )  {
   int  byte;
+  int  notEOF;
+  long  cnt;
+  long  bCnt;
+  unsigned char *  ptr;
   int  collectSummary;	/* Flag that summary information is required */
   long  byteCnt = 0L;
   long  isasciiCnt = 0L;
@@ -720,50 +750,41 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
   long  isspaceCnt = 0L;
   long  freqArray[ 256 ];	/* track frequency of bytes */
   unsigned long  byteAddr = 0L;	/* Index of first byte in each output line */
-  char *  outputString;	/* pointer to character string to print to stdout or a file */
-  int  outputStringSize;	/* must be big enough for MAX_BYTES_PER_LINE bytes per line */
-  char *  bPtr;     /* byte pointer */	/* output line space > 8+2+3*MAX_BYTES_PER_LINE+1+MAX_BYTES_PER_LINE+1 */
-  char *  aPtr;     /* ascii pointer */
-  int  hexFldWdth;
-  char  hexFldFrmt[ 11 ];
 
+#ifdef DEBUG
+  if( D_Flg )  {
+    fprintf( ofp, "Debug: Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
+  }
+#endif
 /* Set or reset flag according to the need to print summary information */
   collectSummary = ( D_Flg || ( verbosityLevel > 1 ) || C_Flg );
   for( byte = 0; byte < 256; byte++ )  freqArray[ byte ] = 0L;
-/* Setup the format for printing the hex bytes */
-  hexFldWdth = HEX_BYTE_FIELD_WIDTH + fieldSeparatorWidth;
-  if( hexFldWdth > ( sizeof( hexFldFrmt ) - 7))  hexFldWdth = ( sizeof( hexFldFrmt ) - 7);
-  else if( hexFldWdth < 2 )  hexFldWdth = 2;
 /* Note that the Column Separator may not be '\0' i.e. ASCII NUL as it is also the end of string delimiter in C code */
   if( *S_ColumnChar == '\0' )  *S_ColumnChar = DEFAULT_COLUMN_SEPARATOR_CHAR;	/* Silently reset Column Separator to the default char */
-  sprintf( hexFldFrmt, "%c02x%c%c%c%c%c",
-    '%', *S_ColumnChar, *S_ColumnChar, *S_ColumnChar, *S_ColumnChar, *S_ColumnChar );	/* Set up a string of the form "%02x  " */
-  bPtr = hexFldFrmt + ( 2 + hexFldWdth );	/* Temp use of bPtr to point to end of Hex format string */
-  *bPtr = '\0';	/* Terminate Hex format string with the correct number of column separators (Defaults to space) */
-/* Get a suitably sized buffer to hold the output string */
-  outputStringSize = (( I_Flg ) ? 4 : 14 ) + ( hexFldWdth + (( A_Flg ) ? 0 : 1 )) * byteDisplayWidth;
-  outputString = malloc( outputStringSize );
-  if( outputString == NULL )  {
-    fprintf( stderr, "PANIC: malloc( %d ) failed\n", outputStringSize );
-    perror( "readByteStreamAndPrintIndexHexAscii()" ); 
-  }
-  else  {
-#ifdef DEBUG
-    if( D_Flg )  {
-      fprintf( ofp, "Debug: hexFldWdth is %d and hexFldFrmt is \"%s\"\n", hexFldWdth, hexFldFrmt ); 
-      fprintf( ofp, "Debug: Size of byteAddr (unsigned int) is %lu bytes\n", sizeof( byteAddr ));
-      fprintf( ofp, "Debug: Capacity of output string is %d characters\n", outputStringSize );
-    }
-#endif
-    *outputString = '\0';		/* in-case the stdin or file has 0 length */
  /* Silently ensure the char indicating a non-ascii or non-printable ascii byte is itself printable */
-    if( ! isprint(( int ) *cCharStrng ))  *cCharStrng = DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_CHAR;
+  if( ! isprint(( int ) *cCharStrng ))  *cCharStrng = DEFAULT_NON_PRINTABLE_ASCII_INDICATOR_CHAR;
  /* Take any fseek() skip into account if there was one */
-    byteAddr = startOffset;
+  byteAddr = startOffset;
  /* Read bytes from stdin or file until end of file or if -B or -L options are active the bytes to dump count reaches zero */
-    while((( byte = fgetc( fp )) != EOF ) && (( ! B_Flg ) || ( bytesToDumpCnt-- > 0L ))) {
-      byte &= BYTE_MASK;
-      if( collectSummary )  {
+  for( notEOF = TRUE, bytesInInputBfr = 0, cnt = 0L, bCnt = 0L;
+    notEOF && (( ! B_Flg ) || ( bytesToDumpCnt > 0L )) && (( bytesInInputBfr = fread( inputBfr, 1, byteDisplayWidth, fp )) > 0 );
+    notEOF = ! ( feof( fp ) || ferror( fp ) || ( B_Flg && (( bytesToDumpCnt -= bCnt ) < 1L ))))  {
+    bCnt = cnt = ( B_Flg && ( bytesToDumpCnt < ( long ) bytesInInputBfr )) ? bytesToDumpCnt : ( long ) bytesInInputBfr;
+    if( D_Flg )
+      fprintf( ofp, "Debug: notEOF is %d, bytesToDumpCnt is %ld, bytesInInputBfr is %d, cnt is %ld\n", notEOF, bytesToDumpCnt, bytesInInputBfr, cnt );
+    ptr = inputBfr;
+    if( ! I_Flg )  outputIndex( byteAddr );
+    if( ! ( I_Flg ||  H_Flg ))  fprintf( ofp, "%c", *S_ColumnChar ); /* Output column separator only if there is about to be 2 columns */
+    if( ! H_Flg )  outputHex( inputBfr, bCnt );
+    if( ! ( A_Flg || ( I_Flg && H_Flg )))  fprintf( ofp, "%c", *S_ColumnChar );
+    if( ! A_Flg )  outputAscii( inputBfr, bCnt, cCharStrng );
+    if( ! ( I_Flg && H_Flg && A_Flg ))  fprintf( ofp, "\n" ); /* Don't output blank lines if all byte lines are suppressed */
+    byteAddr += bCnt;
+    byteCnt += bCnt;
+    if( collectSummary )  {
+      while( cnt-- > 0L )  {
+        byte = ( int ) *ptr++;
+        byte &= BYTE_MASK;
         freqArray[ byte ]++;	/* Accumalate counts of all bytes */
         if( isascii( byte ))  {
           isasciiCnt++;	/* Count ASCII chars as defined by isascii() */
@@ -778,69 +799,9 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
           else if( iscntrl( byte ))  iscntrlCnt++;	/* Count ASCII control chars as defined by iscntrl() */
           else if( isspace( byte ))  isspaceCnt++;	/* Count ASCII space chars as defined by isspace() & not control chars */
         }
-      }
-   /* Initialize new line if required */
-      if(( byteCnt++ % byteDisplayWidth ) == 0 )  {
-     /* Make the line buffer all column separator characters (defaults to space characters) */
-        bPtr = ( char * ) memset( outputString, *S_ColumnChar, outputStringSize );
-     /* Put the Index in the line buffer, if not disabled */
-        if( ! I_Flg )  {
-          sprintf( bPtr, ( dFlg ) ? "%08lu%c" : "%08lx%c", byteAddr, *S_ColumnChar );
-	      if( fieldSeparatorWidth > 0 )  sprintf( bPtr + strlen( outputString ), "%c", *S_ColumnChar );
-          bPtr += strlen( outputString );
-        }
-        aPtr = bPtr + (( H_Flg ) ? 0 : ( hexFldWdth * byteDisplayWidth + 1 ));
-      }
-   /* If Hexadecimal output is required put byte into outputString in Hex form */
-      if( ! H_Flg )  {
-     /* Put byte into outputString in hex form */
-        sprintf( bPtr, hexFldFrmt, byte );		/* Print byte as hex number */
-        bPtr += hexFldWdth;
-      }
-   /* If Ascii output is required put byte into outputString in char form */
-      if( ! A_Flg )  {
-        if(( byte >= lowestPrintableAsciiChar ) && ( byte <= 0x7e ))	/* Test for printable Ascii */
-          sprintf( aPtr, "%c", byte );		/* Print byte as ascii character */
-        else  *aPtr =  *cCharStrng;	/* Print a full stop or alternate printable char instead of non-printable ascii */
-        aPtr += 1;
-      }
-   /* Output current line if required */
-      if(( byteCnt % byteDisplayWidth ) == 0 )  {
-        if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
-        else  {
-          if( ! H_Flg )  *bPtr = *S_ColumnChar;	/* Don't use byte pointer if Hexadecimal is not being output */
-          sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
-        }
-        if( ! ( I_Flg && H_Flg && A_Flg ))  {	/* Don't print lines of column separators if all 3 columns are off */
-          fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
-#ifdef DEBUG
-          if( D_Flg )
-            fprintf( ofp, "Debug: Output string is %lu characters\n", strlen( outputString ));
-#endif
-        }
-        *outputString = '\0';		/* set string back to zero length */
-        byteAddr = startOffset + byteCnt;
-      }
-    }
- /* Finish off last line if it is a short line */
-    if( strlen( outputString ) > 0 )  {
-      if( A_Flg )  sprintf( bPtr, "\n" );	/* terminate line that doesn't have Ascii */
-      else  {
-        if( ! H_Flg )  *bPtr = *S_ColumnChar;	/* Don't use byte pointer if Hexadecimal is not being output */
-        sprintf( aPtr, "\n" );	/* terminate line that does have Ascii */
-      }
-      if( ! ( I_Flg && H_Flg && A_Flg ))  {	/* Don't print last line of column separators if all 3 columns are off */
-        fprintf( ofp, "%s", outputString );	/* print line to output file or stdout */
-#ifdef DEBUG
-        if( D_Flg )
-          fprintf( ofp, "Debug: Output string is %lu characters\n", strlen( outputString ));
-#endif
-      }
-    }
-    if( outputString != NULL )  {
-      free( outputString );
-    }
-  }
+      }  /* end of while loop */
+    }  /* end of if collectSummary */
+  }  /* end of for loop on fread() input */
   if( collectSummary )  {
     fprintf( ofp, "Summary: ASCII: %ld chars in total of which %ld are printable (includes spaces)\n", isasciiCnt, isprintCnt );
     fprintf( ofp, "Summary: ASCII: %ld alphabet ( %ld upper case and %ld lower case ) chars\n",
