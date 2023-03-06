@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Sun Mar  5 21:59:05 2023 
+ * ihad.c last edited on Mon Mar  6 17:05:38 2023 
  *
  * Industry standard dump alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -231,11 +231,12 @@
 
 
 /* Command line Optional Switches: */
-/*  Ascii, beginOffset, ByteCount, charAlternate, Cryptogram, decimal, Debug, */
+/*  alignment, Ascii, beginOffset, ByteCount, charAlternate, Cryptogram, decimal, Debug, */
 /*  fieldSepWidth, help, Hex, Index, outFile, columnSeparator, space, verbosity, width */
-const char  optionStr[] = "Ab:B:c:CdDf:hHIL:o:sS:v::w:";
+const char  optionStr[] = "aAb:B:c:CdDf:hHIL:o:sS:v::w:";
 
 /* Global Flags & default data */
+int  aFlg = FALSE;		/* Alignment of short line option: Control position of Ascii column output */
 int  A_Flg = FALSE;		/* ASCII option: Control Ascii column output */
 int  bFlg = FALSE;		/* begin option: begin offset bytes from the start of the file */
 long  beginOffset = 0L;	/*  or if < 0 then measure back from end of the file */
@@ -432,6 +433,7 @@ void  printOutHelpMessage( char * programName )  {
   printf( "\nUseage:\n" );
   printf( "%s [options] [inputFile1 [inputFile2 [.. inputFileN]]]\n", programName );
   printf( "  where [options] are; -\n" );
+  printf( "   -a .. Enable short line ASCII column alignment\n" );
   printf( "   -A .. Disable output of ASCII column (bytes in ASCII form normally in 3rd column)\n" );
   printf( "   -b N .. Begin file dumps at an offset (N > 0 offset from start, N < 0 offset from end)\n" );
   printf( "   -B N .. Limit dumps to a maximum of N bytes (where N > 0)\n" );
@@ -486,6 +488,7 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
 /* Process switch options from the command line */
   while(( result = getopt( argc, argv, optionStr )) != -1 )  {
     switch( result )  {
+      case 'a' :  aFlg = TRUE; break;
       case 'A' :  A_Flg = TRUE; break;
       case 'b' :  bFlg = TRUE; bStrng = optarg; break;
       case 'B' :  B_Flg = TRUE; B_Strng = optarg; break;
@@ -692,6 +695,9 @@ int  processCommandLineOptions( int  argc, char *  argv[] )  {
     else  printf( "Debug: Number of lines to Dump from the file is not limited by -L option\n" );
   }
 
+/* Report on -a ( short line ASCII column alignment) switch option */
+  printOptionStatusIfRequired( aFlg, "-a" );
+
 /* Report on -A ( ASCII column suppress) switch option */
   printOptionStatusIfRequired( A_Flg, "-A" );
 
@@ -769,18 +775,24 @@ long  readByteStreamAndPrintIndexHexAscii( FILE *  fp, FILE *  ofp, long startOf
   for( notEOF = TRUE, bytesInInputBfr = 0, cnt = 0L, bCnt = 0L;
     notEOF && (( ! B_Flg ) || ( bytesToDumpCnt > 0L )) && (( bytesInInputBfr = fread( inputBfr, 1, byteDisplayWidth, fp )) > 0 );
     notEOF = ! ( feof( fp ) || ferror( fp ) || ( B_Flg && (( bytesToDumpCnt -= bCnt ) < 1L ))))  {
-    bCnt = cnt = ( B_Flg && ( bytesToDumpCnt < ( long ) bytesInInputBfr )) ? bytesToDumpCnt : ( long ) bytesInInputBfr;
+    bCnt = ( B_Flg && ( bytesToDumpCnt < ( long ) bytesInInputBfr )) ? bytesToDumpCnt : ( long ) bytesInInputBfr;
     if( D_Flg )
-      fprintf( ofp, "Debug: notEOF is %d, bytesToDumpCnt is %ld, bytesInInputBfr is %d, cnt is %ld\n", notEOF, bytesToDumpCnt, bytesInInputBfr, cnt );
+      fprintf( ofp, "Debug: notEOF is %d, bytesToDumpCnt is %ld, bytesInInputBfr is %d, bCnt is %ld\n", notEOF, bytesToDumpCnt, bytesInInputBfr, bCnt );
     ptr = inputBfr;
     if( ! I_Flg )  outputIndex( byteAddr );
     if( ! ( I_Flg ||  H_Flg ))  fprintf( ofp, "%c", *S_ColumnChar ); /* Output column separator only if there is about to be 2 columns */
-    if( ! H_Flg )  outputHex( inputBfr, bCnt );
+    if( ! H_Flg )  {
+      outputHex( inputBfr, bCnt );
+      if( aFlg && ( bCnt != byteDisplayWidth )) { /* if Align flag is active then add space chars to align Ascii column */
+        for( cnt = ( byteDisplayWidth - bCnt ) * ( 2 + fieldSeparatorWidth ); cnt > 0L; cnt-- )  fprintf( ofp, " " );
+      }
+    }
     if( ! ( A_Flg || ( I_Flg && H_Flg )))  fprintf( ofp, "%c", *S_ColumnChar );
     if( ! A_Flg )  outputAscii( inputBfr, bCnt, cCharStrng );
     if( ! ( I_Flg && H_Flg && A_Flg ))  fprintf( ofp, "\n" ); /* Don't output blank lines if all byte lines are suppressed */
-    byteAddr += bCnt;
-    byteCnt += bCnt;
+    byteAddr += bCnt; /* Adjust Index value ready for next line that is output */
+    byteCnt += bCnt;  /* Keep track of bytes processed */
+    cnt = bCnt;  /* set cnt in-case summary stats are required */
     if( collectSummary )  {
       while( cnt-- > 0L )  {
         byte = ( int ) *ptr++;

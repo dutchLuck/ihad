@@ -2,8 +2,10 @@
 #
 # T S T
 #
-# tst last edited on Wed Dec 21 23:22:24 2022 
+# tst last edited on Mon Mar  6 17:03:58 2023 
 #
+# To redirect both stdout and stderr to a file, use ampersand redirect operation, for example; -
+#  ./tst &> outputFile
 #
 TEN_PLUSS=++++++++++
 #
@@ -381,7 +383,7 @@ echo "$TEN_PLUSS ihad -d -B 20 -L 4 test52.dat  +++Test Bytes over-rides Lines o
 ../ihad -d -B 20 -L 4 test52.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test Bytes over-rides Lines$TEN_PLUSS"
 echo "$TEN_PLUSS Test lots of options including Bytes over-rides Lines option value to limit output${TEN_PLUSS}"
-../ihad -B 38 -L 8 -f 1 -d -b 30 -c '~' -s -w 5 -S '|' -v0 -o test.tmp test256.dat
+../ihad -a -B 38 -L 8 -f 1 -d -b 30 -c '~' -s -w 5 -S '|' -v0 -o test.tmp test256.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test lots of options$TEN_PLUSS"
 cat test.tmp
 rm test.tmp
@@ -390,8 +392,8 @@ echo "$TEN_PLUSS ihad -IHAv6 test52.dat  +++Test concatenated option${TEN_PLUSS}
 echo "$TEN_PLUSS Shell got Return code number $? for Test concatenated option$TEN_PLUSS"
 #
 # Test invalid or dodgy options
-echo "$TEN_PLUSS ihad -a test16.dat  +++Test non-existant option${TEN_PLUSS}"
-../ihad -a test16.dat
+echo "$TEN_PLUSS ihad -z test16.dat  +++Test non-existant option${TEN_PLUSS}"
+../ihad -z test16.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test non-existant option$TEN_PLUSS"
 echo "$TEN_PLUSS ihad -B -L test52.dat  +++Test missing option values${TEN_PLUSS}"
 ../ihad -B -L test52.dat
@@ -402,4 +404,21 @@ echo "$TEN_PLUSS Shell got Return code number $? for Test non-existant option$TE
 echo "$TEN_PLUSS ihad nonExistantFile.dat  +++Test non-existant file handling${TEN_PLUSS}"
 ../ihad nonExistantFile.dat
 echo "$TEN_PLUSS Shell got Return code number $? for Test non-existant file handling$TEN_PLUSS"
+#
+# Test -a ( ASCII column remains aligned on short lines ) option
+echo "$TEN_PLUSS ihad -a test17.dat  +++Test alignment of ASCII column on short lines option${TEN_PLUSS}"
+../ihad -a test17.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test alignment of ASCII column on short lines option$TEN_PLUSS"
+echo "$TEN_PLUSS ihad -a -d test17.dat  +++Test alignment of ASCII column on short lines option${TEN_PLUSS}"
+../ihad -a -d test17.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test alignment of ASCII column on short lines option$TEN_PLUSS"
+echo "$TEN_PLUSS ihad -a -w 32 test52.dat  +++Test alignment of ASCII column on short lines option${TEN_PLUSS}"
+../ihad -a -w 32 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test alignment of ASCII column on short lines option$TEN_PLUSS"
+echo "$TEN_PLUSS ihad -a -f 1 test52.dat  +++Test alignment of ASCII column on short lines option${TEN_PLUSS}"
+../ihad -a -f 1 test52.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test alignment of ASCII column on short lines option$TEN_PLUSS"
+echo "$TEN_PLUSS ihad -a -S, -w 4 -f2  test17.dat  +++Test alignment of ASCII column on short lines option${TEN_PLUSS}"
+../ihad -a -S, -w 4 -f 2 test17.dat
+echo "$TEN_PLUSS Shell got Return code number $? for Test alignment of ASCII column on short lines option$TEN_PLUSS"
 
