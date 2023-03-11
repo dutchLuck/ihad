@@ -340,7 +340,3 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
 File: "test/ASD_Coin_Level2.encoded" (79 bytes processed)
 ```
-00000018 18191a1b1c1d1e1f2021222324252627 .........!"#$%&'
-00000028 28292a2b2c2d2e2f                 ()*+,-./
-00000018 18191a1b1c1d1e1f2021222324252627 .........!"#$%&'
-00000028 28292a2b2c2d2e2f ()*+,-./
