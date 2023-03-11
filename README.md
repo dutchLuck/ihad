@@ -37,7 +37,8 @@ $
 ihad is released under the MIT license and may be used at your own risk.
 However, unless it provides some specific capability you need then it
 is probably better to use one of the many industry standard dump utilities.
-For example on OSX or linux you could try one of the following: hexdump, xxd or od.
+For example on OSX or linux you could try one of the following: hexdump,
+xxd or od (octal dump) and Windows Powershell has format-hex.
 For comparison sake these utilities with the same input file produce; -
 
 ```
@@ -114,8 +115,8 @@ $ xxd -g 0 tmp.dat
 $
 ```
 
-OR if you have Microsoft Windows powershell and are ok with unicode text output,
-instead of strictly ASCII output; -
+OR if you have Microsoft Windows Powershell available and are ok with
+unicode, instead of strictly ASCII, text output; -
 
 ```
 > format-hex C:\test\tmp.dat
@@ -163,6 +164,7 @@ with the "-h" (help) option to see all the other options that are available; -
 Useage:
 ihad [options] [inputFile1 [inputFile2 [.. inputFileN]]]
   where [options] are; -
+   -a .. Enable short line ASCII column alignment
    -A .. Disable output of ASCII column (bytes in ASCII form normally in 3rd column)
    -b N .. Begin file dumps at an offset (N > 0 offset from start, N < 0 offset from end)
    -B N .. Limit dumps to a maximum of N bytes (where N > 0)
@@ -201,8 +203,9 @@ $ ./ihad -c_ demo.bin
 00000010 101112131415161718191a1b1c1d1e1f ________________
 00000020 202122232425262728292a2b2c2d2e2f _!"#$%&'()*+,-./
 ```
-If displaying the space character is desirable then it may be done with the use of the
--s option. For example; -
+If displaying the space character is desirable,
+such as previously mentioned utility programs do by default,
+then it may be done with the use of the -s option. For example; -
 ```
 $ ./ihad -s demo.bin 
 00000000 000102030405060708090a0b0c0d0e0f ................
@@ -254,6 +257,18 @@ $ ./ihad -L 1 demo.bin
 00000000 000102030405060708090a0b0c0d0e0f ................
 $ ./ihad -B 16 demo.bin 
 00000000 000102030405060708090a0b0c0d0e0f ................
+```
+
+If it is desired that the last line columns align with any previous full lines already
+output even if there are fewer bytes in the last line then the -a option can be used.
+For example; -
+```
+$ ./ihad -a -b 24 demo.bin
+00000018 18191a1b1c1d1e1f2021222324252627 .........!"#$%&'
+00000028 28292a2b2c2d2e2f                 ()*+,-./
+$ ./ihad -b 24 demo.bin
+00000018 18191a1b1c1d1e1f2021222324252627 .........!"#$%&'
+00000028 28292a2b2c2d2e2f ()*+,-./
 ```
 
 Summary information about the characters in files can be obtained by using -v3 and
@@ -325,3 +340,7 @@ Char:  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y
 Char:  R  M  V  G  X  F  W  Z  L  C  D  H  I  K  O  S  B  N  U  A  E  J  P  Q  T  Y 
 File: "test/ASD_Coin_Level2.encoded" (79 bytes processed)
 ```
+00000018 18191a1b1c1d1e1f2021222324252627 .........!"#$%&'
+00000028 28292a2b2c2d2e2f                 ()*+,-./
+00000018 18191a1b1c1d1e1f2021222324252627 .........!"#$%&'
+00000028 28292a2b2c2d2e2f ()*+,-./
