@@ -61,6 +61,10 @@
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.42  2023/04/07 12:09:18  owen
+ * Update revision reported by version option and also
+ * to note buffered line input and -a option.
+ *
  * Revision 0.41  2022/12/28 12:19:38  owen
  * Updated Useage help message.
  *
@@ -206,7 +210,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.41 2022/12/28 12:19:38 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.42 2023/04/07 12:09:18 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
