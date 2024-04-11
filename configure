@@ -2,12 +2,14 @@
 #
 # C O N F I G U R E
 #
+# configure last edited on Thu Apr 11 10:30:12 2024 
+#
 NAME1=ihad
 NAME2=byteFreq
 #
 OP_FILE_NAME=Makefile
 COMPILER=cc
-OPTIONS=-Wall
+OPTIONS="-Wall -pedantic"
 TRGT=$NAME1
 SRC1=$NAME1.c
 SRC2=$NAME2.c
@@ -54,4 +56,7 @@ echo -e "\t$COMPILER $OPTIONS -DDEBUG -c $SRC2" >> $OP_FILE_NAME
 echo -e "\t$COMPILER $OPTIONS -o $TRGT $OBJ1 $OBJ2" >> $OP_FILE_NAME
 echo "" >> $OP_FILE_NAME
 #
-
+echo "valgrind: clean" >> $OP_FILE_NAME
+echo -e "\t$COMPILER $OPTIONS -DDEBUG -g -o $TRGT $SRC1 $SRC2 $LNK_OPTIONS" >> $OP_FILE_NAME
+echo "" >> $OP_FILE_NAME
+#

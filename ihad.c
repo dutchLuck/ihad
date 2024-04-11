@@ -3,7 +3,7 @@
  *
  * Index Hex Ascii Dump of a (binary) file or stdin.
  *
- * ihad.c last edited on Mon Mar  6 17:05:38 2023 
+ * ihad.c last edited on Thu Apr 11 10:30:07 2024 
  *
  * Industry standard dump alternatives to ihad are; -
  *  hexdump with Canonical format i.e.  hexdump -C yourFile
@@ -985,11 +985,19 @@ int  processNonSwitchCommandLineParameters( int  frstIndx, int  lstIndx, char * 
 }
 
 
+void  cleanupStorage( void )  {
+	if( exePath != NULL )  free(( void *) exePath );
+}
+
+
 int  main( int  argc, char *  argv[] )  {
   int  resultIndex;
 #ifdef DEBUG
   int  indx;
 #endif
+
+/* Ensure any allocated memory is free'd */
+	atexit( cleanupStorage );
 
 /* Preset switch option Flags and Data */
   setGlobalFlagDefaults( argv );	/* Set up any Global variables not already set at declaration */
