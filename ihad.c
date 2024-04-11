@@ -47,20 +47,23 @@
  * e.g.
  *  ./ihad -h
  *
- * Compile limited DEBUG version with; -
+ * Compile with; -
  *  cc -Wall -c -UDEBUG byteFreq.c
  *  cc -Wall -c -UDEBUG ihad.c
  *  cc -o ihad ihad.o byteFreq.o
  *
- * Compile full DEBUG version with; -
- *  cc -Wall -c -DDEBUG byteFreq.c
- *  cc -Wall -c -DDEBUG ihad.c
+ * Compile DEBUG version with; -
+ *  cc -Wall -pedantic -c -DDEBUG byteFreq.c
+ *  cc -Wall -pedantic -c -DDEBUG ihad.c
  *  cc -o ihad ihad.o byteFreq.o
  *
  */
 
 /*
  * $Log: ihad.c,v $
+ * Revision 0.43  2024/04/11 04:18:46  owen
+ * Fixed memory leak associated with no free() on exePath
+ *
  * Revision 0.42  2023/04/07 12:09:18  owen
  * Update revision reported by version option and also
  * to note buffered line input and -a option.
@@ -200,7 +203,7 @@
  */
 
 #include <stdio.h>	/* printf() fopen() perror() fgetc() fclose() fprintf() fseek() fread() */
-#include <stdlib.h>	/* atoi() malloc() free() atol() */
+#include <stdlib.h>	/* atoi() free() atol() */
 #include <unistd.h>	/* getopt() */
 #include <string.h>	/* memset() strlen() strdup() strncmp() */
 #include <limits.h>	/* LONG_MIN LONG_MAX INT_MIN */
@@ -210,7 +213,7 @@
 
 #include "byteFreq.h"	/* printByteFrequencies() print_byteFreq_SourceCodeControlIdentifier() */
 
-#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.42 2023/04/07 12:09:18 owen Exp owen $"
+#define  SRC_CODE_CNTRL_ID  "$Id: ihad.c,v 0.43 2024/04/11 04:18:46 owen Exp owen $"
 
 #ifndef FALSE
 #define  FALSE 0
