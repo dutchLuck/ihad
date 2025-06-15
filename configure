@@ -9,7 +9,7 @@ NAME2=byteFreq
 #
 OP_FILE_NAME=Makefile
 COMPILER=cc
-OPTIONS="-Wall -pedantic"
+OPTIONS="-Wall -pedantic -Wextra"
 TRGT=$NAME1
 SRC1=$NAME1.c
 SRC2=$NAME2.c
